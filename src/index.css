@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'ss01';
+  }
+}
+
+@layer utilities {
+  /* Helper: Fraunces con eje SOFT activado para warmth editorial */
+  .fraunces-soft {
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: 'SOFT' 50, 'opsz' 144;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /*
+   * Grain overlay: añade textura sutil tipo papel, aporta calidez
+   * y previene la sensación "plana" de los fondos sólidos.
+   * Usar sobre contenedores con position: relative + overflow: hidden.
+   */
+  .grain-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+    opacity: 0.06;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    z-index: 0;
+  }
+}

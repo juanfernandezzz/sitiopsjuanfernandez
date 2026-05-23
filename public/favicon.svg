@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fondo orgánico sage (border-radius asimétrico aproximado con elipse rotada) -->
+  <ellipse cx="32" cy="32" rx="29" ry="30" fill="#3F5B4A" transform="rotate(-4 32 32)"/>
+  <!-- "J" serif italic cream — evoca Fraunces -->
+  <text x="33" y="46"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="38"
+        font-style="italic"
+        font-weight="400"
+        text-anchor="middle"
+        fill="#F6F1E8">j</text>
+  <!-- Punto terracotta como tilde decorativa (eco del cierre del headline) -->
+  <circle cx="48" cy="48" r="3.5" fill="#C97B5E"/>
+</svg>
