@@ -13,12 +13,15 @@ export default {
           DEFAULT: '#C97B5E',
           dark: '#B0664A',
         },
+        // alias un-t para los componentes C2+
+        terracota: '#C97B5E',
         ink: '#2A3B4C',
         offwhite: '#FFFDF8',
       },
       fontFamily: {
         display: ['Fraunces', 'Georgia', 'serif'],
         sans: ['Karla', 'system-ui', 'sans-serif'],
+        body: ['Karla', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.04em',
