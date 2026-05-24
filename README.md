@@ -60,7 +60,7 @@ sitio-juan/
 - [ ] Sobre Mí (bio canónica + credenciales CV)
 - [ ] Metodología (CBT integrativo + narrativo)
 - [x] Agendar (Cal.com embed × 4 eventos)
-- [ ] Preguntas frecuentes
+- [x] Preguntas frecuentes
 - [ ] Footer (privacidad Ley 21.719-ready)
 
 ## Configuración Cal.com (para Juan)
