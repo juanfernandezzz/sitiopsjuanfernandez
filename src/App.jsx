@@ -5,6 +5,8 @@ import { CAL_NAMESPACE } from './lib/cal'
 import Header from './components/layout/Header'
 import Hero from './components/sections/Hero'
 import ComoTrabajo from './components/sections/ComoTrabajo'
+import Precios from './components/sections/Precios'
+import ComoFuncionaOnline from './components/sections/ComoFuncionaOnline'
 
 export default function App() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
@@ -40,7 +42,9 @@ export default function App() {
       <main>
         <Hero />
         <ComoTrabajo />
-        {/* aquí irán futuras secciones C4, C5, C6 */}
+        <Precios />
+        <ComoFuncionaOnline />
+        {/* aquí irán futuras secciones C5, C6 */}
       </main>
 
       {showWhatsApp && (
