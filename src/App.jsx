@@ -4,6 +4,7 @@ import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
 import Header from './components/layout/Header'
 import Hero from './components/sections/Hero'
+import ComoTrabajo from './components/sections/ComoTrabajo'
 
 export default function App() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
@@ -38,7 +39,8 @@ export default function App() {
       <Header />
       <main>
         <Hero />
-        {/* Secciones C3/C4/C5/C6 vendrán aquí */}
+        <ComoTrabajo />
+        {/* aquí irán futuras secciones C4, C5, C6 */}
       </main>
 
       {showWhatsApp && (

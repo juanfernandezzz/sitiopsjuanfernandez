@@ -3,18 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { CAL_USERNAME, HERO_PRIMARY_CTA, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
 
-/**
- * Foto del psicólogo.
- *
- * Activar cuando exista src/assets/images/juan.jpg:
- *   Opción simple (sin vite-imagetools): descomentar las 2 líneas con "?simple"
- *   Opción óptima (con vite-imagetools instalado): descomentar el bloque "?picture"
- */
-
-// ?simple — fallback básico, solo JPG:
-// import juanJpg from '../../assets/images/juan.jpg';
-
-// ?picture — óptimo (requiere vite-imagetools):
+// Imports de la foto (vite-imagetools genera AVIF/WebP en build).
 import juanAvif from '../../assets/images/juan.jpg?format=avif&w=720&quality=72';
 import juanWebp from '../../assets/images/juan.jpg?format=webp&w=720&quality=78';
 import juanJpg from '../../assets/images/juan.jpg?format=jpg&w=720&quality=82';
@@ -121,8 +110,7 @@ export default function Hero() {
               variants={item}
               className="mt-6 font-body text-[17px] lg:text-[18px] leading-[1.6] text-ink/75 max-w-[36ch]"
             >
-              Acompañamiento individual con enfoque integrativo —cognitivo-conductual y narrativo—.
-              Sesiones de 45 minutos por videollamada segura, con o sin bono Fonasa.
+              Acompañamiento individual con enfoque integrativo, que combina psicología cognitivo-conductual y narrativa. Sesiones de 45 minutos por videollamada segura, con o sin bono Fonasa.
             </motion.p>
 
             <motion.div
@@ -197,7 +185,7 @@ export default function Hero() {
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="font-body text-[13px] tracking-wide text-sage/70 text-center px-6">
-                    Foto Juan Fernández — pendiente
+                    Foto Juan Fernández, pendiente
                   </span>
                 </div>
               )}
