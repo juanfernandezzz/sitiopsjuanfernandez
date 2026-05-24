@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
+import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
 
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
@@ -21,7 +22,8 @@ const ITEMS = [
   },
   {
     q: '¿Cómo compro un bono Fonasa?',
-    a: 'Puedes comprarlo online desde Mi Fonasa con tu ClaveUnica, o presencial en sucursales Fonasa, Caja Los Andes, Caja Los Heroes, ChileAtiende y Servipag. Lo importante: compra el bono ANTES de la sesión y envíame el folio por WhatsApp para validarlo. Si quieres, pídeme la guía visual paso a paso por WhatsApp y te la envío.',
+    a: 'Puedes comprarlo online desde Mi Fonasa con tu ClaveÚnica, o presencial en sucursales Fonasa, Caja Los Andes, Caja Los Héroes, ChileAtiende y Servipag. Lo importante: compra el bono ANTES de la sesión y envíame el folio por WhatsApp para validarlo.',
+    cta: { label: 'Ver guía paso a paso →', action: 'openFonasaModal' },
   },
   {
     q: '¿Qué pasa en la primera sesión?',
@@ -72,7 +74,7 @@ function ChevronIcon({ isOpen }) {
   );
 }
 
-function AccordionItem({ item, index, isOpen, onToggle, reduce }) {
+function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
   const buttonId = `faq-btn-${index}`;
   const panelId = `faq-panel-${index}`;
 
@@ -110,11 +112,20 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce }) {
             style={{ overflow: 'hidden' }}
           >
             <p
-              className="font-body text-ink/75 px-6 pb-6"
+              className="font-body text-ink/75 px-6 pb-4"
               style={{ fontSize: 16, lineHeight: 1.65, maxWidth: '65ch' }}
             >
               {item.a}
             </p>
+            {item.cta && (
+              <button
+                type="button"
+                onClick={() => onCtaAction && onCtaAction(item.cta.action)}
+                className="ml-6 mb-6 font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+              >
+                {item.cta.label}
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -127,9 +138,14 @@ export default function FAQ() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const reduce = useReducedMotion();
+  const { openFonasaModal } = useUI();
 
   const handleToggle = (index) => {
     setOpenIndex((prev) => (prev === index ? null : index));
+  };
+
+  const handleCtaAction = (action) => {
+    if (action === 'openFonasaModal') openFonasaModal();
   };
 
   const container = {
@@ -201,6 +217,7 @@ export default function FAQ() {
                 isOpen={openIndex === i}
                 onToggle={handleToggle}
                 reduce={reduce}
+                onCtaAction={handleCtaAction}
               />
             ))}
           </motion.ul>

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
+import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
 
 const CheckIcon = () => (
@@ -36,6 +37,7 @@ export default function Precios() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const shouldReduceMotion = useReducedMotion();
+  const { openFonasaModal } = useUI();
 
   const container = {
     hidden: {},
@@ -130,6 +132,14 @@ export default function Precios() {
           <p className="font-body text-[13px] text-ink/55 leading-relaxed mb-7">
             Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
           </p>
+
+          <button
+            type="button"
+            onClick={() => openFonasaModal()}
+            className="font-body text-[13px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+          >
+            Ver guía paso a paso para comprar el bono →
+          </button>
 
           <Button
             calLink={`${CAL_USERNAME}/${CAL_EVENTS.primeraSesionFonasa}`}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE } from '../../lib/cal';
+import { useUI } from '../../lib/uiContext';
 
 // Cal embed se carga lazy para no inflar el bundle inicial.
 const Cal = lazy(() =>
@@ -55,6 +56,7 @@ export default function Agendar() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const reduce = useReducedMotion();
+  const { pendingAgendarTab, clearPendingAgendarTab } = useUI();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -64,6 +66,21 @@ export default function Agendar() {
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
   }, []);
+
+  // Sincroniza tab activo con pendingAgendarTab (seteado desde el modal Fonasa).
+  useEffect(() => {
+    if (!pendingAgendarTab) return;
+    if (CAL_EVENTS[pendingAgendarTab]) {
+      setSelectedKey(pendingAgendarTab);
+    }
+    if (typeof window !== 'undefined') {
+      const section = document.getElementById('agendar');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    clearPendingAgendarTab();
+  }, [pendingAgendarTab, clearPendingAgendarTab]);
 
   const calLink = `${CAL_USERNAME}/${CAL_EVENTS[selectedKey]}`;
 

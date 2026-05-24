@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { getCalApi } from '@calcom/embed-react'
 import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
+import { UIProvider } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Hero from './components/sections/Hero'
 import ComoTrabajo from './components/sections/ComoTrabajo'
@@ -9,6 +10,8 @@ import Precios from './components/sections/Precios'
 import ComoFuncionaOnline from './components/sections/ComoFuncionaOnline'
 import Agendar from './components/sections/Agendar'
 import FAQ from './components/sections/FAQ'
+
+const ModalGuiaFonasa = lazy(() => import('./components/modals/ModalGuiaFonasa'))
 
 export default function App() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
@@ -39,30 +42,36 @@ export default function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-cream text-ink font-sans antialiased selection:bg-terracotta/20 selection:text-ink">
-      <Header />
-      <main>
-        <Hero />
-        <ComoTrabajo />
-        <Precios />
-        <ComoFuncionaOnline />
-        <Agendar />
-        <FAQ />
-      </main>
+    <UIProvider>
+      <div className="min-h-screen bg-cream text-ink font-sans antialiased selection:bg-terracotta/20 selection:text-ink">
+        <Header />
+        <main>
+          <Hero />
+          <ComoTrabajo />
+          <Precios />
+          <ComoFuncionaOnline />
+          <Agendar />
+          <FAQ />
+        </main>
 
-      {showWhatsApp && (
-        <FloatingWhatsApp
-          phoneNumber="56973394530"
-          accountName="Juan Fernández"
-          statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
-          chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
-          placeholder="Escribe tu mensaje..."
-          avatar="/juan.jpg"
-          notification={false}
-          allowClickAway
-          allowEsc
-        />
-      )}
-    </div>
+        <Suspense fallback={null}>
+          <ModalGuiaFonasa />
+        </Suspense>
+
+        {showWhatsApp && (
+          <FloatingWhatsApp
+            phoneNumber="56973394530"
+            accountName="Juan Fernández"
+            statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
+            chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
+            placeholder="Escribe tu mensaje..."
+            avatar="/juan.jpg"
+            notification={false}
+            allowClickAway
+            allowEsc
+          />
+        )}
+      </div>
+    </UIProvider>
   )
 }
