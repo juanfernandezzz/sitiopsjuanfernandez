@@ -7,6 +7,7 @@ import Hero from './components/sections/Hero'
 import ComoTrabajo from './components/sections/ComoTrabajo'
 import Precios from './components/sections/Precios'
 import ComoFuncionaOnline from './components/sections/ComoFuncionaOnline'
+import Agendar from './components/sections/Agendar'
 
 export default function App() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
@@ -44,7 +45,8 @@ export default function App() {
         <ComoTrabajo />
         <Precios />
         <ComoFuncionaOnline />
-        {/* aquí irán futuras secciones C5, C6 */}
+        <Agendar />
+        {/* aquí irán futuras secciones C6, C7 */}
       </main>
 
       {showWhatsApp && (

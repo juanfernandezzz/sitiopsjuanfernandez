@@ -59,6 +59,41 @@ sitio-juan/
 
 - [ ] Sobre Mí (bio canónica + credenciales CV)
 - [ ] Metodología (CBT integrativo + narrativo)
-- [ ] Agendar (Cal.com embed × 4 eventos)
+- [x] Agendar (Cal.com embed × 4 eventos)
 - [ ] Preguntas frecuentes
 - [ ] Footer (privacidad Ley 21.719-ready)
+
+## Configuración Cal.com (para Juan)
+
+### Event types requeridos
+Los 4 event types deben existir en cal.com/psicologojuanfernandez con los slugs declarados en `src/lib/cal.js` (`CAL_EVENTS`). Duración 45 min cada uno.
+
+### Inicialización
+Cal.com se inicializa una sola vez en `src/App.jsx` con namespace `psicojuan` (constante `CAL_NAMESPACE` en `src/lib/cal.js`). La config aplica branding sage, layout `month_view` y theme light.
+
+Para que cualquier botón abra el modal correctamente debe llevar el namespace:
+- Si usa el componente `<Button>` con prop `calLink="username/slug"`: el namespace se inyecta automáticamente.
+- Si es un `<button>` nativo: debe incluir `data-cal-link="username/slug"` Y `data-cal-namespace="psicojuan"`.
+
+### Additional Questions (custom fields)
+Cal.com soporta preguntas adicionales por event type. Para los 3 eventos Fonasa (`primeraSesionFonasa`, `controlAvanceFonasa`, `parejaFonasa`) agregar:
+- Pregunta: "Folio del bono Fonasa"
+- Tipo: Short Text
+- Required: No (opcional, porque algunos lo compran después de agendar)
+- Placeholder: "Lo puedes enviar por WhatsApp si aún no lo tienes"
+
+Para `particular15000` NO agregar esta pregunta.
+
+### Email de confirmación
+En cada event type, editar el "Confirmation email" para incluir:
+- Link directo a la sala Doxy.me: https://doxy.me/psicologojuanfernandez
+- Recordatorio de probar cámara y micrófono unos minutos antes
+- Número WhatsApp para coordinar si falla la conexión: +56 9 7339 4530
+
+### Recordatorios automáticos
+Configurar workflows en cal.com con dos triggers:
+- 24h antes: email con el link de la sala
+- 1h antes: email + (opcional) SMS si el cliente dejó número
+
+### Política de reagendamiento
+Definir la política en cada event type (Booking Limits / Reschedule Policy). El copy del sitio en la sección Agendar dice "reagendamiento flexible según mi política" para no contradecir la config real.
