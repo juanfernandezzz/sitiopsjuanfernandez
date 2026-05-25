@@ -316,6 +316,23 @@ export default function Agendar() {
             </li>
           ))}
         </motion.ul>
+
+        {/* Nota discreta sobre consentimiento informado */}
+        <motion.p
+          variants={item}
+          className="font-body text-ink/55"
+          style={{ fontSize: 13, marginTop: 24, lineHeight: 1.5 }}
+        >
+          Si es tu primera sesión conmigo, recibirás un email con el link al
+          consentimiento informado al confirmar tu reserva.{' '}
+          <a
+            href="/consentimiento.html"
+            className="text-sage underline decoration-sage/30 hover:decoration-sage underline-offset-2 transition-colors"
+          >
+            O entra aquí directamente
+          </a>
+          .
+        </motion.p>
       </motion.div>
     </section>
   );
