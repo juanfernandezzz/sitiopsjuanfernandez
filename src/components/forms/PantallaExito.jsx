@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Button from '../ui/Button';
-import { descargarPDF } from '../../lib/generarPDFConsentimiento';
+import { descargarPDF } from '../../lib/descargarPDF';
 
 const WHATSAPP_URL =
   'https://wa.me/56973394530?text=Hola%2C%20firm%C3%A9%20el%20consentimiento%20informado.%20Tengo%20una%20duda.';
@@ -84,9 +84,9 @@ export default function PantallaExito({ pdfBlob }) {
           }}
         >
           Te envié una copia firmada a tu email. Si en 10 minutos no llega, revisa
-          la carpeta de spam o promociones. Tu PDF también se descargó en este
-          dispositivo. Si tienes cualquier duda antes de la sesión, escríbeme por
-          WhatsApp.
+          la carpeta de spam o promociones. Si quieres guardar una copia local
+          en este dispositivo, descárgala con el botón aquí abajo. Si tienes
+          cualquier duda antes de la sesión, escríbeme por WhatsApp.
         </p>
 
         <div

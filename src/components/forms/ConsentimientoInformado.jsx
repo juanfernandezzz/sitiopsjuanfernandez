@@ -57,6 +57,26 @@ function leerQueryParams() {
   }
 }
 
+/**
+ * Formatea los dígitos del celular chileno como "9 1234 5678" para display.
+ * El prefijo +56 vive en un span aparte, no en el state.
+ */
+function formatearTelefonoLocal(input) {
+  let digits = (input || '').replace(/\D/g, '');
+  // Si el usuario pega un número con prefijo 56, lo eliminamos.
+  if (digits.startsWith('56') && digits.length > 9) {
+    digits = digits.slice(2);
+  }
+  digits = digits.slice(0, 9);
+  if (digits.length >= 6) {
+    return digits[0] + ' ' + digits.slice(1, 5) + ' ' + digits.slice(5);
+  }
+  if (digits.length >= 2) {
+    return digits[0] + ' ' + digits.slice(1);
+  }
+  return digits;
+}
+
 export default function ConsentimientoInformado() {
   const initial = leerQueryParams();
 
@@ -74,7 +94,13 @@ export default function ConsentimientoInformado() {
   const [pdfBlobParaDescarga, setPdfBlobParaDescarga] = useState(null);
 
   const [canvasWidth, setCanvasWidth] = useState(400);
-  const [recovery, setRecovery] = useState(null); // {datos, firmaBase64, timestampGuardado} | null
+  const [recovery, setRecovery] = useState(null);
+
+  // Estados de focus para el input compuesto del teléfono (wrapper +56 + input).
+  const [telefonoFocused, setTelefonoFocused] = useState(false);
+
+  // Detección de scroll-end del bloque de texto del consentimiento.
+  const [scrollAtEnd, setScrollAtEnd] = useState(false);
 
   const signaturePadRef = useRef(null);
   const refNombre = useRef(null);
@@ -90,7 +116,6 @@ export default function ConsentimientoInformado() {
     const update = () => {
       const isMobile = window.innerWidth < 640;
       if (isMobile) {
-        // El canvas ocupa el ancho del contenedor menos los paddings.
         const container = refFirma.current?.querySelector('.canvas-wrap');
         const w = container ? container.clientWidth : window.innerWidth - 48;
         setCanvasWidth(Math.max(280, w));
@@ -129,11 +154,9 @@ export default function ConsentimientoInformado() {
     if (d.nombre) setNombre(d.nombre);
     if (d.rut) setRut(d.rut);
     if (d.email) setEmail(d.email);
-    if (d.telefono) setTelefono(d.telefono);
+    if (d.telefono) setTelefono(formatearTelefonoLocal(d.telefono));
     if (Array.isArray(d.checks)) setChecks(d.checks);
-    // Restaurar firma si hay
     if (recovery.firmaBase64 && signaturePadRef.current) {
-      // SignatureCanvas expone fromDataURL en el ref.
       try {
         signaturePadRef.current.fromDataURL(recovery.firmaBase64);
       } catch {
@@ -148,17 +171,14 @@ export default function ConsentimientoInformado() {
     setRecovery(null);
   }, []);
 
-  // Helpers
   const onBlurRut = () => {
     if (!rut) return;
     const v = validarRUT(rut);
     if (v.valido && v.normalizado) setRut(v.normalizado);
   };
 
-  const onBlurTelefono = () => {
-    if (!telefono) return;
-    const v = validarTelefono(telefono);
-    if (v.valido && v.normalizado) setTelefono(v.normalizado);
+  const handleTelefonoChange = (e) => {
+    setTelefono(formatearTelefonoLocal(e.target.value));
   };
 
   const toggleCheck = (i) => {
@@ -167,6 +187,14 @@ export default function ConsentimientoInformado() {
 
   const limpiarFirma = () => {
     signaturePadRef.current?.clear();
+  };
+
+  // Detector de scroll-end para el bloque del consentimiento.
+  // Solo actualiza state si el valor cambió, para evitar re-renders innecesarios.
+  const handleConsentScroll = (e) => {
+    const el = e.target;
+    const reached = el.scrollHeight - el.scrollTop - el.clientHeight < 8;
+    setScrollAtEnd((prev) => (prev === reached ? prev : reached));
   };
 
   function validarTodo() {
@@ -257,10 +285,8 @@ export default function ConsentimientoInformado() {
     setErrorEnvio(null);
 
     try {
-      // 1. Firma ya capturada en validarTodo
       const firmaBase64 = firmaPNG;
 
-      // 2. Metadata
       const timestampISO = new Date().toISOString();
       const userAgent = navigator.userAgent;
       const zonaHoraria = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -272,7 +298,6 @@ export default function ConsentimientoInformado() {
         telefono: normalizarTelefono(telefono),
       };
 
-      // 3. Hash SHA-256 del payload (sin firma binaria)
       const { sha256 } = await import('../../lib/hash');
       const payloadParaHash = {
         datos: datosPaciente,
@@ -283,8 +308,8 @@ export default function ConsentimientoInformado() {
       };
       const hashDocumento = await sha256(JSON.stringify(payloadParaHash));
 
-      // 4. Generar PDF
-      const { generarPDF, descargarPDF } = await import('../../lib/generarPDFConsentimiento');
+      // Dynamic import: jsPDF solo se carga aquí, no en initial bundle.
+      const { generarPDF } = await import('../../lib/generarPDFConsentimiento');
       const pdfBlob = await generarPDF({
         ...datosPaciente,
         fechaISO: timestampISO,
@@ -293,7 +318,6 @@ export default function ConsentimientoInformado() {
         hashDocumento,
       });
 
-      // 5. Blob a base64
       const pdfBase64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
@@ -301,7 +325,6 @@ export default function ConsentimientoInformado() {
         reader.readAsDataURL(pdfBlob);
       });
 
-      // 6. POST a la Netlify Function
       const response = await fetch('/.netlify/functions/enviar-consentimiento', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -321,11 +344,11 @@ export default function ConsentimientoInformado() {
         throw new Error(`Error servidor (${response.status}): ${errorBody}`);
       }
 
-      // 7. Descarga local fallback
+      // Guardar blob para descarga manual desde PantallaExito.
+      // No disparamos auto-download: algunos browsers lo bloquean y el
+      // mensaje de éxito se vuelve falso. El usuario lo baja con click explícito.
       setPdfBlobParaDescarga(pdfBlob);
-      descargarPDF(pdfBlob, `consentimiento-${datosPaciente.rut}.pdf`);
 
-      // 8. Limpiar y éxito
       sessionStorage.removeItem(SESSION_KEY);
       setExito(true);
     } catch (err) {
@@ -351,15 +374,16 @@ export default function ConsentimientoInformado() {
     return <PantallaExito pdfBlob={pdfBlobParaDescarga} />;
   }
 
+  // Feedback en tiempo real del RUT: muestra error de DV si el usuario ya
+  // ingresó suficiente caracteres pero el dígito verificador es incorrecto.
+  const rutDigitsLength = rut.replace(/[^\dkK]/g, '').length;
+  const rutValidacion = rut ? validarRUT(rut) : null;
+  const mostrarRutOK = rut && rutValidacion?.valido;
+  const mostrarRutErrorVivo =
+    rut && !errores.rut && !rutValidacion?.valido && rutDigitsLength >= 8;
+
   return (
-    <div
-      style={{
-        maxWidth: 720,
-        margin: '0 auto',
-        padding: '24px',
-      }}
-    >
-      {/* Heading */}
+    <div style={{ maxWidth: 720, margin: '0 auto', padding: '24px' }}>
       <h2
         className="font-display text-ink"
         style={{
@@ -386,7 +410,6 @@ export default function ConsentimientoInformado() {
         llegará una copia firmada a tu email y la podrás descargar en PDF.
       </p>
 
-      {/* Banner de recuperación */}
       {recovery && (
         <div
           role="status"
@@ -513,18 +536,21 @@ export default function ConsentimientoInformado() {
               value={rut}
               onChange={(e) => setRut(e.target.value)}
               onBlur={onBlurRut}
-              aria-invalid={!!errores.rut}
+              aria-invalid={!!errores.rut || mostrarRutErrorVivo}
               aria-describedby={errores.rut ? 'err-rut' : undefined}
               placeholder="17.520.730-9"
               style={{
                 ...inputBase,
-                ...(errores.rut ? inputError : {}),
+                ...(errores.rut || mostrarRutErrorVivo ? inputError : {}),
               }}
               onFocus={(e) => {
-                if (!errores.rut) {
+                if (!errores.rut && !mostrarRutErrorVivo) {
                   e.target.style.borderColor = '#3F5B4A';
                   e.target.style.boxShadow = '0 0 0 3px rgba(168, 181, 160, 0.2)';
                 }
+              }}
+              onBlurCapture={(e) => {
+                e.target.style.boxShadow = 'none';
               }}
               autoComplete="off"
               inputMode="text"
@@ -539,12 +565,20 @@ export default function ConsentimientoInformado() {
               >
                 {errores.rut}
               </p>
-            ) : rut && validarRUT(rut).valido ? (
+            ) : mostrarRutOK ? (
               <p
                 className="font-body text-sage"
                 style={{ fontSize: 13, marginTop: 6 }}
               >
                 Formato válido: {normalizarRUT(rut)}
+              </p>
+            ) : mostrarRutErrorVivo ? (
+              <p
+                className="font-body"
+                role="alert"
+                style={{ color: '#B0664A', fontSize: 13, marginTop: 6 }}
+              >
+                {rutValidacion.error}
               </p>
             ) : null}
           </div>
@@ -587,35 +621,84 @@ export default function ConsentimientoInformado() {
             )}
           </div>
 
-          {/* Teléfono */}
+          {/* Teléfono: wrapper con prefijo +56 fijo + input editable */}
           <div style={{ marginBottom: 8 }}>
             <label htmlFor="cons-tel" style={labelBase}>
               Teléfono
             </label>
-            <input
-              ref={refTelefono}
-              id="cons-tel"
-              type="tel"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              onBlur={onBlurTelefono}
-              aria-invalid={!!errores.telefono}
-              aria-describedby={errores.telefono ? 'err-tel' : undefined}
-              placeholder="+56 9 1234 5678"
+            <div
               style={{
                 ...inputBase,
+                padding: 0,
+                display: 'flex',
+                alignItems: 'stretch',
+                overflow: 'hidden',
                 ...(errores.telefono ? inputError : {}),
+                borderColor: errores.telefono
+                  ? '#C97B5E'
+                  : telefonoFocused
+                  ? '#3F5B4A'
+                  : 'rgba(63, 91, 74, 0.3)',
+                boxShadow:
+                  telefonoFocused && !errores.telefono
+                    ? '0 0 0 3px rgba(168, 181, 160, 0.2)'
+                    : 'none',
               }}
-              onFocus={(e) => {
-                if (!errores.telefono) {
-                  e.target.style.borderColor = '#3F5B4A';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(168, 181, 160, 0.2)';
-                }
-              }}
-              autoComplete="tel"
-              inputMode="tel"
-              required
-            />
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  padding: '12px 4px 12px 16px',
+                  color: 'rgba(42, 59, 76, 0.55)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                  fontSize: 16,
+                  fontFamily: 'Karla, system-ui, sans-serif',
+                  borderRight: '1px solid rgba(63, 91, 74, 0.15)',
+                  marginRight: 12,
+                }}
+              >
+                +56
+              </span>
+              <input
+                ref={refTelefono}
+                id="cons-tel"
+                type="tel"
+                value={telefono}
+                onChange={handleTelefonoChange}
+                aria-invalid={!!errores.telefono}
+                aria-describedby={errores.telefono ? 'err-tel' : 'hint-tel'}
+                placeholder="9 1234 5678"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  background: 'transparent',
+                  padding: '12px 16px 12px 0',
+                  fontSize: 16,
+                  fontFamily: 'Karla, system-ui, sans-serif',
+                  color: '#2A3B4C',
+                  outline: 'none',
+                  width: '100%',
+                }}
+                onFocus={() => setTelefonoFocused(true)}
+                onBlur={() => setTelefonoFocused(false)}
+                autoComplete="tel-national"
+                inputMode="tel"
+                maxLength={11}
+                required
+              />
+            </div>
+            {!errores.telefono && (
+              <p
+                id="hint-tel"
+                className="font-body text-ink/55"
+                style={{ fontSize: 12, marginTop: 4 }}
+              >
+                Sin el código de país. Ejemplo: 9 1234 5678.
+              </p>
+            )}
             {errores.telefono && (
               <p
                 id="err-tel"
@@ -647,6 +730,7 @@ export default function ConsentimientoInformado() {
               overflowY: 'auto',
               padding: 24,
             }}
+            onScroll={handleConsentScroll}
           >
             <pre
               className="font-body"
@@ -662,7 +746,7 @@ export default function ConsentimientoInformado() {
             >
               {TEXTO_CONSENTIMIENTO}
             </pre>
-            {/* Indicador visual sutil de scroll */}
+            {/* Indicador visual de scroll: se desvanece al llegar al final */}
             <div
               aria-hidden="true"
               style={{
@@ -677,6 +761,8 @@ export default function ConsentimientoInformado() {
                 background:
                   'linear-gradient(to bottom, rgba(255,253,248,0) 0%, #FFFDF8 100%)',
                 pointerEvents: 'none',
+                opacity: scrollAtEnd ? 0 : 1,
+                transition: 'opacity 0.2s ease',
               }}
             />
           </div>

@@ -5,6 +5,8 @@
  * Cero em-dashes y cero en-dashes en el PDF.
  *
  * El import de jsPDF es dinámico para mantener fuera del bundle inicial.
+ * Helper descargarPDF vive en src/lib/descargarPDF.js (archivo separado
+ * para que PantallaExito pueda importarlo estáticamente sin arrastrar jsPDF).
  */
 
 import { TEXTO_CONSENTIMIENTO, CHECKBOXES_DECLARACION } from './textoConsentimiento';
@@ -148,15 +150,4 @@ export async function generarPDF({
   doc.text('psicologojuanfernandez.cl', 20, footerY + 8);
 
   return doc.output('blob');
-}
-
-export function descargarPDF(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
