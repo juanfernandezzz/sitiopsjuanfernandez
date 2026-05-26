@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         consentimiento: resolve(__dirname, 'consentimiento.html'),
+        politica: resolve(__dirname, 'politica-privacidad.html'),
       },
     },
   },

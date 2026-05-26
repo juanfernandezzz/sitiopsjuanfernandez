@@ -4,6 +4,7 @@ import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
 import { UIProvider } from './lib/uiContext'
 import Header from './components/layout/Header'
+import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
 import ComoTrabajo from './components/sections/ComoTrabajo'
 import Precios from './components/sections/Precios'
@@ -53,6 +54,8 @@ export default function App() {
           <Agendar />
           <FAQ />
         </main>
+
+        <Footer />
 
         <Suspense fallback={null}>
           <ModalGuiaFonasa />
