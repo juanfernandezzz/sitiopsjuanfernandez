@@ -1,5 +1,4 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { getCalApi } from '@calcom/embed-react'
 import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
 import { UIProvider } from './lib/uiContext'
@@ -23,8 +22,18 @@ export default function App() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Cal.com se carga al primer evento de interacción del usuario. El dynamic
+  // import saca @calcom/embed-react del chunk principal y el listener once:true
+  // garantiza una sola inicialización. Si un usuario clickea un CTA antes de
+  // que Cal cargue, el Button (src/components/ui/Button.jsx) tiene fallback a
+  // window.open(cal.com) en pestaña nueva, así que la ruta de booking nunca
+  // queda inerte.
   useEffect(() => {
-    (async () => {
+    let loaded = false
+    const loadCal = async () => {
+      if (loaded) return
+      loaded = true
+      const { getCalApi } = await import('@calcom/embed-react')
       const cal = await getCalApi({ namespace: CAL_NAMESPACE })
       cal('ui', {
         hideEventTypeDetails: false,
@@ -39,7 +48,12 @@ export default function App() {
           },
         },
       })
-    })()
+      cleanup()
+    }
+    const events = ['click', 'scroll', 'touchstart', 'keydown']
+    const cleanup = () => events.forEach(e => window.removeEventListener(e, loadCal))
+    events.forEach(e => window.addEventListener(e, loadCal, { passive: true, once: true }))
+    return cleanup
   }, [])
 
   return (

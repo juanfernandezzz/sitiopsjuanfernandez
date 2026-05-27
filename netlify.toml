@@ -3,7 +3,35 @@
   publish   = "dist"
   functions = "netlify/functions"
 
+# Redirects: los más específicos primero. Sin estos, /politica-privacidad
+# y /consentimiento sin extensión caerían en el catch-all y servirían el
+# index, rompiendo el SEO y el contenido legal de esas rutas.
+[[redirects]]
+  from   = "/politica-privacidad"
+  to     = "/politica-privacidad.html"
+  status = 301
+
+[[redirects]]
+  from   = "/consentimiento"
+  to     = "/consentimiento.html"
+  status = 301
+
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200
+
+# Headers de seguridad globales.
+# Permissions-Policy deniega cámara y micrófono a nivel sitio porque la
+# videollamada vive en doxy.me, no en este dominio. El usuario sale del
+# sitio para entrar a la consulta.
+# CSP queda pendiente para C12: Cal.com, Google Fonts e iframes de embed
+# requieren calibración cuidadosa que no entra en este ciclo.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
