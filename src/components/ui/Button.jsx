@@ -43,7 +43,7 @@ const Button = forwardRef(function Button(
     children,
     href,
     onClick,
-    calLink, // 'username/slug' — activa Cal.com embed
+    calLink, // 'username/slug': activa Cal.com embed
     ...rest
   },
   ref

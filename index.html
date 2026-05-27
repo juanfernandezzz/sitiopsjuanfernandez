@@ -2,6 +2,9 @@
 <html lang="es-CL">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3F5B4A" />
+
     <!-- Favicons (set completo: SVG vectorial + PNGs para cada contexto) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -9,27 +12,30 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#F6F1E8" />
 
-    <!-- SEO -->
-    <title>Juan Fernández · Psicólogo Clínico Online en Chile</title>
-    <meta
-      name="description"
-      content="Psicoterapia clínica online en sesiones de 45 minutos. Atiendo adultos en todo Chile con enfoque integrativo. Modalidad particular y Fonasa MLE. Registro MINSAL N° 876085."
-    />
-    <meta name="author" content="Juan Fernández Arce" />
+    <!-- SEO core -->
+    <title>Juan Fernández | Psicólogo Clínico Online en Chile | Fonasa</title>
+    <meta name="description" content="Psicólogo clínico titulado. Atención online por videollamada con bono Fonasa ($5.570) o particular ($15.000). Enfoque integrativo. Sesiones de 45 minutos." />
+    <meta name="author" content="Juan Fernández" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://psicologojuanfernandez.cl/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Juan Fernández, Psicólogo Clínico" />
+    <meta property="og:title" content="Juan Fernández | Psicólogo Clínico Online en Chile" />
+    <meta property="og:description" content="Atención psicológica online con bono Fonasa o particular. Enfoque integrativo. Sesiones de 45 minutos por videollamada." />
+    <meta property="og:image" content="https://psicologojuanfernandez.cl/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://psicologojuanfernandez.cl/" />
     <meta property="og:locale" content="es_CL" />
-    <meta property="og:title" content="Juan Fernández · Psicólogo Clínico Online" />
-    <meta
-      property="og:description"
-      content="Psicoterapia online para adultos en Chile. Sesiones de 45 min, modalidad particular y Fonasa MLE."
-    />
-    <meta property="og:url" content="https://psicologojuanfernandez.cl" />
-    <meta property="og:image" content="/og.jpg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Juan Fernández | Psicólogo Clínico Online en Chile" />
+    <meta name="twitter:description" content="Atención psicológica online con bono Fonasa o particular. Sesiones de 45 minutos por videollamada." />
+    <meta name="twitter:image" content="https://psicologojuanfernandez.cl/og.jpg" />
 
     <!-- Fonts: Fraunces variable (eje SOFT para warmth) + Karla -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,6 +44,188 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Karla:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!-- JSON-LD #1: Physician -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Physician",
+      "@id": "https://psicologojuanfernandez.cl/#prestador",
+      "name": "Juan Fernández",
+      "givenName": "Juan",
+      "familyName": "Fernández",
+      "honorificPrefix": "Psic.",
+      "jobTitle": "Psicólogo Clínico",
+      "medicalSpecialty": "Psychology",
+      "additionalType": "https://schema.org/Psychologist",
+      "description": "Psicólogo clínico con enfoque integrativo (cognitivo-conductual y narrativo). Atención online por videollamada con bono Fonasa MLE o particular.",
+      "image": "https://psicologojuanfernandez.cl/juan.jpg",
+      "url": "https://psicologojuanfernandez.cl/",
+      "telephone": "+56973394530",
+      "email": "juanfernandezpsicologo@gmail.com",
+      "knowsLanguage": ["es", "en"],
+      "areaServed": { "@type": "Country", "name": "Chile" },
+      "availableService": [
+        {
+          "@type": "MedicalTherapy",
+          "name": "Psicoterapia individual online (Fonasa MLE)",
+          "description": "Sesión de 45 minutos por videollamada. Cubierta por bono Fonasa MLE códigos 09 08 101 y 09 08 102.",
+          "offers": {
+            "@type": "Offer",
+            "price": "5570",
+            "priceCurrency": "CLP",
+            "description": "Copago con bono Fonasa MLE"
+          }
+        },
+        {
+          "@type": "MedicalTherapy",
+          "name": "Psicoterapia individual particular",
+          "description": "Sesión de 45 minutos por videollamada. Sin previsión.",
+          "offers": {
+            "@type": "Offer",
+            "price": "15000",
+            "priceCurrency": "CLP"
+          }
+        },
+        {
+          "@type": "MedicalTherapy",
+          "name": "Psicoterapia de pareja online (Fonasa MLE)",
+          "description": "Cubierta por bono Fonasa MLE código 09 08 103.",
+          "offers": {
+            "@type": "Offer",
+            "price": "5570",
+            "priceCurrency": "CLP"
+          }
+        }
+      ],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "credentialCategory": "Título Profesional",
+          "name": "Psicólogo Clínico, Universidad Viña del Mar (2025)"
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "credentialCategory": "Registro Nacional de Prestadores Individuales",
+          "name": "RNPI 876085",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Superintendencia de Salud de Chile"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD #2: WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://psicologojuanfernandez.cl/#website",
+      "url": "https://psicologojuanfernandez.cl/",
+      "name": "Juan Fernández, Psicólogo Clínico",
+      "inLanguage": "es-CL",
+      "publisher": { "@id": "https://psicologojuanfernandez.cl/#prestador" }
+    }
+    </script>
+
+    <!-- JSON-LD #3: FAQPage -->
+    <!-- MANTENIMIENTO: si editas faqData.js, actualizar también este JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cómo saber si la terapia es para mí?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Si llevas más de un par de semanas con algo que te incomoda: ansiedad, tristeza, una decisión difícil, una sensación que no logras nombrar. Vale la pena conversarlo. La primera sesión es para conocernos y entender juntos qué te trae. Si después no quieres continuar, no hay compromiso."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿La terapia online funciona igual que la presencial?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Para la mayoría de los procesos personales que llegan a consulta, la evidencia disponible (estudios desde 2015 en adelante) muestra resultados equivalentes a la modalidad presencial. Lo importante es tener un lugar privado donde puedas hablar tranquilo y una conexión estable. Hay situaciones específicas en las que recomiendo terapia presencial. Si fuera tu caso, te lo diría con honestidad."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuánto cuesta una sesión?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hay dos modalidades: sesión particular por $15.000, o sesión con bono Fonasa por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 0908101, 0908102 y 0908103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo compro un bono Fonasa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Puedes comprarlo online desde Mi Fonasa con tu ClaveÚnica, o presencial en sucursales Fonasa, Caja Los Andes, Caja Los Héroes, ChileAtiende y Servipag. Lo importante: compra el bono ANTES de la sesión y envíame el folio por WhatsApp para validarlo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué pasa en la primera sesión?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nos conocemos. Me cuentas qué te trae, con el detalle que tú quieras dar, sin presión. Te explico cómo trabajo. Exploramos qué necesitas. Si al final de los 45 minutos sentimos que tiene sentido seguir, definimos un plan. Si no, también está bien."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Necesito instalar algo para la videollamada?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Las sesiones son a través de Doxy.me, plataforma de telerehabilitación certificada por Fonasa. Se abre desde cualquier navegador moderno (Chrome, Safari, Firefox, Edge). Recibes un link, le das clic, das permiso a cámara y micrófono, y entras a la sala de espera. Yo te admito cuando estoy listo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Mis datos están protegidos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. La plataforma de videollamadas está certificada por Fonasa y la conexión va cifrada. No grabo las sesiones. La ficha clínica se mantiene bajo los mismos estándares que una atención presencial, conforme a la Ley 21.541 de telemedicina y a la normativa de protección de datos vigente en Chile."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Con qué frecuencia se hacen las sesiones?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Lo habitual es semanal o quincenal, según el momento del proceso. Lo conversamos en la segunda sesión y lo ajustamos a tu ritmo y posibilidades."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo cancelar o reagendar?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Puedes reagendar desde el mismo email de confirmación hasta 6 horas antes de la sesión sin costo. Cancelaciones con menos de 6 horas se reagendan caso a caso."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué pasa si tengo una crisis fuera del horario de sesión?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Las sesiones son agendadas y no funciono como servicio de urgencia. Si estás en riesgo o tienes una crisis fuera de horario, por favor contacta Salud Responde 600 360 7777 (gratuito, 24/7) o acude a la urgencia más cercana. En la siguiente sesión podemos trabajar lo que ocurrió."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <noscript>
+      <p style="padding:24px;text-align:center;font-family:Georgia,serif;color:#2A3B4C;">
+        Este sitio requiere JavaScript para agendar sesiones. Si no puedes habilitarlo, escríbeme a juanfernandezpsicologo@gmail.com o por WhatsApp al +56 9 7339 4530.
+      </p>
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

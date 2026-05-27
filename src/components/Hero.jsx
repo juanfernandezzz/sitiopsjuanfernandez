@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { ShieldCheck, GraduationCap, BadgeCheck, Sparkles } from 'lucide-react'
 
-// Easing "expo-out" — más natural que default, refinado para movimientos largos
+// Easing "expo-out": más natural que default, refinado para movimientos largos
 const ease = [0.16, 1, 0.3, 1]
 
 const stagger = {
@@ -44,7 +44,7 @@ export default function Hero() {
         />
       </svg>
 
-      {/* Punto terracotta superior derecho — accent visual */}
+      {/* Punto terracotta superior derecho: accent visual */}
       <div className="hidden lg:block absolute top-32 right-24 w-1.5 h-1.5 rounded-full bg-terracotta/50" />
       <div className="hidden lg:block absolute top-40 right-32 w-1 h-1 rounded-full bg-sage/30" />
 
@@ -156,7 +156,7 @@ export default function Hero() {
           {/* Columna derecha: foto profesional con tratamiento orgánico (blob clip) */}
           <motion.div variants={item} className="lg:col-span-5 relative">
             <div className="relative max-w-sm mx-auto lg:max-w-none">
-              {/* Marco offset sage — sombra orgánica detrás de la foto */}
+              {/* Marco offset sage: sombra orgánica detrás de la foto */}
               <div
                 className="absolute -inset-4 lg:-inset-6 bg-sage/10 -z-10"
                 style={{
@@ -188,7 +188,7 @@ export default function Hero() {
                 />
               </div>
 
-              {/* Tag flotante: presencia + título — trust signal en tiempo real */}
+              {/* Tag flotante: presencia + título, trust signal en tiempo real */}
               <div className="absolute -bottom-4 left-4 lg:-bottom-6 lg:left-8 bg-offwhite shadow-[0_12px_32px_-12px_rgba(42,59,76,0.18)] rounded-full px-5 py-3 lg:px-6 lg:py-3.5 flex items-center gap-3">
                 <span className="relative flex w-2 h-2">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-terracotta opacity-60 animate-ping" />

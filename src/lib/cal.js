@@ -17,8 +17,8 @@ export const CAL_EVENTS = {
 };
 
 // Decisión CRO: qué evento dispara el CTA primario del hero/header.
-// Opción A (recomendada): primera sesión Fonasa — copago $5.570 cubre ~80% del público chileno.
-// Opción B: particular $15.000 — sin restricción de previsión.
+// Opción A (recomendada): primera sesión Fonasa, copago $5.570 cubre ~80% del público chileno.
+// Opción B: particular $15.000, sin restricción de previsión.
 // Cambiar aquí propaga el cambio a todos los CTAs primarios.
 export const HERO_PRIMARY_CTA = CAL_EVENTS.primeraSesionFonasa;
 

@@ -55,7 +55,7 @@ export default function Nav() {
           </a>
         </nav>
 
-        {/* Mobile: solo CTA — máxima reducción de fricción */}
+        {/* Mobile: solo CTA, máxima reducción de fricción */}
         <a
           href="#agendar"
           className="lg:hidden px-4 py-2 bg-terracotta text-offwhite text-sm rounded-full shadow-[0_4px_14px_-4px_rgba(201,123,94,0.4)]"
