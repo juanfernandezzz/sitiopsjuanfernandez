@@ -12,25 +12,8 @@ const NAV_ITEMS = [
 const PRIMARY_CAL_LINK = `${CAL_USERNAME}/${HERO_PRIMARY_CTA}`;
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const firstMobileLinkRef = useRef(null);
-
-  // El header aparece cuando el sentinel del Hero sale de viewport hacia arriba.
-  useEffect(() => {
-    const sentinel = document.getElementById('hero-end-sentinel');
-    if (!sentinel) {
-      const onScroll = () => setScrolled(window.scrollY > 600);
-      window.addEventListener('scroll', onScroll, { passive: true });
-      return () => window.removeEventListener('scroll', onScroll);
-    }
-    const io = new IntersectionObserver(
-      ([entry]) => setScrolled(!entry.isIntersecting && entry.boundingClientRect.top < 0),
-      { threshold: 0 }
-    );
-    io.observe(sentinel);
-    return () => io.disconnect();
-  }, []);
 
   // Lock body scroll mientras el menú móvil está abierto.
   useEffect(() => {
@@ -52,46 +35,46 @@ export default function Header() {
 
   return (
     <>
-      <AnimatePresence>
-        {scrolled && (
-          <motion.header
-            key="sticky-header"
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -80, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed top-0 left-0 right-0 z-40 bg-cream/85 backdrop-blur-md border-b border-ink/5"
-          >
-            <div className="mx-auto max-w-6xl px-5 lg:px-8 h-16 flex items-center justify-between">
-              <Brand />
-              <nav className="hidden md:flex items-center gap-8">
-                {NAV_ITEMS.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className="font-body text-[15px] text-ink/80 hover:text-ink transition-colors duration-150"
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
-              <div className="hidden md:block">
-                <Button size="sm" variant="primary" calLink={PRIMARY_CAL_LINK}>
-                  Agendar sesión
-                </Button>
-              </div>
-              <button
-                aria-label="Abrir menú"
-                aria-expanded={mobileOpen}
-                onClick={() => setMobileOpen(true)}
-                className="md:hidden p-2 -mr-2 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light rounded"
+      {/* Header fijo, visible desde el inicio. Fondo sage, texto cream. */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-sage text-cream shadow-[0_2px_12px_-6px_rgba(42,59,76,0.5)]">
+        <div className="mx-auto max-w-6xl px-5 lg:px-8 h-[52px] md:h-[60px] flex items-center justify-between">
+          <Brand />
+
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_ITEMS.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="font-body text-[15px] text-cream/80 hover:text-cream transition-colors duration-150"
               >
-                <BurgerIcon />
-              </button>
-            </div>
-          </motion.header>
-        )}
-      </AnimatePresence>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="primary"
+              calLink={PRIMARY_CAL_LINK}
+              className="text-[13px] md:text-sm px-4 md:px-5"
+            >
+              Agendar
+            </Button>
+            <button
+              aria-label="Abrir menú"
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden p-1.5 -mr-1.5 text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/60 rounded"
+            >
+              <BurgerIcon />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Spacer: empuja el contenido para que no quede bajo el header fijo. */}
+      <div aria-hidden="true" className="h-[52px] md:h-[60px]" />
 
       <AnimatePresence>
         {mobileOpen && (
@@ -117,7 +100,7 @@ export default function Header() {
               className="fixed top-0 right-0 bottom-0 z-50 w-[82%] max-w-sm bg-cream shadow-2xl flex flex-col"
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-ink/5">
-                <Brand small />
+                <Brand small dark />
                 <button
                   aria-label="Cerrar menú"
                   onClick={() => setMobileOpen(false)}
@@ -158,19 +141,18 @@ export default function Header() {
   );
 }
 
-function Brand({ small = false }) {
+function Brand({ small = false, dark = false }) {
+  const nameColor = dark ? 'text-ink' : 'text-cream';
+  const subColor = dark ? 'text-sage' : 'text-cream/70';
   return (
     <a
       href="#top"
-      className="flex flex-col leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light rounded"
+      className="flex flex-col leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/60 rounded"
     >
-      <span
-        className={`font-display ${small ? 'text-[18px]' : 'text-[20px]'} text-ink`}
-        style={{ fontVariationSettings: '"opsz" 36, "SOFT" 50' }}
-      >
+      <span className={`font-wordmark ${small ? 'text-[19px]' : 'text-[21px] md:text-[23px]'} ${nameColor}`}>
         Juan Fernández
       </span>
-      <span className="font-body text-[10px] uppercase tracking-[0.18em] text-sage mt-0.5">
+      <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${subColor} mt-0.5`}>
         Psicólogo Clínico
       </span>
     </a>

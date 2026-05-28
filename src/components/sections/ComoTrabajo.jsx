@@ -61,7 +61,7 @@ export default function ComoTrabajo() {
         className="pointer-events-none absolute top-1/3 -right-32 w-[380px] h-[380px] rounded-full bg-sage-light/15 blur-3xl"
       />
 
-      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 py-20 lg:py-28">
+      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 py-16 lg:py-20">
         <motion.div
           variants={container}
           initial="hidden"
@@ -71,7 +71,7 @@ export default function ComoTrabajo() {
           {/* Eyebrow */}
           <motion.span
             variants={item}
-            className="inline-flex items-center gap-2 font-body text-[12px] uppercase tracking-[0.22em] text-sage mb-5"
+            className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
           >
             <span className="w-6 h-px bg-sage" aria-hidden="true" />
             Cómo trabajo
@@ -96,14 +96,14 @@ export default function ComoTrabajo() {
           {/* Subheadline */}
           <motion.p
             variants={item}
-            className="mt-5 font-body text-[17px] lg:text-[18px] leading-[1.6] text-ink/75 max-w-[44ch]"
+            className="mt-5 font-body text-[18px] lg:text-[19px] leading-[1.6] text-ink/80 max-w-[44ch]"
           >
             Acompañamiento individual por videollamada. Sesiones de 45 minutos.
           </motion.p>
 
           {/* Motivos de consulta */}
           <motion.div variants={item} className="mt-10 lg:mt-12">
-            <p className="font-body text-[13px] uppercase tracking-[0.18em] text-sage/85 mb-4">
+            <p className="font-body text-[14px] uppercase tracking-[0.16em] text-sage mb-4">
               Atiendo motivos de consulta como:
             </p>
             <ul className="flex flex-wrap gap-2 lg:gap-2.5">
@@ -142,7 +142,7 @@ export default function ComoTrabajo() {
               >
                 <span
                   aria-hidden="true"
-                  className="font-display block leading-none text-terracota/25"
+                  className="font-display block leading-none text-terracota/55"
                   style={{
                     fontSize: 'clamp(4.5rem, 7vw, 6rem)',
                     fontWeight: 500,
@@ -164,7 +164,7 @@ export default function ComoTrabajo() {
                 >
                   {paso.titulo}
                 </h3>
-                <p className="mt-3 font-body text-[15.5px] lg:text-[16px] leading-[1.65] text-ink/72 max-w-[34ch]">
+                <p className="mt-3 font-body text-[16px] lg:text-[16.5px] leading-[1.65] text-ink/78 max-w-[34ch]">
                   {paso.cuerpo}
                 </p>
               </motion.li>
@@ -182,7 +182,7 @@ export default function ComoTrabajo() {
         >
           <motion.p
             variants={item}
-            className="font-body text-[13.5px] lg:text-[14px] text-sage/90 max-w-[44ch] leading-[1.55]"
+            className="font-body text-[14px] lg:text-[14.5px] text-sage max-w-[44ch] leading-[1.55]"
           >
             Videollamada por Doxy.me, plataforma certificada por Fonasa para telerehabilitación. Conexión segura, sin descargas ni instalaciones.
           </motion.p>

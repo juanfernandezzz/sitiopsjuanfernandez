@@ -125,7 +125,7 @@ export default function FAQ() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="bg-cream py-20 md:py-28 px-5 md:px-8"
+      className="bg-cream py-16 md:py-20 px-5 md:px-8"
       style={{ scrollMarginTop: '80px' }}
     >
       <div

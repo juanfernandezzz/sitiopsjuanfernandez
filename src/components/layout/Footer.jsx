@@ -82,12 +82,11 @@ function ColumnaIdentidad() {
   return (
     <div>
       <p
-        className="font-display"
+        className="font-wordmark"
         style={{
-          fontSize: 22,
+          fontSize: 24,
           fontWeight: 500,
-          fontVariationSettings: '"opsz" 144, "SOFT" 50',
-          letterSpacing: '-0.01em',
+          letterSpacing: '0',
           color: '#F6F1E8',
           margin: 0,
           lineHeight: 1.1,
@@ -136,7 +135,7 @@ function ColumnaCredenciales() {
   const items = [
     `Psicólogo titulado, ${PRESTADOR.universidad}`,
     `Registro Nacional Prestadores Individuales (RNPI): ${PRESTADOR.rnpi}`,
-    'Prestador inscrito en Fonasa MLE',
+    'Prestador inscrito en Fonasa (Modalidad Libre Elección)',
     `Códigos: ${PRESTADOR.fonasaCodigos}`,
     'Plataforma certificada por Fonasa: Doxy.me',
   ];

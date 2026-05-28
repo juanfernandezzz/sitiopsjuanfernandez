@@ -4,6 +4,8 @@ import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
 
+const FLOW_PAGO_URL = 'https://www.flow.cl/btn.php?token=z98de88976cd9faf4f72fdd4c6f0032cc3052def';
+
 const CheckIcon = () => (
   <svg
     width="18"
@@ -25,7 +27,7 @@ const FEATURES_FONASA_PRIMERA = [
   'Sesión de 45 minutos',
   'Disponible para afiliados Fonasa tramos B, C y D',
   'Código 0908101 para usuarios nuevos',
-  'Plataforma certificada por Fonasa (Doxy.me)',
+  'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
 ];
 
 const SECONDARY_CARD_SHADOW = {
@@ -60,10 +62,10 @@ export default function Precios() {
       id="precios"
       ref={ref}
       style={{ scrollMarginTop: '80px' }}
-      className="bg-cream py-24 md:py-32 px-6"
+      className="bg-cream py-16 md:py-20 px-6"
     >
       <motion.div
-        className="max-w-3xl mx-auto"
+        className="max-w-5xl mx-auto"
         variants={container}
         initial="hidden"
         animate={inView ? 'visible' : 'hidden'}
@@ -71,9 +73,9 @@ export default function Precios() {
         {/* Header */}
         <motion.div
           variants={item}
-          className="text-center mb-16 md:mb-20 max-w-2xl mx-auto"
+          className="text-center mb-12 md:mb-16 max-w-2xl mx-auto"
         >
-          <p className="text-sage text-xs uppercase tracking-[0.2em] font-body mb-4">
+          <p className="text-sage text-[13px] uppercase tracking-[0.18em] font-body mb-4">
             Precios transparentes
           </p>
           <h2
@@ -82,179 +84,195 @@ export default function Precios() {
           >
             Precios y formas de pago
           </h2>
-          <p className="font-body text-lg text-ink/70 leading-relaxed">
+          <p className="font-body text-lg text-ink/75 leading-relaxed">
             Sesión de 45 minutos. Misma duración y dedicación independiente del modo de pago.
           </p>
         </motion.div>
 
-        {/* Card 1: Primera sesión Fonasa (destacada) */}
-        <motion.article
-          variants={item}
-          className="relative bg-offwhite rounded-2xl p-8 md:p-10 mb-6 md:mb-8 flex flex-col"
-          style={{
-            border: '1.5px solid #C97B5E',
-            boxShadow:
-              '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
-          }}
-        >
-          <span className="absolute -top-3 right-6 bg-terracotta text-cream font-body text-[11px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full select-none">
-            Más utilizada
-          </span>
+        {/* Grid 1 + 3 en desktop: destacada a la izquierda, tres apiladas a la derecha */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+          {/* Columna izquierda: card destacada */}
+          <motion.article
+            variants={item}
+            className="relative bg-offwhite rounded-2xl p-8 md:p-10 flex flex-col"
+            style={{
+              border: '1.5px solid #C97B5E',
+              boxShadow:
+                '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
+            }}
+          >
+            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-full select-none">
+              Si es tu primera vez conmigo
+            </span>
 
-          <h3 className="font-display text-xl text-ink mb-6">
-            Primera sesión con bono Fonasa
-          </h3>
+            <h3 className="font-display text-xl text-ink mb-6 mt-2">
+              Primera sesión con bono Fonasa
+            </h3>
 
-          <div className="mb-8">
-            <p
-              className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
-              style={{ fontVariationSettings: '"opsz" 144' }}
+            <div className="mb-8">
+              <p
+                className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
+                style={{ fontVariationSettings: '"opsz" 144' }}
+              >
+                $5.570
+              </p>
+              <p className="font-body text-[15px] text-sage">
+                Copago Modalidad Libre Elección
+              </p>
+            </div>
+
+            <ul className="space-y-3 mb-5">
+              {FEATURES_FONASA_PRIMERA.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex gap-3 font-body text-[15px] text-ink/80 leading-snug"
+                >
+                  <CheckIcon />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="font-body text-[14px] text-ink/60 leading-relaxed mb-7">
+              Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
+            </p>
+
+            <button
+              type="button"
+              onClick={() => openFonasaModal()}
+              className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
             >
-              $5.570
-            </p>
-            <p className="font-body text-sm text-sage">
-              Copago Modalidad Libre Elección
-            </p>
-          </div>
+              Ver guía paso a paso para comprar el bono →
+            </button>
 
-          <ul className="space-y-3 mb-5">
-            {FEATURES_FONASA_PRIMERA.map((feature) => (
-              <li
-                key={feature}
-                className="flex gap-3 font-body text-[15px] text-ink/80 leading-snug"
+            <div className="mt-auto">
+              <Button
+                calLink={`${CAL_USERNAME}/${CAL_EVENTS.primeraSesionFonasa}`}
+                variant="primary"
+                size="lg"
+                className="w-full"
               >
-                <CheckIcon />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
+                Agendar primera sesión Fonasa
+              </Button>
+            </div>
+          </motion.article>
 
-          <p className="font-body text-[13px] text-ink/55 leading-relaxed mb-7">
-            Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
-          </p>
+          {/* Columna derecha: tres cards apiladas */}
+          <div className="flex flex-col gap-6 lg:gap-8">
+            {/* Sesión de avance (Fonasa) */}
+            <motion.article
+              variants={item}
+              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
+              style={SECONDARY_CARD_SHADOW}
+            >
+              <h3 className="font-display text-lg text-ink mb-2">
+                Sesión de avance con bono Fonasa
+              </h3>
+              <p className="mb-2">
+                <span
+                  className="font-display text-2xl md:text-3xl text-ink"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  $5.570
+                </span>
+                <span className="font-body text-[15px] text-sage ml-3">
+                  Copago Modalidad Libre Elección
+                </span>
+              </p>
+              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
+                Para pacientes que ya iniciaron tratamiento conmigo. Código 0908102, sesión de 45 minutos.
+              </p>
+              <div className="mt-auto">
+                <Button
+                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.controlAvanceFonasa}`}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
+                >
+                  Agendar sesión de avance
+                </Button>
+              </div>
+            </motion.article>
 
-          <button
-            type="button"
-            onClick={() => openFonasaModal()}
-            className="font-body text-[13px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
-          >
-            Ver guía paso a paso para comprar el bono →
-          </button>
+            {/* Terapia de pareja (Fonasa) */}
+            <motion.article
+              variants={item}
+              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
+              style={SECONDARY_CARD_SHADOW}
+            >
+              <h3 className="font-display text-lg text-ink mb-2">
+                Terapia de pareja con bono Fonasa
+              </h3>
+              <p className="mb-2">
+                <span
+                  className="font-display text-2xl md:text-3xl text-ink"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  $5.570
+                </span>
+                <span className="font-body text-[15px] text-sage ml-3">
+                  Copago Modalidad Libre Elección
+                </span>
+              </p>
+              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
+                Código 0908103. Sesión de 45 minutos con ambos miembros presentes.
+              </p>
+              <div className="mt-auto">
+                <Button
+                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.parejaFonasa}`}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
+                >
+                  Agendar sesión de pareja
+                </Button>
+              </div>
+            </motion.article>
 
-          <Button
-            calLink={`${CAL_USERNAME}/${CAL_EVENTS.primeraSesionFonasa}`}
-            variant="primary"
-            size="lg"
-            className="w-full"
-          >
-            Agendar primera sesión Fonasa
-          </Button>
-        </motion.article>
-
-        {/* Card 2: Sesión de avance (Fonasa) */}
-        <motion.article
-          variants={item}
-          className="bg-offwhite rounded-2xl p-6 md:p-8 mb-4 md:mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-          style={SECONDARY_CARD_SHADOW}
-        >
-          <div className="md:max-w-xl">
-            <h3 className="font-display text-lg text-ink mb-2">
-              Sesión de avance con bono Fonasa
-            </h3>
-            <p className="mb-2">
-              <span
-                className="font-display text-2xl md:text-3xl text-ink"
-                style={{ fontVariationSettings: '"opsz" 144' }}
-              >
-                $5.570
-              </span>
-              <span className="font-body text-sm text-sage ml-3">
-                Copago Modalidad Libre Elección
-              </span>
-            </p>
-            <p className="font-body text-sm text-ink/65 leading-relaxed">
-              Para pacientes que ya iniciaron tratamiento conmigo. Código 0908102, sesión de 45 minutos.
-            </p>
+            {/* Sesión particular */}
+            <motion.article
+              variants={item}
+              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
+              style={SECONDARY_CARD_SHADOW}
+            >
+              <h3 className="font-display text-lg text-ink mb-2">
+                Sesión particular
+              </h3>
+              <p className="mb-2">
+                <span
+                  className="font-display text-2xl md:text-3xl text-ink"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  $15.000
+                </span>
+                <span className="font-body text-[15px] text-sage ml-3">
+                  Con transferencia electrónica o botón de pago
+                </span>
+              </p>
+              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
+                Sin previsión requerida. Comprobante para reembolso de isapre cuando aplique.
+              </p>
+              <div className="mt-auto flex flex-col gap-3">
+                <Button
+                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular15000}`}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
+                >
+                  Agendar particular
+                </Button>
+                <a
+                  href={FLOW_PAGO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                >
+                  Pagar con botón de pago →
+                </a>
+              </div>
+            </motion.article>
           </div>
-          <Button
-            calLink={`${CAL_USERNAME}/${CAL_EVENTS.controlAvanceFonasa}`}
-            variant="primary"
-            size="md"
-            className="md:flex-shrink-0"
-          >
-            Agendar sesión de avance
-          </Button>
-        </motion.article>
-
-        {/* Card 3: Terapia de pareja (Fonasa) */}
-        <motion.article
-          variants={item}
-          className="bg-offwhite rounded-2xl p-6 md:p-8 mb-4 md:mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-          style={SECONDARY_CARD_SHADOW}
-        >
-          <div className="md:max-w-xl">
-            <h3 className="font-display text-lg text-ink mb-2">
-              Terapia de pareja con bono Fonasa
-            </h3>
-            <p className="mb-2">
-              <span
-                className="font-display text-2xl md:text-3xl text-ink"
-                style={{ fontVariationSettings: '"opsz" 144' }}
-              >
-                $5.570
-              </span>
-              <span className="font-body text-sm text-sage ml-3">
-                Copago Modalidad Libre Elección
-              </span>
-            </p>
-            <p className="font-body text-sm text-ink/65 leading-relaxed">
-              Código 0908103. Sesión de 45 minutos con ambos miembros presentes.
-            </p>
-          </div>
-          <Button
-            calLink={`${CAL_USERNAME}/${CAL_EVENTS.parejaFonasa}`}
-            variant="primary"
-            size="md"
-            className="md:flex-shrink-0"
-          >
-            Agendar sesión de pareja
-          </Button>
-        </motion.article>
-
-        {/* Card 4: Sesión particular */}
-        <motion.article
-          variants={item}
-          className="bg-offwhite rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-          style={SECONDARY_CARD_SHADOW}
-        >
-          <div className="md:max-w-xl">
-            <h3 className="font-display text-lg text-ink mb-2">
-              Sesión particular
-            </h3>
-            <p className="mb-2">
-              <span
-                className="font-display text-2xl md:text-3xl text-ink"
-                style={{ fontVariationSettings: '"opsz" 144' }}
-              >
-                $15.000
-              </span>
-              <span className="font-body text-sm text-sage ml-3">
-                Por sesión de 45 minutos
-              </span>
-            </p>
-            <p className="font-body text-sm text-ink/65 leading-relaxed">
-              Sin previsión requerida. Pagas sesión por sesión, sin compromiso. Plataforma certificada por Fonasa. Comprobante para reembolso de isapre cuando aplique.
-            </p>
-          </div>
-          <Button
-            calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular15000}`}
-            variant="primary"
-            size="md"
-            className="md:flex-shrink-0"
-          >
-            Agendar particular
-          </Button>
-        </motion.article>
+        </div>
       </motion.div>
     </section>
   );

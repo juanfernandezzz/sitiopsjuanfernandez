@@ -113,7 +113,7 @@ export default function ComoFuncionaOnline() {
       id="como-funciona"
       ref={ref}
       style={{ scrollMarginTop: '80px' }}
-      className="bg-cream py-24 md:py-32 px-6"
+      className="bg-cream py-16 md:py-20 px-6"
     >
       <motion.div
         className="max-w-6xl mx-auto"
@@ -124,9 +124,9 @@ export default function ComoFuncionaOnline() {
         {/* Header */}
         <motion.div
           variants={item}
-          className="text-center mb-16 md:mb-20 max-w-2xl mx-auto"
+          className="text-center mb-12 md:mb-14 max-w-2xl mx-auto"
         >
-          <p className="text-sage text-xs uppercase tracking-[0.2em] font-body mb-4">
+          <p className="text-sage text-[13px] uppercase tracking-[0.18em] font-body mb-4">
             Cómo funciona online
           </p>
           <h2
@@ -135,26 +135,26 @@ export default function ComoFuncionaOnline() {
           >
             Cómo funciona una sesión online
           </h2>
-          <p className="font-body text-lg text-ink/70 leading-relaxed">
+          <p className="font-body text-[18px] md:text-[19px] text-ink/80 leading-relaxed">
             Es más simple de lo que parece. En 4 pasos.
           </p>
         </motion.div>
 
         {/* Steps grid: 1 / 2 / 4 cols */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-20 md:mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-14 md:mb-16">
           {STEPS.map((s) => (
             <motion.div key={s.num} variants={item} className="flex flex-col">
               <span
                 className="font-display text-6xl md:text-7xl leading-none mb-5"
                 style={{
                   fontVariationSettings: '"opsz" 144',
-                  color: 'rgba(168, 181, 160, 0.4)',
+                  color: 'rgba(95, 122, 104, 0.78)',
                 }}
               >
                 {s.num}
               </span>
               <h3 className="font-display text-xl text-ink mb-3">{s.title}</h3>
-              <p className="font-body text-[15px] md:text-base text-ink/70 leading-[1.65]">
+              <p className="font-body text-[15.5px] md:text-[16.5px] text-ink/78 leading-[1.65]">
                 {s.text}
               </p>
             </motion.div>
@@ -184,10 +184,18 @@ export default function ComoFuncionaOnline() {
           ))}
         </motion.div>
 
+        {/* Nota de pago: primero copago Fonasa, luego particular */}
+        <motion.p
+          variants={item}
+          className="font-body text-[15px] text-ink/75 text-center max-w-[52ch] mx-auto leading-relaxed mb-6"
+        >
+          El pago es simple: copago de $5.570 con bono Fonasa, o $15.000 en modalidad particular. Lo eliges al momento de agendar.
+        </motion.p>
+
         {/* Closing line */}
         <motion.p
           variants={item}
-          className="font-body text-sm italic text-ink/60 text-center max-w-[50ch] mx-auto leading-relaxed"
+          className="font-body text-[14px] italic text-ink/65 text-center max-w-[50ch] mx-auto leading-relaxed"
         >
           Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.
         </motion.p>

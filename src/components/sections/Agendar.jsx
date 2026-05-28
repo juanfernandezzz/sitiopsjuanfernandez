@@ -9,9 +9,10 @@ const Cal = lazy(() =>
 );
 
 const TABS = [
-  { key: 'particular15000', label: 'Particular', price: '$15.000' },
-  { key: 'primeraSesionFonasa', label: 'Bono Fonasa', price: '$5.570' },
-  { key: 'parejaFonasa', label: 'Pareja Fonasa', price: '$5.570' },
+  { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: '$5.570' },
+  { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: '$5.570' },
+  { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: '$5.570' },
+  { key: 'particular15000', label: 'Sesión arancel particular', price: '$15.000' },
 ];
 
 const REASSURANCES = [
@@ -105,7 +106,7 @@ export default function Agendar() {
       id="agendar"
       ref={ref}
       style={{ scrollMarginTop: '80px' }}
-      className="relative bg-cream py-20 md:py-28 px-5 md:px-8"
+      className="relative bg-cream py-16 md:py-20 px-5 md:px-8"
       aria-labelledby="agendar-heading"
     >
       <motion.div
@@ -121,7 +122,7 @@ export default function Agendar() {
           className="font-body uppercase text-sage"
           style={{
             fontSize: 13,
-            letterSpacing: '0.2em',
+            letterSpacing: '0.18em',
             fontWeight: 600,
             marginBottom: 14,
           }}
@@ -166,11 +167,11 @@ export default function Agendar() {
           variants={item}
           role="tablist"
           aria-label="Tipo de sesión"
-          className="inline-flex flex-wrap gap-1 mb-6 bg-offwhite"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 bg-offwhite"
           style={{
             border: '1px solid rgba(63,91,74,0.15)',
-            borderRadius: 999,
-            padding: 4,
+            borderRadius: 14,
+            padding: 6,
           }}
         >
           {TABS.map((tab) => {
@@ -184,9 +185,9 @@ export default function Agendar() {
                 className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
                   backgroundColor: active ? '#C97B5E' : 'transparent',
-                  color: active ? '#F6F1E8' : 'rgba(42,59,76,0.6)',
-                  borderRadius: 999,
-                  padding: '10px 20px',
+                  color: active ? '#F6F1E8' : 'rgba(42,59,76,0.7)',
+                  borderRadius: 10,
+                  padding: '12px 16px',
                   fontSize: 14,
                   fontWeight: 600,
                   border: 'none',
@@ -194,18 +195,20 @@ export default function Agendar() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  lineHeight: 1.2,
-                  minWidth: 120,
+                  textAlign: 'left',
+                  lineHeight: 1.25,
+                  width: '100%',
+                  height: '100%',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.color = '#3F5B4A';
                 }}
                 onMouseLeave={(e) => {
                   if (!active)
-                    e.currentTarget.style.color = 'rgba(42,59,76,0.6)';
+                    e.currentTarget.style.color = 'rgba(42,59,76,0.7)';
                 }}
               >
-                <span>{tab.label}</span>
+                <span style={{ whiteSpace: 'normal' }}>{tab.label}</span>
                 <span
                   style={{
                     fontSize: 12,

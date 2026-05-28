@@ -22,11 +22,10 @@ export default function HeaderUtilitario() {
     >
       <a
         href="/"
-        className="font-display text-sage"
+        className="font-wordmark text-sage"
         style={{
-          fontSize: 18,
-          letterSpacing: '-0.01em',
-          fontVariationSettings: '"opsz" 144, "SOFT" 50',
+          fontSize: 20,
+          letterSpacing: '0',
           textDecoration: 'none',
         }}
       >

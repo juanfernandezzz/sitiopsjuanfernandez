@@ -12,45 +12,36 @@ npm run dev
 
 Servidor de desarrollo en `http://localhost:5173`.
 
-## Pendiente antes del primer commit
-
-**Foto profesional** (único pendiente):
-Súbeme la imagen en el chat y la coloco en `public/juan.jpg` + regenero el zip. Mientras tanto el `<img src="/juan.jpg">` del Hero estará roto.
-
-Cuando la foto esté en `public/juan.jpg`, también puedo regenerar `og.jpg` incorporándola como elemento visual (en lugar del monograma tipográfico actual).
-
 ## Assets ya incluidos
 
-- `public/favicon.svg`: monograma "j" serif italic sobre círculo sage con accent terracotta
+- `public/favicon.svg`: monograma "JF" serif sobre fondo ink con accent terracotta (más PNG e .ico derivados)
 - `public/og.jpg`: 1200×630, diseño editorial con headline + signature, MINSAL N° 876085
 
 ## Estructura
 
 ```
 sitio-juan/
-├── public/
-│   ├── favicon.svg          ✓ creado
-│   ├── og.jpg               ✓ creado
-│   ├── juan.jpg             ← falta (subir)
-│   ├── robots.txt           ✓ creado (C10)
-│   └── sitemap.xml          ✓ creado (C10)
+├── public/                  favicon set (svg+png+ico), og.jpg, juan.jpg, robots.txt, sitemap.xml
 ├── src/
+│   ├── assets/images/juan.jpg
 │   ├── components/
-│   │   ├── Nav.jsx
-│   │   └── Hero.jsx
-│   ├── lib/
-│   │   ├── contacto.js
-│   │   └── faqData.js       ✓ creado (C10)
-│   ├── App.jsx
-│   ├── main.jsx
+│   │   ├── layout/          Header (barra fija sage), HeaderUtilitario, Footer
+│   │   ├── sections/        Hero, ComoTrabajo, Precios, ComoFuncionaOnline, Agendar, FAQ
+│   │   ├── modals/          ModalGuiaFonasa
+│   │   ├── forms/           ConsentimientoInformado, PantallaExito
+│   │   └── ui/              Button
+│   ├── lib/                 cal, contacto, faqData, validacion, hash, generarPDF..., descargarPDF, uiContext, textoConsentimiento
+│   ├── pages/               PoliticaPrivacidad
+│   ├── App.jsx              raiz del sitio principal
+│   ├── ConsentimientoApp.jsx
+│   ├── PoliticaPrivacidadApp.jsx
+│   ├── main.jsx / main-consentimiento.jsx / main-politica.jsx
 │   └── index.css
-├── index.html
-├── consentimiento.html
-├── politica-privacidad.html
-├── package.json
-├── tailwind.config.js
-├── postcss.config.js
-└── vite.config.js
+├── netlify/functions/       cal-webhook, enviar-consentimiento
+├── index.html / consentimiento.html / politica-privacidad.html
+├── netlify.toml
+├── tailwind.config.js / postcss.config.js / vite.config.js
+└── package.json
 ```
 
 ## Sistema de diseño
@@ -62,13 +53,15 @@ sitio-juan/
 - **Fraunces** display con eje SOFT activado (warmth)
 - **Karla** body
 
-## Próximas secciones
+## Secciones del sitio (todas implementadas)
 
-- [ ] Sobre Mí (bio canónica + credenciales CV)
-- [ ] Metodología (CBT integrativo + narrativo)
-- [x] Agendar (Cal.com embed × 4 eventos)
+- [x] Hero (rotación de frase, foto con marco)
+- [x] Cómo trabajo
+- [x] Precios (grid 1+3, 4 modalidades)
+- [x] Cómo funciona online
+- [x] Agendar (Cal.com embed, 4 event types)
 - [x] Preguntas frecuentes
-- [ ] Footer (privacidad Ley 21.719-ready)
+- [x] Footer (privacidad Ley 21.719-ready)
 
 ## Configuración Cal.com (para Juan)
 

@@ -22,6 +22,7 @@ export default {
         display: ['Fraunces', 'Georgia', 'serif'],
         sans: ['Karla', 'system-ui', 'sans-serif'],
         body: ['Karla', 'system-ui', 'sans-serif'],
+        wordmark: ['"EB Garamond"', 'Georgia', 'serif'],
       },
       letterSpacing: {
         tightest: '-0.04em',

@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { CAL_USERNAME, HERO_PRIMARY_CTA, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
 
@@ -17,8 +17,25 @@ const WA_HREF = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 const PRIMARY_CAL_LINK = `${CAL_USERNAME}/${HERO_PRIMARY_CTA}`;
 const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 
+// Frases que rotan en el cierre del H1. La primera se renderiza en la carga
+// (es el LCP y lo que lee Google). La más larga reserva la altura del bloque.
+const ROTATING = [
+  'trabajemos lo que hoy te limita',
+  'un espacio donde eres protagonista',
+  'sin salir de casa, a tu propio ritmo',
+];
+const LONGEST = 'sin salir de casa, a tu propio ritmo';
+const ROTATE_MS = 4500;
+
 export default function Hero() {
   const reduce = useReducedMotion();
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % ROTATING.length), ROTATE_MS);
+    return () => clearInterval(t);
+  }, [reduce]);
 
   const container = {
     hidden: {},
@@ -61,31 +78,18 @@ export default function Hero() {
         className="pointer-events-none absolute -bottom-32 left-[-80px] w-[360px] h-[360px] rounded-full bg-terracota/10 blur-3xl"
       />
 
-      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-10 lg:pt-20 pb-14 lg:pb-24">
-        {/* Brand inline */}
-        <div className="mb-10 lg:mb-16">
-          <span
-            className="block font-display text-[22px] lg:text-[26px] text-ink"
-            style={{ fontVariationSettings: '"opsz" 48, "SOFT" 50' }}
-          >
-            Juan Fernández
-          </span>
-          <span className="block font-body text-[11px] uppercase tracking-[0.22em] text-sage mt-1">
-            Psicólogo Clínico
-          </span>
-        </div>
-
+      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-8 lg:pt-14 pb-12 lg:pb-16">
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex flex-col-reverse gap-10 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center"
+          className="flex flex-col-reverse gap-8 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center"
         >
           {/* Columna texto */}
           <div className="lg:col-span-3">
             <motion.span
               variants={item}
-              className="inline-flex items-center gap-2 font-body text-[12px] uppercase tracking-[0.22em] text-sage mb-6"
+              className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
             >
               <span className="w-6 h-px bg-sage" aria-hidden="true" />
               Terapia online en Chile
@@ -103,14 +107,35 @@ export default function Hero() {
                 textWrap: 'balance',
               }}
             >
-              Terapia psicológica online, hecha para escucharte de verdad.
+              Terapia psicológica online,
+              {/* Bloque rotante: el ghost reserva altura para evitar saltos (CLS 0). */}
+              <span className="block relative mt-1">
+                <span className="invisible" aria-hidden="true">
+                  {LONGEST}
+                </span>
+                <span className="absolute inset-0">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={idx}
+                      className="italic text-sage"
+                      style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 0' }}
+                      initial={reduce ? false : { opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduce ? { opacity: 1 } : { opacity: 0, y: -14 }}
+                      transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      {ROTATING[idx]}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
+              </span>
             </motion.h1>
 
             <motion.p
               variants={item}
-              className="mt-6 font-body text-[17px] lg:text-[18px] leading-[1.6] text-ink/75 max-w-[36ch]"
+              className="mt-6 font-body text-[17px] lg:text-[19px] leading-[1.6] text-ink/80 max-w-[40ch]"
             >
-              Acompañamiento individual con enfoque integrativo, que combina psicología cognitivo-conductual y narrativa. Sesiones de 45 minutos por videollamada segura, con o sin bono Fonasa.
+              Acompañamiento individual con enfoque integrativo, que combina psicología cognitivo-conductual y psicología narrativa. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
             </motion.p>
 
             <motion.div
@@ -135,7 +160,7 @@ export default function Hero() {
             {/* Microcopy: aclara restricción y ofrece ruta alternativa sin abandonar el fold. */}
             <motion.p
               variants={item}
-              className="mt-3 font-body text-[13px] text-ink/55"
+              className="mt-3 font-body text-[14px] text-ink/60"
             >
               Primera sesión con bono Fonasa: copago $5.570.{' '}
               <button
@@ -143,6 +168,12 @@ export default function Hero() {
                 data-cal-link={PARTICULAR_CAL_LINK}
                 data-cal-namespace="psicojuan"
                 data-cal-config='{"layout":"month_view"}'
+                onClick={() => {
+                  // Fallback: si Cal aún no está inicializado, abre la URL directa.
+                  if (typeof window !== 'undefined' && !window.Cal) {
+                    window.open(`https://cal.com/${PARTICULAR_CAL_LINK}`, '_blank', 'noopener,noreferrer');
+                  }
+                }}
                 className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
               >
                 ¿Sin Fonasa? Ver sesión particular ($15.000) →
@@ -151,59 +182,65 @@ export default function Hero() {
 
             <motion.ul
               variants={item}
-              className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[13px] lg:text-[14px] text-sage"
+              className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[14px] lg:text-[15px] text-sage"
             >
               <li>Psicólogo clínico titulado</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
-              <li>Inscrito en Fonasa MLE</li>
+              <li>Inscrito en Fonasa</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
               <li>Plataforma certificada por Fonasa</li>
             </motion.ul>
           </div>
 
-          {/* Columna foto */}
+          {/* Columna foto: más contenida en mobile, marco offwhite + sombra reforzada */}
           <motion.div variants={photoVariant} className="lg:col-span-2">
-            <div
-              className="relative w-full overflow-hidden rounded-2xl bg-sage-light/15 shadow-[0_30px_60px_-30px_rgba(63,91,74,0.35),0_18px_40px_-25px_rgba(201,123,94,0.25)]"
-              style={{ aspectRatio: '4 / 5' }}
-            >
-              {juanJpg ? (
-                <picture>
-                  <source srcSet={juanAvif} type="image/avif" />
-                  <source srcSet={juanWebp} type="image/webp" />
-                  <img
-                    src={juanJpg}
-                    alt="Juan Fernández, psicólogo clínico"
-                    width={720}
-                    height={900}
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                  />
-                </picture>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-body text-[13px] tracking-wide text-sage/70 text-center px-6">
-                    Foto Juan Fernández, pendiente
-                  </span>
-                </div>
-              )}
-
+            <div className="mx-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-none">
               <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-                }}
-              />
+                className="relative w-full overflow-hidden rounded-2xl bg-offwhite ring-1 ring-sage/15 p-1.5 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
+              >
+                <div
+                  className="relative w-full overflow-hidden rounded-xl bg-sage-light/15"
+                  style={{ aspectRatio: '4 / 5' }}
+                >
+                  {juanJpg ? (
+                    <picture>
+                      <source srcSet={juanAvif} type="image/avif" />
+                      <source srcSet={juanWebp} type="image/webp" />
+                      <img
+                        src={juanJpg}
+                        alt="Juan Fernández, psicólogo clínico"
+                        width={720}
+                        height={900}
+                        loading="eager"
+                        fetchpriority="high"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </picture>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="font-body text-[13px] tracking-wide text-sage/70 text-center px-6">
+                        Foto Juan Fernández, pendiente
+                      </span>
+                    </div>
+                  )}
+
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay"
+                    style={{
+                      backgroundImage:
+                        "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Sentinel para que el Header sepa cuándo activarse */}
+      {/* Sentinel heredado (ya no controla el header fijo, pero no estorba) */}
       <div id="hero-end-sentinel" aria-hidden="true" className="absolute bottom-0 h-px w-px" />
     </section>
   );
