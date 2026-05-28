@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /consentimiento.html
 
 Sitemap: https://psicologojuanfernandez.cl/sitemap.xml
