@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Button from '../ui/Button';
-import { CAL_USERNAME, HERO_PRIMARY_CTA } from '../../lib/cal';
+import ModalTipoSesion from '../modals/ModalTipoSesion';
 
 const NAV_ITEMS = [
   { label: 'Cómo trabajo', href: '#como-trabajo' },
@@ -9,10 +9,9 @@ const NAV_ITEMS = [
   { label: 'Agendar', href: '#agendar' },
 ];
 
-const PRIMARY_CAL_LINK = `${CAL_USERNAME}/${HERO_PRIMARY_CTA}`;
-
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [tipoSesionOpen, setTipoSesionOpen] = useState(false);
   const firstMobileLinkRef = useRef(null);
 
   // Lock body scroll mientras el menú móvil está abierto.
@@ -56,7 +55,7 @@ export default function Header() {
             <Button
               size="sm"
               variant="primary"
-              calLink={PRIMARY_CAL_LINK}
+              onClick={() => setTipoSesionOpen(true)}
               className="text-[13px] md:text-sm px-4 md:px-5"
             >
               Agendar
@@ -126,8 +125,12 @@ export default function Header() {
                 <Button
                   size="lg"
                   variant="primary"
-                  calLink={PRIMARY_CAL_LINK}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    // Pequeño delay: deja que el panel mobile cierre su animación
+                    // antes de montar el modal, evitando dos overlays encimados.
+                    setTimeout(() => setTipoSesionOpen(true), 280);
+                  }}
                   className="w-full"
                 >
                   Agendar sesión
@@ -137,6 +140,11 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
+
+      <ModalTipoSesion
+        open={tipoSesionOpen}
+        onClose={() => setTipoSesionOpen(false)}
+      />
     </>
   );
 }

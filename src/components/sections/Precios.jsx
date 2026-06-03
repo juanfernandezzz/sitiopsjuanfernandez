@@ -4,7 +4,7 @@ import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
 
-const FLOW_PAGO_URL = 'https://www.flow.cl/btn.php?token=z98de88976cd9faf4f72fdd4c6f0032cc3052def';
+const WEBPAY_PAGO_URL = 'https://www.webpay.cl/form-pay/388212';
 
 const CheckIcon = () => (
   <svg
@@ -246,7 +246,7 @@ export default function Precios() {
                   $15.000
                 </span>
                 <span className="font-body text-[15px] text-sage ml-3">
-                  Con transferencia electrónica o botón de pago
+                  Con transferencia electrónica o WebPay
                 </span>
               </p>
               <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
@@ -261,14 +261,36 @@ export default function Precios() {
                 >
                   Agendar particular
                 </Button>
-                <a
-                  href={FLOW_PAGO_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
-                >
-                  Pagar con botón de pago →
-                </a>
+                <div className="flex items-center gap-4">
+                  <a
+                    href={WEBPAY_PAGO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                  >
+                    Link de pago WebPay →
+                  </a>
+                  <a
+                    href={WEBPAY_PAGO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Pagar con WebPay escaneando el código QR"
+                    className="flex-shrink-0 rounded-lg p-1.5 bg-offwhite ring-1 ring-sage/20 hover:ring-sage/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light"
+                  >
+                    <img
+                      src="/webpay-qr.png"
+                      alt="Código QR para pagar con WebPay"
+                      width={64}
+                      height={64}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ display: 'block', width: 64, height: 64 }}
+                    />
+                  </a>
+                </div>
+                <p className="font-body text-[13px] text-ink/55 leading-snug">
+                  Escanea el QR o usa el link para pagar con WebPay.
+                </p>
               </div>
             </motion.article>
           </div>

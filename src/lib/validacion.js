@@ -26,6 +26,35 @@ export function normalizarRUT(s) {
   return `${cuerpoConPuntos}-${dv}`;
 }
 
+/**
+ * Formatea el RUT mientras el usuario escribe (onChange), sin asumir
+ * prematuramente que el último dígito es el verificador.
+ *
+ * Regla: solo separamos cuerpo y DV con guion cuando hay al menos 8
+ * caracteres (7 de cuerpo mínimo + DV), longitud de un RUT chileno válido.
+ * Por debajo de eso, agrupamos en miles sin guion para que el usuario pueda
+ * seguir tipeando el cuerpo sin que se le inserte un guion intermedio.
+ * Acepta una sola K/k, siempre al final.
+ */
+export function formatearRUTEnVivo(s) {
+  let limpio = (s || '').replace(/[^\dkK]/g, '').toUpperCase();
+  // La K solo puede ir al final (es DV). Quitamos cualquier K que no esté al final.
+  limpio = limpio.replace(/K(?=.)/g, '');
+  limpio = limpio.slice(0, 9); // 8 cuerpo + 1 DV como tope físico
+
+  if (limpio.length <= 1) return limpio;
+
+  // Mientras el RUT aún es corto, agrupamos solo en miles, sin guion de DV.
+  if (limpio.length < 8) {
+    return limpio.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  const cuerpo = limpio.slice(0, -1);
+  const dv = limpio.slice(-1);
+  const cuerpoConPuntos = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${cuerpoConPuntos}-${dv}`;
+}
+
 export function validarRUT(s) {
   const limpio = (s || '').replace(/[^\dkK]/g, '').toUpperCase();
   if (limpio.length < 8 || limpio.length > 9) {

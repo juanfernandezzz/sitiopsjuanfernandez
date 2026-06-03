@@ -134,7 +134,7 @@ function ColumnaIdentidad() {
 function ColumnaCredenciales() {
   const items = [
     `Psicólogo titulado, ${PRESTADOR.universidad}`,
-    `Registro Nacional Prestadores Individuales (RNPI): ${PRESTADOR.rnpi}`,
+    `Registro en la Superintendencia de Salud N° ${PRESTADOR.rnpi}`,
     'Prestador inscrito en Fonasa (Modalidad Libre Elección)',
     `Códigos: ${PRESTADOR.fonasaCodigos}`,
     'Plataforma certificada por Fonasa: Doxy.me',

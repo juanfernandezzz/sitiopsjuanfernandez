@@ -192,14 +192,16 @@ export default function Hero() {
             </motion.ul>
           </div>
 
-          {/* Columna foto: más contenida en mobile, marco offwhite + sombra reforzada */}
+          {/* Columna foto: borde fino sage definido (sin marco de relleno offwhite,
+              que se leía como marco pálido de bajo contraste). Mobile más grande
+              para reforzar la señal de competencia del headshot sin que domine el CTA. */}
           <motion.div variants={photoVariant} className="lg:col-span-2">
-            <div className="mx-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-none">
+            <div className="mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:max-w-none">
               <div
-                className="relative w-full overflow-hidden rounded-2xl bg-offwhite ring-1 ring-sage/15 p-1.5 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
+                className="relative w-full overflow-hidden rounded-2xl ring-1 ring-sage/30 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
               >
                 <div
-                  className="relative w-full overflow-hidden rounded-xl bg-sage-light/15"
+                  className="relative w-full overflow-hidden rounded-2xl bg-sage-light/15"
                   style={{ aspectRatio: '4 / 5' }}
                 >
                   {juanJpg ? (

@@ -10,6 +10,7 @@ import {
   validarTelefono,
   normalizarRUT,
   normalizarTelefono,
+  formatearRUTEnVivo,
 } from '../../lib/validacion';
 
 const SESSION_KEY = 'consentimiento_pendiente';
@@ -170,6 +171,10 @@ export default function ConsentimientoInformado() {
     sessionStorage.removeItem(SESSION_KEY);
     setRecovery(null);
   }, []);
+
+  const handleRutChange = (e) => {
+    setRut(formatearRUTEnVivo(e.target.value));
+  };
 
   const onBlurRut = () => {
     if (!rut) return;
@@ -534,11 +539,11 @@ export default function ConsentimientoInformado() {
               id="cons-rut"
               type="text"
               value={rut}
-              onChange={(e) => setRut(e.target.value)}
+              onChange={handleRutChange}
               onBlur={onBlurRut}
               aria-invalid={!!errores.rut || mostrarRutErrorVivo}
               aria-describedby={errores.rut ? 'err-rut' : undefined}
-              placeholder="17.520.730-9"
+              placeholder="12.345.678-9"
               style={{
                 ...inputBase,
                 ...(errores.rut || mostrarRutErrorVivo ? inputError : {}),
