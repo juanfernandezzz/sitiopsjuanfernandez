@@ -101,6 +101,7 @@ export const handler = async (event) => {
     `&email=${encodeURIComponent(attendee.email)}`;
 
   const eventTitle = booking.eventType?.title || 'sesión';
+  const eventSlug = booking.eventType?.slug || '';
   const startTime = booking.startTime
     ? new Date(booking.startTime).toLocaleString('es-CL', {
         dateStyle: 'long',
@@ -109,12 +110,64 @@ export const handler = async (event) => {
       })
     : '';
 
+  // --- Datos del prestador (públicos, hardcodeados server-side a propósito).
+  // El webhook corre server-side y no lee las VITE_ vars del cliente. ---
+  const RUT_PRESTADOR = '17.520.730-9';
+  const WHATSAPP = '+56 9 7339 4530';
+  const MI_FONASA_URL = 'https://mi.fonasa.gob.cl/';
+  const WEBPAY_URL = 'https://www.webpay.cl/form-pay/388212';
+  const TRANSFER_EMAIL = 'juanfernandezpsicologo@gmail.com';
+
+  // Mapeo slug del evento Cal -> código Fonasa con su string literal del portal
+  // (idéntico a lo que el usuario ve en Mi Fonasa, para que seleccione el código
+  // correcto). Verificado contra src/lib/cal.js. Si el slug no calza, pagoLineas
+  // queda vacío y el email sale sin bloque de pago (degradación segura).
+  const FONASA_POR_SLUG = {
+    'primera-sesion-bonofonasa':
+      "09 08 101 Telerehabilitación: Psicólogo clínico (sesiones 45')",
+    'sesiones-de-avance-bonofonasa':
+      '09 08 102 Telerehabilitación: Psicoterapia individual',
+    'psicoterapia-de-pareja-bonofonasa':
+      '09 08 103 Telerehabilitación: Sesión de psicoterapia de pareja (con ambos miembros)',
+  };
+  const ES_PARTICULAR =
+    eventSlug === 'psicoterapia-individual-online-particular-15.000';
+
+  let pagoLineas = [];
+  if (FONASA_POR_SLUG[eventSlug]) {
+    pagoLineas = [
+      'PAGO DE TU SESIÓN (BONO FONASA)',
+      'Antes de la sesión necesitas comprar el bono Fonasa:',
+      `1. Entra a Mi Fonasa: ${MI_FONASA_URL}`,
+      `2. Busca el prestador por RUT: ${RUT_PRESTADOR} (Juan Fernández).`,
+      `3. Selecciona el código: ${FONASA_POR_SLUG[eventSlug]}`,
+      '4. Paga el bono (copago $5.570 para tramos B, C y D) y recibirás un folio.',
+      `5. Envíame el folio por WhatsApp (${WHATSAPP}) antes de la sesión. Sin el folio no puedo registrar la prestación en Fonasa.`,
+    ];
+  } else if (ES_PARTICULAR) {
+    pagoLineas = [
+      'PAGO DE TU SESIÓN (PARTICULAR, $15.000)',
+      'Puedes pagar de dos formas antes de la sesión:',
+      `Opción 1, WebPay: ${WEBPAY_URL}`,
+      'Opción 2, transferencia electrónica:',
+      '  Banco: BancoEstado (CuentaRUT)',
+      '  N° de cuenta: 17520730',
+      '  Titular: Juan Fernández',
+      `  RUT: ${RUT_PRESTADOR}`,
+      `  Correo para el comprobante: ${TRANSFER_EMAIL}`,
+      `Envíame el comprobante a ese correo o por WhatsApp (${WHATSAPP}).`,
+    ];
+  }
+
+  // Bloque de pago con líneas en blanco a los lados (vacío si el slug no calza).
+  const bloquePago = pagoLineas.length ? ['', ...pagoLineas, ''] : [];
+
   try {
     const result = await resend.emails.send({
       from: FROM,
       to: [attendee.email],
       reply_to: REPLY_TO,
-      subject: 'Requisito antes de tu sesión: consentimiento informado',
+      subject: 'Antes de tu sesión: consentimiento informado y pago',
       text: [
         `Hola ${primerNombre},`,
         ``,
@@ -126,8 +179,8 @@ export const handler = async (event) => {
         `${linkConsentimiento}`,
         ``,
         `Llegará una copia firmada a tu email y la podrás descargar en PDF.`,
-        ``,
-        `Si tienes cualquier duda escríbeme por WhatsApp al +56 9 7339 4530 o responde a este email.`,
+        ...bloquePago,
+        `Si tienes cualquier duda escríbeme por WhatsApp al ${WHATSAPP} o responde a este email.`,
         ``,
         `Nos vemos pronto.`,
         ``,

@@ -12,9 +12,25 @@ export const PRESTADOR = {
   universidad: 'Universidad Viña del Mar',
   anioTitulo: 2025,
   rnpi: '876085',
-  fonasaCodigos: '09 08 101 / 102 / 103',
   ciudadBase: 'Valparaíso',
 };
+
+/**
+ * Códigos Fonasa MLE con nomenclatura funcional (lenguaje del paciente).
+ * Formato del token numérico unificado a "09 08 101" en todo el sitio, idéntico
+ * a como lo muestra el portal Mi Fonasa, para que el código que el usuario lee
+ * aquí calce exactamente con el que selecciona al comprar el bono.
+ *
+ * Nota: los strings LITERALES del arancel Fonasa (p. ej. "Telerehabilitación:
+ * Psicólogo clínico") viven solo donde el usuario debe reconocer el portal:
+ * la guía (ModalGuiaFonasa) y el correo post-reserva (cal-webhook). Aquí se usa
+ * la etiqueta funcional para no recargar al usuario que solo está orientándose.
+ */
+export const FONASA_CODIGOS = [
+  { codigo: '09 08 101', etiqueta: 'primera sesión individual' },
+  { codigo: '09 08 102', etiqueta: 'sesión de avance' },
+  { codigo: '09 08 103', etiqueta: 'terapia de pareja' },
+];
 
 export const CONTACTO = {
   email: 'juanfernandezpsicologo@gmail.com',
@@ -35,4 +51,5 @@ export const LEGAL = {
 export const URLS_EXTERNAS = {
   superintendenciaSalud: 'https://www.superdesalud.gob.cl/',
   fonasa: 'https://www.fonasa.cl/',
+  miFonasa: 'https://mi.fonasa.gob.cl/',
 };

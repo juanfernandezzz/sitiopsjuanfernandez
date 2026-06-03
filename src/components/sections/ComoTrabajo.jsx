@@ -184,7 +184,7 @@ export default function ComoTrabajo() {
             variants={item}
             className="font-body text-[14px] lg:text-[14.5px] text-sage max-w-[44ch] leading-[1.55]"
           >
-            Videollamada por Doxy.me, plataforma certificada por Fonasa para telerehabilitación. Conexión segura, sin descargas ni instalaciones.
+            Videollamada por Doxy.me, plataforma certificada por Fonasa para teleconsulta. Conexión segura, sin descargas ni instalaciones.
           </motion.p>
           <motion.div variants={item} className="shrink-0">
             <Button size="lg" variant="primary" calLink={PRIMARY_CAL_LINK}>

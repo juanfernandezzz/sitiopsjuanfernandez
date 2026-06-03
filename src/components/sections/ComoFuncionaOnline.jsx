@@ -63,11 +63,12 @@ const STEPS = [
     num: '01',
     title: 'Tu reserva queda confirmada',
     text: 'Recibes en tu email la confirmación con fecha, hora y enlace de la sesión. Todo desde Cal.com.',
+    nota: 'Antes de la sesión: compras tu bono Fonasa y me envías el folio, o pagas la sesión particular por transferencia o WebPay. Te lo recuerdo en el mismo correo.',
   },
   {
     num: '02',
     title: 'Recibes el link de la sala',
-    text: 'Te envío por email el link a mi sala virtual en Doxy.me, plataforma certificada por Fonasa para telerehabilitación. No necesitas descargar nada.',
+    text: 'Te envío por email el link a mi sala virtual en Doxy.me, plataforma certificada por Fonasa para teleconsulta. No necesitas descargar nada.',
   },
   {
     num: '03',
@@ -157,6 +158,11 @@ export default function ComoFuncionaOnline() {
               <p className="font-body text-[15.5px] md:text-[16.5px] text-ink/78 leading-[1.65]">
                 {s.text}
               </p>
+              {s.nota && (
+                <p className="mt-3 font-body text-[13.5px] text-ink/60 leading-[1.6] border-l-2 border-sage/30 pl-3">
+                  {s.nota}
+                </p>
+              )}
             </motion.div>
           ))}
         </div>

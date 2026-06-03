@@ -26,11 +26,12 @@ const CheckIcon = () => (
 const FEATURES_FONASA_PRIMERA = [
   'Sesión de 45 minutos',
   'Disponible para afiliados Fonasa tramos B, C y D',
-  'Código 0908101 para usuarios nuevos',
+  'Código 09 08 101 para usuarios nuevos',
   'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
 ];
 
 const SECONDARY_CARD_SHADOW = {
+  border: '1px solid rgba(63, 91, 74, 0.18)',
   boxShadow:
     '0 1px 3px rgba(42, 59, 76, 0.04), 0 8px 24px rgba(42, 59, 76, 0.04)',
 };
@@ -90,8 +91,9 @@ export default function Precios() {
         </motion.div>
 
         {/* Grid 1 + 3 en desktop: destacada a la izquierda, tres apiladas a la derecha */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-          {/* Columna izquierda: card destacada */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-start">
+          {/* Columna izquierda: card destacada (se dimensiona a su contenido,
+              sin estirarse a la altura de las tres apiladas: evita el hueco). */}
           <motion.article
             variants={item}
             className="relative bg-offwhite rounded-2xl p-8 md:p-10 flex flex-col"
@@ -101,8 +103,8 @@ export default function Precios() {
                 '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
             }}
           >
-            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[11px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-full select-none">
-              Si es tu primera vez conmigo
+            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[11.5px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
+              Para tu primera sesión
             </span>
 
             <h3 className="font-display text-xl text-ink mb-6 mt-2">
@@ -180,7 +182,7 @@ export default function Precios() {
                 </span>
               </p>
               <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
-                Para pacientes que ya iniciaron tratamiento conmigo. Código 0908102, sesión de 45 minutos.
+                Para pacientes que ya iniciaron tratamiento conmigo. Código 09 08 102, sesión de 45 minutos.
               </p>
               <div className="mt-auto">
                 <Button
@@ -215,7 +217,7 @@ export default function Precios() {
                 </span>
               </p>
               <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
-                Código 0908103. Sesión de 45 minutos con ambos miembros presentes.
+                Código 09 08 103. Sesión de 45 minutos con ambos miembros presentes.
               </p>
               <div className="mt-auto">
                 <Button
@@ -252,7 +254,7 @@ export default function Precios() {
               <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
                 Sin previsión requerida. Comprobante para reembolso de isapre cuando aplique.
               </p>
-              <div className="mt-auto flex flex-col gap-3">
+              <div className="mt-auto flex flex-col gap-4">
                 <Button
                   calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular15000}`}
                   variant="primary"
@@ -261,36 +263,59 @@ export default function Precios() {
                 >
                   Agendar particular
                 </Button>
-                <div className="flex items-center gap-4">
-                  <a
-                    href={WEBPAY_PAGO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
-                  >
-                    Link de pago WebPay →
-                  </a>
-                  <a
-                    href={WEBPAY_PAGO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Pagar con WebPay escaneando el código QR"
-                    className="flex-shrink-0 rounded-lg p-1.5 bg-offwhite ring-1 ring-sage/20 hover:ring-sage/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light"
-                  >
-                    <img
-                      src="/webpay-qr.png"
-                      alt="Código QR para pagar con WebPay"
-                      width={64}
-                      height={64}
-                      loading="lazy"
-                      decoding="async"
-                      style={{ display: 'block', width: 64, height: 64 }}
-                    />
-                  </a>
+
+                {/* Pago WebPay: form POST oficial. Sale directo a WebPay (sin
+                    preventDefault) y abre en pestaña nueva para no perder el sitio.
+                    El SVG del botón se sirve local desde /public (sin hotlinking). */}
+                <div className="flex flex-col gap-3 pt-4 border-t border-sage/15">
+                  <p className="font-body text-[13px] text-ink/60 leading-snug">
+                    ¿Prefieres pagar ahora? Hazlo con WebPay:
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <form
+                      method="post"
+                      action="https://www.webpay.cl/backpub/external/form-pay"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex"
+                    >
+                      <input type="hidden" name="idFormulario" value="388212" />
+                      <input type="hidden" name="monto" value="15000" />
+                      <input
+                        type="image"
+                        name="button1"
+                        src="/boton-webpay.svg"
+                        alt="Pagar la sesión particular de $15.000 con WebPay"
+                        title="Pagar con WebPay"
+                        className="block transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite rounded-md"
+                        style={{ height: 46, width: 'auto' }}
+                      />
+                    </form>
+
+                    {/* QR: solo escritorio (escanear la pantalla del propio teléfono
+                        no sirve en mobile; ahí basta el botón de arriba). */}
+                    <a
+                      href={WEBPAY_PAGO_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Pagar con WebPay escaneando el código QR con tu teléfono"
+                      className="hidden md:flex flex-shrink-0 rounded-lg p-1.5 bg-offwhite ring-1 ring-sage/20 hover:ring-sage/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light"
+                    >
+                      <img
+                        src="/webpay-qr.png"
+                        alt="Código QR para pagar con WebPay"
+                        width={64}
+                        height={64}
+                        loading="lazy"
+                        decoding="async"
+                        style={{ display: 'block', width: 64, height: 64 }}
+                      />
+                    </a>
+                  </div>
+                  <p className="hidden md:block font-body text-[13px] text-ink/55 leading-snug">
+                    Pulsa el botón, o escanea el código con tu teléfono.
+                  </p>
                 </div>
-                <p className="font-body text-[13px] text-ink/55 leading-snug">
-                  Escanea el QR o usa el link para pagar con WebPay.
-                </p>
               </div>
             </motion.article>
           </div>

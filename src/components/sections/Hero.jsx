@@ -135,7 +135,7 @@ export default function Hero() {
               variants={item}
               className="mt-6 font-body text-[17px] lg:text-[19px] leading-[1.6] text-ink/80 max-w-[40ch]"
             >
-              Acompañamiento individual con enfoque integrativo, que combina psicología cognitivo-conductual y psicología narrativa. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
+              Un espacio para trabajar lo que hoy te pesa y darle un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular. Con enfoque cognitivo-conductual y narrativo.
             </motion.p>
 
             <motion.div

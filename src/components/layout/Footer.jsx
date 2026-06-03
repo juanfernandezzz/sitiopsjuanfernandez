@@ -1,4 +1,4 @@
-import { PRESTADOR, CONTACTO, LEGAL } from '../../lib/contacto';
+import { PRESTADOR, CONTACTO, LEGAL, FONASA_CODIGOS } from '../../lib/contacto';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -136,7 +136,6 @@ function ColumnaCredenciales() {
     `Psicólogo titulado, ${PRESTADOR.universidad}`,
     `Registro en la Superintendencia de Salud N° ${PRESTADOR.rnpi}`,
     'Prestador inscrito en Fonasa (Modalidad Libre Elección)',
-    `Códigos: ${PRESTADOR.fonasaCodigos}`,
     'Plataforma certificada por Fonasa: Doxy.me',
   ];
   return (
@@ -158,6 +157,16 @@ function ColumnaCredenciales() {
             {item}
           </li>
         ))}
+        <li style={{ marginTop: 8 }}>
+          Códigos Fonasa:
+          <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0' }}>
+            {FONASA_CODIGOS.map(({ codigo, etiqueta }) => (
+              <li key={codigo} style={{ color: 'rgba(246, 241, 232, 0.7)' }}>
+                {codigo} ({etiqueta})
+              </li>
+            ))}
+          </ul>
+        </li>
       </ul>
     </div>
   );

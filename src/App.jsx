@@ -5,7 +5,9 @@ import { UIProvider } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
+import MotivosConsulta from './components/sections/MotivosConsulta'
 import ComoTrabajo from './components/sections/ComoTrabajo'
+import Credenciales from './components/sections/Credenciales'
 import Precios from './components/sections/Precios'
 import ComoFuncionaOnline from './components/sections/ComoFuncionaOnline'
 import Agendar from './components/sections/Agendar'
@@ -62,7 +64,9 @@ export default function App() {
         <Header />
         <main>
           <Hero />
+          <MotivosConsulta />
           <ComoTrabajo />
+          <Credenciales />
           <Precios />
           <ComoFuncionaOnline />
           <Agendar />

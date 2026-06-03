@@ -16,7 +16,21 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿La terapia online funciona igual que la presencial?',
-    a: 'Para la mayoría de los procesos personales que llegan a consulta, la evidencia disponible (estudios desde 2015 en adelante) muestra resultados equivalentes a la modalidad presencial. Lo importante es tener un lugar privado donde puedas hablar tranquilo y una conexión estable. Hay situaciones específicas en las que recomiendo terapia presencial. Si fuera tu caso, te lo diría con honestidad.',
+    a: 'Sí, para la mayoría de los procesos que llegan a consulta. Varios metaanálisis que reúnen cientos de estudios concluyen que la terapia por videollamada logra resultados equivalentes a la presencial, y que el beneficio es especialmente claro en ansiedad y depresión cuando se trabaja con terapia cognitivo-conductual. Lo importante es que tengas un lugar privado donde hablar tranquilo y una conexión estable. Hay situaciones específicas en las que recomiendo terapia presencial. Si fuera tu caso, te lo diría con honestidad.',
+    fuentes: [
+      {
+        label: 'Greenwood et al. (2020), Clinical Psychology Review',
+        url: 'https://www.sciencedirect.com/science/article/abs/pii/S027273582030132X',
+      },
+      {
+        label: 'Fernandez et al. (2021), Clinical Psychology & Psychotherapy',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/33826190/',
+      },
+      {
+        label: 'Revisión global (2024), Computers in Human Behavior',
+        url: 'https://www.sciencedirect.com/science/article/abs/pii/S0747563224001936',
+      },
+    ],
   },
   {
     q: '¿Cuánto cuesta una sesión?',
@@ -33,7 +47,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Necesito instalar algo para la videollamada?',
-    a: 'No. Las sesiones son a través de Doxy.me, plataforma de telerehabilitación certificada por Fonasa. Se abre desde cualquier navegador moderno (Chrome, Safari, Firefox, Edge). Recibes un link, le das clic, das permiso a cámara y micrófono, y entras a la sala de espera. Yo te admito cuando estoy listo.',
+    a: 'No. Las sesiones son a través de Doxy.me, plataforma de teleconsulta certificada por Fonasa. Se abre desde cualquier navegador moderno (Chrome, Safari, Firefox, Edge). Recibes un link, le das clic, das permiso a cámara y micrófono, y entras a la sala de espera. Yo te admito cuando estoy listo.',
   },
   {
     q: '¿Mis datos están protegidos?',

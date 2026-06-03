@@ -74,6 +74,27 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
             >
               {item.a}
             </p>
+            {item.fuentes && (
+              <div className="px-6 pb-5 -mt-1" style={{ maxWidth: '65ch' }}>
+                <p className="font-body text-[12.5px] uppercase tracking-[0.14em] text-sage/80 mb-2">
+                  Estudios que lo respaldan
+                </p>
+                <ul className="flex flex-col gap-1.5" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {item.fuentes.map((f) => (
+                    <li key={f.url}>
+                      <a
+                        href={f.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-body text-[13px] text-ink/60 hover:text-sage underline decoration-sage/25 hover:decoration-sage underline-offset-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                      >
+                        {f.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {item.cta && (
               <button
                 type="button"

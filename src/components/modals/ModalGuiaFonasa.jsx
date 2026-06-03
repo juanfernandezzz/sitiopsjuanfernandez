@@ -19,12 +19,14 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useUI } from '../../lib/uiContext';
+import { PRESTADOR } from '../../lib/contacto';
 import Button from '../ui/Button';
 
-const RUT_PROFESIONAL =
-  import.meta.env.VITE_RUT_PROFESIONAL && import.meta.env.VITE_RUT_PROFESIONAL.trim() !== ''
-    ? import.meta.env.VITE_RUT_PROFESIONAL
-    : 'pendiente';
+// RUT del prestador: dato público, leído de la fuente única (contacto.js).
+// Antes salía de import.meta.env.VITE_RUT_PROFESIONAL con default 'pendiente',
+// lo que arriesgaba mostrar "pendiente" en producción si la variable no estaba
+// configurada en Netlify, rompiendo la compra del bono.
+const RUT_PROFESIONAL = PRESTADOR.rut;
 
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
 const WA_MESSAGE = encodeURIComponent(
@@ -56,7 +58,7 @@ const PASOS = [
   {
     titulo: 'Selecciona el código de prestación',
     desc:
-      'Elige uno de los códigos disponibles según el tipo de sesión: 0908101 o 0908102 para individual, 0908103 para pareja. El copago para tramos B, C y D es de $5.570.',
+      'Elige uno de los códigos disponibles según el tipo de sesión: 09 08 101 o 09 08 102 para individual, 09 08 103 para pareja. El copago para tramos B, C y D es de $5.570.',
   },
   {
     titulo: 'Paga el bono en línea',
@@ -375,9 +377,9 @@ export default function ModalGuiaFonasa() {
                       }}
                       className="marker:text-sage/50"
                     >
-                      <li>0908101 (Psicólogo clínico)</li>
-                      <li>0908102 (Psicoterapia individual)</li>
-                      <li>0908103 (Psicoterapia de pareja)</li>
+                      <li>09 08 101 Telerehabilitación: Psicólogo clínico (sesiones 45')</li>
+                      <li>09 08 102 Telerehabilitación: Psicoterapia individual</li>
+                      <li>09 08 103 Telerehabilitación: Sesión de psicoterapia de pareja (con ambos miembros)</li>
                     </ul>
                   </li>
                 </ul>

@@ -56,7 +56,7 @@ export default function Header() {
               size="sm"
               variant="primary"
               onClick={() => setTipoSesionOpen(true)}
-              className="text-[13px] md:text-sm px-4 md:px-5"
+              className="text-sm font-semibold !px-5 !py-2.5 md:!py-2"
             >
               Agendar
             </Button>

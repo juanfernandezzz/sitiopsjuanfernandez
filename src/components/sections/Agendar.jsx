@@ -12,13 +12,13 @@ const TABS = [
   { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: '$5.570' },
   { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: '$5.570' },
   { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: '$5.570' },
-  { key: 'particular15000', label: 'Sesión arancel particular', price: '$15.000' },
+  { key: 'particular15000', label: 'Sesión particular', price: '$15.000' },
 ];
 
 const REASSURANCES = [
   'Recibes confirmación inmediata por correo',
   'Recordatorios automáticos 24h y 1h antes',
-  'Reagendamiento flexible según mi política',
+  'Puedes reagendar hasta 6 horas antes, sin costo',
 ];
 
 const CheckIcon = () => (
