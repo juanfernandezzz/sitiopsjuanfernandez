@@ -286,7 +286,7 @@ export default function Precios() {
                         alt="Pagar la sesión particular de $15.000 con WebPay"
                         title="Pagar con WebPay"
                         className="block transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite rounded-md"
-                        style={{ height: 46, width: 'auto' }}
+                        style={{ height: 56, width: 'auto' }}
                       />
                     </form>
 
@@ -302,11 +302,11 @@ export default function Precios() {
                       <img
                         src="/webpay-qr.png"
                         alt="Código QR para pagar con WebPay"
-                        width={64}
-                        height={64}
+                        width={128}
+                        height={128}
                         loading="lazy"
                         decoding="async"
-                        style={{ display: 'block', width: 64, height: 64 }}
+                        style={{ display: 'block', width: 128, height: 128 }}
                       />
                     </a>
                   </div>

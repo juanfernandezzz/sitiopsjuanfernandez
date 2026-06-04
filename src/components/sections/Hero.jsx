@@ -20,7 +20,7 @@ const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 // Frases que rotan en el cierre del H1. La primera se renderiza en la carga
 // (es el LCP y lo que lee Google). La más larga reserva la altura del bloque.
 const ROTATING = [
-  'trabajemos lo que hoy te limita',
+  'con empatía y sin prejuicios',
   'un espacio donde eres protagonista',
   'sin salir de casa, a tu propio ritmo',
 ];
@@ -136,7 +136,7 @@ export default function Hero() {
               variants={item}
               className="mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
             >
-              Trabaja lo que hoy te pesa y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
+              Trabajemos lo que hoy te limita y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
             </motion.p>
 
             <motion.div

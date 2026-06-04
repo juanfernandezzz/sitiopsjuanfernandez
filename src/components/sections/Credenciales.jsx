@@ -33,7 +33,7 @@ const CheckIcon = () => (
 const CREDENCIALES = [
   `Psicólogo clínico titulado, ${PRESTADOR.universidad}`,
   `Inscrito en la Superintendencia de Salud (N° ${PRESTADOR.rnpi})`,
-  'Formación continua: cuidado clínico (Harvard), terapia cognitivo-conductual y Primeros Auxilios Psicológicos (UAB)',
+  'Formación continua en terapia cognitivo-conductual, cuidado clínico (Harvard) y primeros auxilios psicológicos (UAB)',
   'Inglés nivel C1 (EF-SET): atención también en inglés',
 ];
 
