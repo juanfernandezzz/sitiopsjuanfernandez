@@ -66,27 +66,27 @@ export default function ModalTipoSesion({ open, onClose }) {
   return (
     <AnimatePresence>
       {open && (
-        <>
-          <motion.div
-            key="tipo-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-ink/45 z-[60]"
-          />
+        <motion.div
+          key="tipo-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/45 p-4"
+        >
           <motion.div
             key="tipo-panel"
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Elige el tipo de sesión"
+            onClick={(e) => e.stopPropagation()}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed left-1/2 top-1/2 z-[61] w-[92%] max-w-md max-h-[90dvh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 bg-cream rounded-2xl shadow-2xl"
+            className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto bg-cream rounded-2xl shadow-2xl"
           >
             <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-3">
               <div>
@@ -154,7 +154,7 @@ export default function ModalTipoSesion({ open, onClose }) {
               ))}
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );
