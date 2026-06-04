@@ -19,10 +19,33 @@ const UIContext = createContext(null);
 
 export function UIProvider({ children }) {
   const [isFonasaModalOpen, setIsFonasaModalOpen] = useState(false);
+  const [isTipoSesionOpen, setIsTipoSesionOpen] = useState(false);
   const [pendingAgendarTab, setPendingAgendarTab] = useState(null);
 
   // Guarda el elemento que tenía foco al abrir el modal (para devolverlo al cerrar).
   const previousFocusRef = useRef(null);
+
+  // Modal selector de tipo de sesión: abierto desde todos los CTA genéricos de
+  // "Agendar" (hero, header, menú mobile, cierre de ComoTrabajo). Centraliza el
+  // estado para que cualquier sección pueda abrirlo vía useUI().
+  const openTipoSesionModal = useCallback(() => {
+    if (typeof document !== 'undefined') {
+      previousFocusRef.current = document.activeElement;
+    }
+    setIsTipoSesionOpen(true);
+  }, []);
+
+  const closeTipoSesionModal = useCallback(() => {
+    setIsTipoSesionOpen(false);
+    if (typeof window !== 'undefined') {
+      requestAnimationFrame(() => {
+        const el = previousFocusRef.current;
+        if (el && typeof el.focus === 'function') {
+          el.focus();
+        }
+      });
+    }
+  }, []);
 
   const openFonasaModal = useCallback((options = {}) => {
     if (typeof document !== 'undefined') {
@@ -72,6 +95,9 @@ export function UIProvider({ children }) {
     isFonasaModalOpen,
     openFonasaModal,
     closeFonasaModal,
+    isTipoSesionOpen,
+    openTipoSesionModal,
+    closeTipoSesionModal,
     pendingAgendarTab,
     clearPendingAgendarTab,
     navigateToAgendarFonasa,

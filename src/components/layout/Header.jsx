@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Button from '../ui/Button';
-import ModalTipoSesion from '../modals/ModalTipoSesion';
+import { useUI } from '../../lib/uiContext';
 
 const NAV_ITEMS = [
   { label: 'Cómo trabajo', href: '#como-trabajo' },
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [tipoSesionOpen, setTipoSesionOpen] = useState(false);
+  const { openTipoSesionModal } = useUI();
   const firstMobileLinkRef = useRef(null);
 
   // Lock body scroll mientras el menú móvil está abierto.
@@ -44,7 +44,7 @@ export default function Header() {
               <a
                 key={item.href}
                 href={item.href}
-                className="font-body text-[15px] text-cream/80 hover:text-cream transition-colors duration-150"
+                className="font-body text-[16px] text-cream/80 hover:text-cream transition-colors duration-150"
               >
                 {item.label}
               </a>
@@ -55,8 +55,8 @@ export default function Header() {
             <Button
               size="sm"
               variant="primary"
-              onClick={() => setTipoSesionOpen(true)}
-              className="text-sm font-semibold !px-5 !py-2.5 md:!py-2"
+              onClick={openTipoSesionModal}
+              className="text-sm font-semibold !px-5 !py-3"
             >
               Agendar
             </Button>
@@ -128,8 +128,8 @@ export default function Header() {
                   onClick={() => {
                     setMobileOpen(false);
                     // Pequeño delay: deja que el panel mobile cierre su animación
-                    // antes de montar el modal, evitando dos overlays encimados.
-                    setTimeout(() => setTipoSesionOpen(true), 280);
+                    // antes de abrir el modal, evitando dos overlays encimados.
+                    setTimeout(() => openTipoSesionModal(), 280);
                   }}
                   className="w-full"
                 >
@@ -140,11 +140,6 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
-
-      <ModalTipoSesion
-        open={tipoSesionOpen}
-        onClose={() => setTipoSesionOpen(false)}
-      />
     </>
   );
 }

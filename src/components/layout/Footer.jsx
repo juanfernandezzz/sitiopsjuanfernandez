@@ -47,7 +47,7 @@ export default function Footer() {
           <p
             className="font-body"
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: 'rgba(246, 241, 232, 0.6)',
               margin: 0,
               lineHeight: 1.5,
@@ -58,7 +58,7 @@ export default function Footer() {
           <p
             className="font-body mx-auto"
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: 'rgba(246, 241, 232, 0.45)',
               margin: '6px auto 0',
               lineHeight: 1.55,
@@ -97,7 +97,7 @@ function ColumnaIdentidad() {
       <p
         className="font-body"
         style={{
-          fontSize: 14,
+          fontSize: 15,
           color: 'rgba(246, 241, 232, 0.8)',
           margin: '4px 0 0',
         }}
@@ -107,7 +107,7 @@ function ColumnaIdentidad() {
       <p
         className="font-body"
         style={{
-          fontSize: 13,
+          fontSize: 14,
           color: 'rgba(246, 241, 232, 0.7)',
           margin: '8px 0 0',
         }}
@@ -117,7 +117,7 @@ function ColumnaIdentidad() {
       <p
         className="font-body"
         style={{
-          fontSize: 13,
+          fontSize: 14,
           color: 'rgba(246, 241, 232, 0.7)',
           margin: '16px 0 0',
           lineHeight: 1.6,
@@ -147,7 +147,7 @@ function ColumnaCredenciales() {
           listStyle: 'none',
           padding: 0,
           margin: 0,
-          fontSize: 13,
+          fontSize: 14,
           color: 'rgba(246, 241, 232, 0.8)',
           lineHeight: 1.7,
         }}
@@ -179,7 +179,7 @@ function ColumnaContacto() {
       <div
         className="font-body"
         style={{
-          fontSize: 13,
+          fontSize: 14,
           color: 'rgba(246, 241, 232, 0.85)',
           lineHeight: 1.7,
         }}
@@ -193,12 +193,6 @@ function ColumnaContacto() {
           href={CONTACTO.whatsappUrl}
           icon={<WhatsAppIcon />}
           label={`WhatsApp ${CONTACTO.whatsappDisplay}`}
-          external
-        />
-        <LinkConIcono
-          href={CONTACTO.doxyUrl}
-          icon={<VideoIcon />}
-          label="Doxy.me (videollamada)"
           external
         />
       </div>
@@ -319,7 +313,7 @@ function NavLinks({ items }) {
         listStyle: 'none',
         padding: 0,
         margin: 0,
-        fontSize: 13,
+        fontSize: 14,
         lineHeight: 1.7,
       }}
     >
@@ -404,34 +398,6 @@ function WhatsAppIcon() {
       <path
         d="M5.7 5.8c.15-.35.32-.36.45-.36.12 0 .25 0 .36 0 .12 0 .29.04.45.34.16.31.55 1.34.6 1.44.05.1.08.21.02.34-.06.13-.09.21-.17.32-.08.1-.17.23-.25.31-.08.09-.17.18-.07.36.1.18.42.7.91 1.13.62.55 1.15.72 1.33.81.18.09.28.07.39-.04.1-.11.45-.52.57-.7.12-.18.24-.15.4-.09.16.06 1.04.49 1.22.58.18.09.3.13.34.21.04.08.04.47-.11.92-.15.45-.86.86-1.23.91-.34.05-.77.07-1.24-.08-.29-.09-.66-.21-1.13-.42-1.99-.86-3.29-2.88-3.39-3.02-.1-.13-.81-1.07-.81-2.04 0-.97.51-1.45.69-1.65l.18-.2z"
         fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function VideoIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="1.5"
-        y="4"
-        width="9"
-        height="8"
-        rx="1.3"
-        stroke="currentColor"
-        strokeWidth="1.3"
-      />
-      <path
-        d="M10.5 7l4-2v6l-4-2v-2z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
       />
     </svg>
   );

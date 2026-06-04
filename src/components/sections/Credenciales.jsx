@@ -92,7 +92,7 @@ export default function Credenciales() {
           {CREDENCIALES.map((credencial) => (
             <li
               key={credencial}
-              className="flex gap-3 font-body text-[15px] text-ink/80 leading-snug"
+              className="flex gap-3 font-body text-[16px] text-ink/80 leading-snug"
             >
               <CheckIcon />
               <span>{credencial}</span>

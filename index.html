@@ -13,6 +13,11 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
 
+    <!-- Preload del LCP (foto del hero). El navegador la descubre en el HTML,
+         sin esperar a que React monte el componente. WebP con fallback JPG;
+         la URL coincide exactamente con la que renderiza Hero.jsx. -->
+    <link rel="preload" as="image" href="/juan-720.webp" type="image/webp" fetchpriority="high" />
+
     <!-- SEO core -->
     <title>Juan Fernández | Psicólogo Clínico Online en Chile | Fonasa</title>
     <meta name="description" content="Psicólogo clínico titulado. Atención online por videollamada con bono Fonasa ($5.570) o particular ($15.000). Enfoque integrativo. Sesiones de 45 minutos." />
@@ -164,7 +169,7 @@
           "name": "¿Cuánto cuesta una sesión?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Hay dos modalidades: sesión particular por $15.000, o sesión con bono Fonasa por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 0908101, 0908102 y 0908103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión."
+            "text": "Hay dos modalidades: sesión particular por $15.000, o sesión con bono Fonasa por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión."
           }
         },
         {

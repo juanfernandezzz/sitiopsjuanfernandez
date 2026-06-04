@@ -111,9 +111,7 @@ export default function ComoFuncionaOnline() {
 
   return (
     <section
-      id="como-funciona"
       ref={ref}
-      style={{ scrollMarginTop: '80px' }}
       className="bg-cream py-16 md:py-20 px-6"
     >
       <motion.div
@@ -128,7 +126,7 @@ export default function ComoFuncionaOnline() {
           className="text-center mb-12 md:mb-14 max-w-2xl mx-auto"
         >
           <p className="text-sage text-[13px] uppercase tracking-[0.18em] font-body mb-4">
-            Cómo funciona online
+            Teleconsulta paso a paso
           </p>
           <h2
             className="font-display text-4xl md:text-5xl text-ink mb-5"
@@ -136,7 +134,7 @@ export default function ComoFuncionaOnline() {
           >
             Cómo funciona una sesión online
           </h2>
-          <p className="font-body text-[18px] md:text-[19px] text-ink/80 leading-relaxed">
+          <p className="font-body text-[18px] md:text-[20px] text-ink/80 leading-relaxed">
             Es más simple de lo que parece. En 4 pasos.
           </p>
         </motion.div>
@@ -155,11 +153,11 @@ export default function ComoFuncionaOnline() {
                 {s.num}
               </span>
               <h3 className="font-display text-xl text-ink mb-3">{s.title}</h3>
-              <p className="font-body text-[15.5px] md:text-[16.5px] text-ink/78 leading-[1.65]">
+              <p className="font-body text-[16px] md:text-[17px] text-ink/78 leading-[1.65]">
                 {s.text}
               </p>
               {s.nota && (
-                <p className="mt-3 font-body text-[13.5px] text-ink/60 leading-[1.6] border-l-2 border-sage/30 pl-3">
+                <p className="mt-3 font-body text-[14px] text-ink/60 leading-[1.6] border-l-2 border-sage/30 pl-3">
                   {s.nota}
                 </p>
               )}
@@ -193,7 +191,7 @@ export default function ComoFuncionaOnline() {
         {/* Nota de pago: primero copago Fonasa, luego particular */}
         <motion.p
           variants={item}
-          className="font-body text-[15px] text-ink/75 text-center max-w-[52ch] mx-auto leading-relaxed mb-6"
+          className="font-body text-[16px] text-ink/75 text-center max-w-[52ch] mx-auto leading-relaxed mb-6"
         >
           El pago es simple: copago de $5.570 con bono Fonasa, o $15.000 en modalidad particular. Lo eliges al momento de agendar.
         </motion.p>
@@ -201,7 +199,7 @@ export default function ComoFuncionaOnline() {
         {/* Closing line */}
         <motion.p
           variants={item}
-          className="font-body text-[14px] italic text-ink/65 text-center max-w-[50ch] mx-auto leading-relaxed"
+          className="font-body text-[15px] italic text-ink/65 text-center max-w-[50ch] mx-auto leading-relaxed"
         >
           Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.
         </motion.p>

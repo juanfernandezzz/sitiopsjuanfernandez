@@ -60,9 +60,7 @@ export default function Precios() {
 
   return (
     <section
-      id="precios"
       ref={ref}
-      style={{ scrollMarginTop: '80px' }}
       className="bg-cream py-16 md:py-20 px-6"
     >
       <motion.div
@@ -86,7 +84,7 @@ export default function Precios() {
             Precios y formas de pago
           </h2>
           <p className="font-body text-lg text-ink/75 leading-relaxed">
-            Sesión de 45 minutos. Misma duración y dedicación independiente del modo de pago.
+            Misma duración y dedicación, independiente del modo de pago.
           </p>
         </motion.div>
 
@@ -103,7 +101,7 @@ export default function Precios() {
                 '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
             }}
           >
-            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[11.5px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
+            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[12px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
               Para tu primera sesión
             </span>
 
@@ -118,7 +116,7 @@ export default function Precios() {
               >
                 $5.570
               </p>
-              <p className="font-body text-[15px] text-sage">
+              <p className="font-body text-[16px] text-sage">
                 Copago Modalidad Libre Elección
               </p>
             </div>
@@ -127,7 +125,7 @@ export default function Precios() {
               {FEATURES_FONASA_PRIMERA.map((feature) => (
                 <li
                   key={feature}
-                  className="flex gap-3 font-body text-[15px] text-ink/80 leading-snug"
+                  className="flex gap-3 font-body text-[16px] text-ink/80 leading-snug"
                 >
                   <CheckIcon />
                   <span>{feature}</span>
@@ -135,14 +133,14 @@ export default function Precios() {
               ))}
             </ul>
 
-            <p className="font-body text-[14px] text-ink/60 leading-relaxed mb-7">
+            <p className="font-body text-[15px] text-ink/60 leading-relaxed mb-7">
               Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
             </p>
 
             <button
               type="button"
               onClick={() => openFonasaModal()}
-              className="font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+              className="font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
             >
               Ver guía paso a paso para comprar el bono →
             </button>
@@ -177,11 +175,11 @@ export default function Precios() {
                 >
                   $5.570
                 </span>
-                <span className="font-body text-[15px] text-sage ml-3">
+                <span className="font-body text-[16px] text-sage ml-3">
                   Copago Modalidad Libre Elección
                 </span>
               </p>
-              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
+              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
                 Para pacientes que ya iniciaron tratamiento conmigo. Código 09 08 102, sesión de 45 minutos.
               </p>
               <div className="mt-auto">
@@ -212,11 +210,11 @@ export default function Precios() {
                 >
                   $5.570
                 </span>
-                <span className="font-body text-[15px] text-sage ml-3">
+                <span className="font-body text-[16px] text-sage ml-3">
                   Copago Modalidad Libre Elección
                 </span>
               </p>
-              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
+              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
                 Código 09 08 103. Sesión de 45 minutos con ambos miembros presentes.
               </p>
               <div className="mt-auto">
@@ -247,12 +245,12 @@ export default function Precios() {
                 >
                   $15.000
                 </span>
-                <span className="font-body text-[15px] text-sage ml-3">
+                <span className="font-body text-[16px] text-sage ml-3">
                   Con transferencia electrónica o WebPay
                 </span>
               </p>
-              <p className="font-body text-[15px] text-ink/70 leading-relaxed mb-5">
-                Sin previsión requerida. Comprobante para reembolso de isapre cuando aplique.
+              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
+                Sin previsión requerida. Comprobante para reembolso de Isapre cuando aplique.
               </p>
               <div className="mt-auto flex flex-col gap-4">
                 <Button
@@ -268,7 +266,7 @@ export default function Precios() {
                     preventDefault) y abre en pestaña nueva para no perder el sitio.
                     El SVG del botón se sirve local desde /public (sin hotlinking). */}
                 <div className="flex flex-col gap-3 pt-4 border-t border-sage/15">
-                  <p className="font-body text-[13px] text-ink/60 leading-snug">
+                  <p className="font-body text-[14px] text-ink/60 leading-snug">
                     ¿Prefieres pagar ahora? Hazlo con WebPay:
                   </p>
                   <div className="flex items-center gap-4">
@@ -312,7 +310,7 @@ export default function Precios() {
                       />
                     </a>
                   </div>
-                  <p className="hidden md:block font-body text-[13px] text-ink/55 leading-snug">
+                  <p className="hidden md:block font-body text-[14px] text-ink/55 leading-snug">
                     Pulsa el botón, o escanea el código con tu teléfono.
                   </p>
                 </div>

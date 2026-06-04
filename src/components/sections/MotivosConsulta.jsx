@@ -57,7 +57,7 @@ export default function MotivosConsulta() {
           {MOTIVOS.map((motivo) => (
             <li
               key={motivo}
-              className="font-body text-[15px] text-ink/85 bg-offwhite rounded-full px-4 py-1.5"
+              className="font-body text-[16px] text-ink/85 bg-offwhite rounded-full px-4 py-1.5"
               style={{ border: '1px solid rgba(63, 91, 74, 0.2)' }}
             >
               {motivo}
@@ -67,7 +67,7 @@ export default function MotivosConsulta() {
 
         <motion.p
           variants={item}
-          className="font-body text-[15.5px] md:text-[16px] text-ink/70 leading-relaxed max-w-[46ch] mx-auto"
+          className="font-body text-[16px] md:text-[17px] text-ink/70 leading-relaxed max-w-[46ch] mx-auto"
         >
           Trabajamos juntos a tu ritmo, con un enfoque que combina psicología cognitivo-conductual y narrativa.
         </motion.p>

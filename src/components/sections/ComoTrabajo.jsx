@@ -1,11 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
-import { CAL_USERNAME, HERO_PRIMARY_CTA } from '../../lib/cal';
-
-const PRIMARY_CAL_LINK = `${CAL_USERNAME}/${HERO_PRIMARY_CTA}`;
-
-const MOTIVOS = ['Ansiedad', 'Depresión', 'Relaciones', 'Duelo', 'Estrés'];
+import { useUI } from '../../lib/uiContext';
 
 const PASOS = [
   {
@@ -27,6 +23,7 @@ const PASOS = [
 
 export default function ComoTrabajo() {
   const reduce = useReducedMotion();
+  const { openTipoSesionModal } = useUI();
 
   const container = {
     hidden: {},
@@ -45,9 +42,7 @@ export default function ComoTrabajo() {
 
   return (
     <section
-      id="como-trabajo"
       className="relative bg-cream text-ink overflow-hidden"
-      style={{ scrollMarginTop: '80px' }}
       aria-label="Cómo trabajo"
     >
       {/* Separador visual sutil del Hero: línea horizontal fina */}
@@ -96,27 +91,10 @@ export default function ComoTrabajo() {
           {/* Subheadline */}
           <motion.p
             variants={item}
-            className="mt-5 font-body text-[18px] lg:text-[19px] leading-[1.6] text-ink/80 max-w-[44ch]"
+            className="mt-5 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[44ch]"
           >
             Acompañamiento individual por videollamada. Sesiones de 45 minutos.
           </motion.p>
-
-          {/* Motivos de consulta */}
-          <motion.div variants={item} className="mt-10 lg:mt-12">
-            <p className="font-body text-[14px] uppercase tracking-[0.16em] text-sage mb-4">
-              Atiendo motivos de consulta como:
-            </p>
-            <ul className="flex flex-wrap gap-2 lg:gap-2.5">
-              {MOTIVOS.map((motivo) => (
-                <li
-                  key={motivo}
-                  className="font-body text-[14px] lg:text-[15px] text-sage py-2 px-4 rounded-full border border-sage-light/70 bg-off-white/60"
-                >
-                  {motivo}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
         </motion.div>
 
         {/* Pasos numerados */}
@@ -164,7 +142,7 @@ export default function ComoTrabajo() {
                 >
                   {paso.titulo}
                 </h3>
-                <p className="mt-3 font-body text-[16px] lg:text-[16.5px] leading-[1.65] text-ink/78 max-w-[34ch]">
+                <p className="mt-3 font-body text-[16px] lg:text-[17px] leading-[1.65] text-ink/78 max-w-[34ch]">
                   {paso.cuerpo}
                 </p>
               </motion.li>
@@ -182,13 +160,13 @@ export default function ComoTrabajo() {
         >
           <motion.p
             variants={item}
-            className="font-body text-[14px] lg:text-[14.5px] text-sage max-w-[44ch] leading-[1.55]"
+            className="font-body text-[15px] text-sage max-w-[44ch] leading-[1.55]"
           >
             Videollamada por Doxy.me, plataforma certificada por Fonasa para teleconsulta. Conexión segura, sin descargas ni instalaciones.
           </motion.p>
           <motion.div variants={item} className="shrink-0">
-            <Button size="lg" variant="primary" calLink={PRIMARY_CAL_LINK}>
-              Agenda tu primera sesión
+            <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
+              Agendar tu sesión
             </Button>
           </motion.div>
         </motion.div>

@@ -34,7 +34,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una sesión?',
-    a: 'Hay dos modalidades: sesión particular por $15.000, o sesión con bono Fonasa por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 0908101, 0908102 y 0908103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión.',
+    a: 'Hay dos modalidades: sesión particular por $15.000, o sesión con bono Fonasa por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión.',
   },
   {
     q: '¿Cómo compro un bono Fonasa?',

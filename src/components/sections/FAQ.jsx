@@ -86,7 +86,7 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
                         href={f.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-body text-[13px] text-ink/60 hover:text-sage underline decoration-sage/25 hover:decoration-sage underline-offset-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                        className="font-body text-[14px] text-ink/60 hover:text-sage underline decoration-sage/25 hover:decoration-sage underline-offset-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
                       >
                         {f.label}
                       </a>
@@ -99,7 +99,7 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
               <button
                 type="button"
                 onClick={() => onCtaAction && onCtaAction(item.cta.action)}
-                className="ml-6 mb-6 font-body text-[14px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                className="ml-6 mb-6 font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
               >
                 {item.cta.label}
               </button>
@@ -144,10 +144,8 @@ export default function FAQ() {
 
   return (
     <section
-      id="faq"
       aria-labelledby="faq-heading"
       className="bg-cream py-16 md:py-20 px-5 md:px-8"
-      style={{ scrollMarginTop: '80px' }}
     >
       <div
         ref={ref}

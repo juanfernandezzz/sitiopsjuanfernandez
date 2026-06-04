@@ -1,22 +1,79 @@
-import { useEffect, useState, lazy, Suspense } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
-import { UIProvider } from './lib/uiContext'
+import { UIProvider, useUI } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
-import MotivosConsulta from './components/sections/MotivosConsulta'
-import ComoTrabajo from './components/sections/ComoTrabajo'
-import Credenciales from './components/sections/Credenciales'
-import Precios from './components/sections/Precios'
-import ComoFuncionaOnline from './components/sections/ComoFuncionaOnline'
-import Agendar from './components/sections/Agendar'
-import FAQ from './components/sections/FAQ'
+import ModalTipoSesion from './components/modals/ModalTipoSesion'
 
+// Hero queda EAGER: es el LCP y debe renderizar de inmediato.
+// El resto del cuerpo se carga lazy y solo se monta cuando se acerca al viewport
+// (IntersectionObserver), lo que saca su JS y su Framer Motion del bundle inicial
+// y posterga el TBT hasta que cada sección entra en pantalla.
+const MotivosConsulta = lazy(() => import('./components/sections/MotivosConsulta'))
+const ComoTrabajo = lazy(() => import('./components/sections/ComoTrabajo'))
+const Credenciales = lazy(() => import('./components/sections/Credenciales'))
+const Precios = lazy(() => import('./components/sections/Precios'))
+const ComoFuncionaOnline = lazy(() => import('./components/sections/ComoFuncionaOnline'))
+const Agendar = lazy(() => import('./components/sections/Agendar'))
+const FAQ = lazy(() => import('./components/sections/FAQ'))
 const ModalGuiaFonasa = lazy(() => import('./components/modals/ModalGuiaFonasa'))
 
+/**
+ * Envuelve una sección lazy. Monta el contenido cuando el wrapper se acerca al
+ * viewport (rootMargin 300px de anticipo, para que el chunk alcance a cargar
+ * antes de ser visible). Mientras no está montado reserva minHeight para limitar
+ * el CLS. El `id` y el scrollMarginTop viven aquí, en el wrapper, para que los
+ * enlaces ancla (#precios, #agendar, etc.) funcionen aunque la sección todavía
+ * no se haya montado.
+ */
+function LazySection({ id, scrollMarginTop = '80px', minHeight, children }) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true)
+      return
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisible(true)
+          obs.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      id={id}
+      style={{ scrollMarginTop, minHeight: visible ? undefined : minHeight }}
+    >
+      {visible ? <Suspense fallback={null}>{children}</Suspense> : null}
+    </div>
+  )
+}
+
 export default function App() {
+  return (
+    <UIProvider>
+      <AppShell />
+    </UIProvider>
+  )
+}
+
+function AppShell() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
+  const { isTipoSesionOpen, closeTipoSesionModal } = useUI()
 
   useEffect(() => {
     const onScroll = () => setShowWhatsApp(window.scrollY > 200)
@@ -59,40 +116,40 @@ export default function App() {
   }, [])
 
   return (
-    <UIProvider>
-      <div className="min-h-screen bg-cream text-ink font-sans antialiased selection:bg-terracotta/20 selection:text-ink">
-        <Header />
-        <main>
-          <Hero />
-          <MotivosConsulta />
-          <ComoTrabajo />
-          <Credenciales />
-          <Precios />
-          <ComoFuncionaOnline />
-          <Agendar />
-          <FAQ />
-        </main>
+    <div className="min-h-screen bg-cream text-ink font-sans antialiased selection:bg-terracotta/20 selection:text-ink">
+      <Header />
+      <main>
+        <Hero />
+        <LazySection minHeight={220}><MotivosConsulta /></LazySection>
+        <LazySection id="como-trabajo" minHeight={720}><ComoTrabajo /></LazySection>
+        <LazySection minHeight={420}><Credenciales /></LazySection>
+        <LazySection id="precios" minHeight={900}><Precios /></LazySection>
+        <LazySection id="como-funciona" minHeight={760}><ComoFuncionaOnline /></LazySection>
+        <LazySection id="agendar" minHeight={980}><Agendar /></LazySection>
+        <LazySection id="faq" minHeight={560}><FAQ /></LazySection>
+      </main>
 
-        <Footer />
+      <Footer />
 
-        <Suspense fallback={null}>
-          <ModalGuiaFonasa />
-        </Suspense>
+      <Suspense fallback={null}>
+        <ModalGuiaFonasa />
+      </Suspense>
 
-        {showWhatsApp && (
-          <FloatingWhatsApp
-            phoneNumber="56973394530"
-            accountName="Juan Fernández"
-            statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
-            chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
-            placeholder="Escribe tu mensaje..."
-            avatar="/juan.jpg"
-            notification={false}
-            allowClickAway
-            allowEsc
-          />
-        )}
-      </div>
-    </UIProvider>
+      <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
+
+      {showWhatsApp && (
+        <FloatingWhatsApp
+          phoneNumber="56973394530"
+          accountName="Juan Fernández"
+          statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
+          chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
+          placeholder="Escribe tu mensaje..."
+          avatar="/juan.jpg"
+          notification={false}
+          allowClickAway
+          allowEsc
+        />
+      )}
+    </div>
   )
 }

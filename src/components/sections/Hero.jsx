@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
-import { CAL_USERNAME, HERO_PRIMARY_CTA, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
+import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
+import { useUI } from '../../lib/uiContext';
 
-// Imports de la foto (vite-imagetools genera AVIF/WebP en build).
-import juanAvif from '../../assets/images/juan.jpg?format=avif&w=720&quality=72';
-import juanWebp from '../../assets/images/juan.jpg?format=webp&w=720&quality=78';
-import juanJpg from '../../assets/images/juan.jpg?format=jpg&w=720&quality=82';
+// La foto del hero se sirve desde /public con nombre fijo (juan-720.webp /
+// juan-720.jpg) para que coincida EXACTAMENTE con el <link rel="preload"> de
+// index.html. Así el navegador la descubre y descarga desde el parseo del HTML,
+// sin esperar a que React monte el componente (era la causa del LCP alto).
 
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
 const WA_MESSAGE = encodeURIComponent(
@@ -14,7 +15,6 @@ const WA_MESSAGE = encodeURIComponent(
 );
 const WA_HREF = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
-const PRIMARY_CAL_LINK = `${CAL_USERNAME}/${HERO_PRIMARY_CTA}`;
 const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 
 // Frases que rotan en el cierre del H1. La primera se renderiza en la carga
@@ -29,6 +29,7 @@ const ROTATE_MS = 4500;
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const { openTipoSesionModal } = useUI();
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -133,17 +134,17 @@ export default function Hero() {
 
             <motion.p
               variants={item}
-              className="mt-6 font-body text-[17px] lg:text-[19px] leading-[1.6] text-ink/80 max-w-[40ch]"
+              className="mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
             >
-              Un espacio para trabajar lo que hoy te pesa y darle un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular. Con enfoque cognitivo-conductual y narrativo.
+              Trabaja lo que hoy te pesa y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
             </motion.p>
 
             <motion.div
               variants={item}
               className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
             >
-              <Button size="lg" variant="primary" calLink={PRIMARY_CAL_LINK}>
-                Agenda tu primera sesión
+              <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
+                Agendar tu sesión
               </Button>
               <Button
                 size="lg"
@@ -160,7 +161,7 @@ export default function Hero() {
             {/* Microcopy: aclara restricción y ofrece ruta alternativa sin abandonar el fold. */}
             <motion.p
               variants={item}
-              className="mt-3 font-body text-[14px] text-ink/60"
+              className="mt-3 font-body text-[15px] text-ink/60"
             >
               Primera sesión con bono Fonasa: copago $5.570.{' '}
               <button
@@ -182,13 +183,13 @@ export default function Hero() {
 
             <motion.ul
               variants={item}
-              className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[14px] lg:text-[15px] text-sage"
+              className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
             >
               <li>Psicólogo clínico titulado</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
               <li>Inscrito en Fonasa</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
-              <li>Plataforma certificada por Fonasa</li>
+              <li>Videollamada cifrada</li>
             </motion.ul>
           </div>
 
@@ -204,28 +205,19 @@ export default function Hero() {
                   className="relative w-full overflow-hidden rounded-2xl bg-sage-light/15"
                   style={{ aspectRatio: '4 / 5' }}
                 >
-                  {juanJpg ? (
-                    <picture>
-                      <source srcSet={juanAvif} type="image/avif" />
-                      <source srcSet={juanWebp} type="image/webp" />
-                      <img
-                        src={juanJpg}
-                        alt="Juan Fernández, psicólogo clínico"
-                        width={720}
-                        height={900}
-                        loading="eager"
-                        fetchpriority="high"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                    </picture>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="font-body text-[13px] tracking-wide text-sage/70 text-center px-6">
-                        Foto Juan Fernández, pendiente
-                      </span>
-                    </div>
-                  )}
+                  <picture>
+                    <source srcSet="/juan-720.webp" type="image/webp" />
+                    <img
+                      src="/juan-720.jpg"
+                      alt="Juan Fernández, psicólogo clínico"
+                      width={720}
+                      height={964}
+                      loading="eager"
+                      fetchpriority="high"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  </picture>
 
                   <div
                     aria-hidden="true"

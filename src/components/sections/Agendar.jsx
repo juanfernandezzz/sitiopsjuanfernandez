@@ -103,9 +103,7 @@ export default function Agendar() {
 
   return (
     <section
-      id="agendar"
       ref={ref}
-      style={{ scrollMarginTop: '80px' }}
       className="relative bg-cream py-16 md:py-20 px-5 md:px-8"
       aria-labelledby="agendar-heading"
     >
@@ -158,8 +156,7 @@ export default function Agendar() {
             marginBottom: 32,
           }}
         >
-          Elige el tipo de sesión y la hora que te acomode. Recibes un correo
-          con la confirmación y el enlace de la sala.
+          Elige el tipo de sesión y la hora que te acomode.
         </motion.p>
 
         {/* Segmented control */}
@@ -249,7 +246,7 @@ export default function Agendar() {
               <p
                 className="font-body text-ink/75"
                 style={{
-                  fontSize: 15,
+                  fontSize: 16,
                   lineHeight: 1.5,
                   maxWidth: 320,
                 }}
@@ -310,7 +307,7 @@ export default function Agendar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.4,
               }}
             >
@@ -324,7 +321,7 @@ export default function Agendar() {
         <motion.p
           variants={item}
           className="font-body text-ink/55"
-          style={{ fontSize: 13, marginTop: 24, lineHeight: 1.5 }}
+          style={{ fontSize: 14, marginTop: 24, lineHeight: 1.5 }}
         >
           Si es tu primera sesión conmigo, recibirás un email con el link al
           consentimiento informado al confirmar tu reserva.{' '}
