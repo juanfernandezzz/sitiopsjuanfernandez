@@ -72,7 +72,13 @@ export default function ModalTipoSesion({ open, onClose }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={onClose}
+          onClick={(e) => {
+            // Cierra solo si el clic cae directamente en el backdrop, no en un
+            // hijo. Evitamos stopPropagation en el panel: ese stopPropagation
+            // cortaba el burbujeo del clic hasta document, donde Cal.com tiene su
+            // listener delegado de data-cal-link, y por eso el calendario no abría.
+            if (e.target === e.currentTarget) onClose();
+          }}
           className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/45 p-4"
         >
           <motion.div
@@ -81,7 +87,6 @@ export default function ModalTipoSesion({ open, onClose }) {
             role="dialog"
             aria-modal="true"
             aria-label="Elige el tipo de sesión"
-            onClick={(e) => e.stopPropagation()}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
