@@ -5,7 +5,13 @@ import { descargarPDF } from '../../lib/descargarPDF';
 const WHATSAPP_URL =
   'https://wa.me/56973394530?text=Hola%2C%20firm%C3%A9%20el%20consentimiento%20informado.%20Tengo%20una%20duda.';
 
-export default function PantallaExito({ pdfBlob }) {
+export default function PantallaExito({
+  pdfBlob,
+  titulo = 'Listo. Recibí tu consentimiento firmado.',
+  descripcion = 'Te envié una copia firmada a tu email. Si en 10 minutos no llega, revisa la carpeta de spam o promociones. Si quieres guardar una copia local en este dispositivo, descárgala con el botón aquí abajo. Si tienes cualquier duda antes de la sesión, escríbeme por WhatsApp.',
+  downloadName = 'consentimiento-firmado.pdf',
+  whatsappUrl = WHATSAPP_URL,
+}) {
   const headingRef = useRef(null);
 
   useEffect(() => {
@@ -17,7 +23,7 @@ export default function PantallaExito({ pdfBlob }) {
 
   const descargarManual = () => {
     if (!pdfBlob) return;
-    descargarPDF(pdfBlob, 'consentimiento-firmado.pdf');
+    descargarPDF(pdfBlob, downloadName);
   };
 
   return (
@@ -72,7 +78,7 @@ export default function PantallaExito({ pdfBlob }) {
             maxWidth: '20ch',
           }}
         >
-          Listo. Recibí tu consentimiento firmado.
+          {titulo}
         </h2>
 
         <p
@@ -83,10 +89,7 @@ export default function PantallaExito({ pdfBlob }) {
             maxWidth: '60ch',
           }}
         >
-          Te envié una copia firmada a tu email. Si en 10 minutos no llega, revisa
-          la carpeta de spam o promociones. Si quieres guardar una copia local
-          en este dispositivo, descárgala con el botón aquí abajo. Si tienes
-          cualquier duda antes de la sesión, escríbeme por WhatsApp.
+          {descripcion}
         </p>
 
         <div
@@ -108,7 +111,7 @@ export default function PantallaExito({ pdfBlob }) {
           </Button>
 
           <a
-            href={WHATSAPP_URL}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="font-body text-sage"

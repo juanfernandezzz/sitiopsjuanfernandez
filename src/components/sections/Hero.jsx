@@ -20,9 +20,9 @@ const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 // Frases que rotan en el cierre del H1. La primera se renderiza en la carga
 // (es el LCP y lo que lee Google). La más larga reserva la altura del bloque.
 const ROTATING = [
-  'con empatía y sin prejuicios',
   'un espacio donde eres protagonista',
   'sin salir de casa, a tu propio ritmo',
+  'con empatía y sin prejuicios',
 ];
 const LONGEST = 'sin salir de casa, a tu propio ritmo';
 const ROTATE_MS = 4500;

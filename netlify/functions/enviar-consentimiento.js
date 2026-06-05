@@ -33,7 +33,13 @@ export const handler = async (event) => {
     timestampISO,
     userAgent,
     zonaHoraria,
+    tipo,
   } = payload;
+
+  // Ramo del documento: 'asentimiento' (menores) o 'consentimiento' (default).
+  const esAsentimiento = tipo === 'asentimiento';
+  const DOC = esAsentimiento ? 'asentimiento' : 'consentimiento';
+  const DOC_CAP = esAsentimiento ? 'Asentimiento' : 'Consentimiento';
 
   if (
     !datos?.nombre ||
@@ -64,7 +70,7 @@ export const handler = async (event) => {
   const firmaBuffer = Buffer.from(firmaBase64.split(',')[1] || firmaBase64, 'base64');
   const pdfBuffer = Buffer.from(pdfBase64.split(',')[1] || pdfBase64, 'base64');
 
-  const filenamePDF = `consentimiento-${datos.rut}-${Date.now()}.pdf`;
+  const filenamePDF = `${DOC}-${datos.rut}-${Date.now()}.pdf`;
   const fechaLegible = new Date(timestampISO).toLocaleString('es-CL', {
     dateStyle: 'long',
     timeStyle: 'short',
@@ -75,9 +81,9 @@ export const handler = async (event) => {
     from: FROM,
     to: [TO_PRESTADOR],
     reply_to: REPLY_TO,
-    subject: `Consentimiento firmado: ${datos.nombre} (${datos.rut})`,
+    subject: `${DOC_CAP} firmado: ${datos.nombre} (${datos.rut})`,
     text: [
-      `Nuevo consentimiento informado firmado.`,
+      `Nuevo ${DOC} informado firmado.`,
       ``,
       `Paciente:`,
       `  Nombre: ${datos.nombre}`,
@@ -107,11 +113,11 @@ export const handler = async (event) => {
     from: FROM,
     to: [datos.email],
     reply_to: REPLY_TO,
-    subject: 'Tu copia del consentimiento informado',
+    subject: `Tu copia del ${DOC} informado`,
     text: [
       `Hola ${primerNombre},`,
       ``,
-      `Recibí tu consentimiento informado firmado. Adjunto encuentras tu copia en PDF.`,
+      `Recibí tu ${DOC} informado firmado. Adjunto encuentras tu copia en PDF.`,
       ``,
       `Si tienes dudas antes de la sesión, escríbeme por WhatsApp al +56 9 7339 4530 o responde directamente a este email.`,
       ``,

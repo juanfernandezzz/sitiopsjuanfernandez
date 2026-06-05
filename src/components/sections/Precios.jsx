@@ -180,7 +180,7 @@ export default function Precios() {
                 </span>
               </p>
               <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                Para pacientes que ya iniciaron tratamiento conmigo. Código 09 08 102, sesión de 45 minutos.
+                Para quienes ya iniciaron tratamiento conmigo. Código 09 08 102, sesión de 45 minutos.
               </p>
               <div className="mt-auto">
                 <Button
