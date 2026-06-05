@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE } from '../../lib/cal';
 import { useUI } from '../../lib/uiContext';
 
@@ -51,10 +51,12 @@ const EmbedSkeleton = () => (
 );
 
 export default function Agendar() {
-  const [selectedKey, setSelectedKey] = useState('primeraSesionFonasa');
+  const [selectedKey, setSelectedKey] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [showChooseWarning, setShowChooseWarning] = useState(false);
 
   const ref = useRef(null);
+  const refTabs = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const reduce = useReducedMotion();
   const { pendingAgendarTab, clearPendingAgendarTab } = useUI();
@@ -83,7 +85,14 @@ export default function Agendar() {
     clearPendingAgendarTab();
   }, [pendingAgendarTab, clearPendingAgendarTab]);
 
-  const calLink = `${CAL_USERNAME}/${CAL_EVENTS[selectedKey]}`;
+  const calLink = selectedKey ? `${CAL_USERNAME}/${CAL_EVENTS[selectedKey]}` : null;
+
+  const pedirSeleccion = () => {
+    setShowChooseWarning(true);
+    if (typeof window !== 'undefined' && refTabs.current) {
+      refTabs.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
 
   const container = {
     hidden: {},
@@ -159,8 +168,39 @@ export default function Agendar() {
           Elige el tipo de sesión y la hora que te acomode.
         </motion.p>
 
+        {/* Aviso: elige una opción antes de agendar */}
+        <AnimatePresence>
+          {showChooseWarning && (
+            <motion.div
+              role="alert"
+              initial={{ opacity: 0, y: -8 }}
+              animate={
+                reduce
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }
+              }
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: reduce ? 0.2 : 0.5, ease: 'easeOut' }}
+              className="font-body"
+              style={{
+                background: 'rgba(201,123,94,0.12)',
+                border: '1px solid rgba(201,123,94,0.5)',
+                color: '#9C5638',
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 15,
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              Elige una opción antes de agendar.
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Segmented control */}
         <motion.div
+          ref={refTabs}
           variants={item}
           role="tablist"
           aria-label="Tipo de sesión"
@@ -178,7 +218,10 @@ export default function Agendar() {
                 key={tab.key}
                 role="tab"
                 aria-selected={active}
-                onClick={() => setSelectedKey(tab.key)}
+                onClick={() => {
+                  setSelectedKey(tab.key);
+                  setShowChooseWarning(false);
+                }}
                 className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
                   backgroundColor: active ? '#C97B5E' : 'transparent',
@@ -251,13 +294,21 @@ export default function Agendar() {
                   maxWidth: 320,
                 }}
               >
-                Toca el botón para ver el calendario y elegir tu hora.
+                Elige una opción arriba y toca el botón para ver el calendario y tu hora.
               </p>
               <button
                 type="button"
-                data-cal-link={calLink}
-                data-cal-namespace={CAL_NAMESPACE}
-                data-cal-config='{"layout":"month_view","theme":"light"}'
+                {...(selectedKey
+                  ? {
+                      'data-cal-link': calLink,
+                      'data-cal-namespace': CAL_NAMESPACE,
+                      'data-cal-config': '{"layout":"month_view","theme":"light"}',
+                    }
+                  : {})}
+                onClick={() => {
+                  if (!selectedKey) pedirSeleccion();
+                  else setShowChooseWarning(false);
+                }}
                 className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
                   backgroundColor: '#C97B5E',
@@ -276,7 +327,7 @@ export default function Agendar() {
                 Ver disponibilidad
               </button>
             </div>
-          ) : (
+          ) : selectedKey ? (
             <Suspense fallback={<EmbedSkeleton />}>
               <Cal
                 key={selectedKey}
@@ -290,6 +341,24 @@ export default function Agendar() {
                 config={{ layout: 'month_view', theme: 'light' }}
               />
             </Suspense>
+          ) : (
+            <div
+              style={{
+                minHeight: 760,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 24px',
+                textAlign: 'center',
+              }}
+            >
+              <p
+                className="font-body text-ink/70"
+                style={{ fontSize: 18, lineHeight: 1.5, maxWidth: 420 }}
+              >
+                Elige una opción arriba para ver el calendario con las horas disponibles.
+              </p>
+            </div>
           )}
         </motion.div>
 
