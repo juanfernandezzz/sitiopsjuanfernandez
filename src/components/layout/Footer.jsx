@@ -1,4 +1,4 @@
-import { PRESTADOR, CONTACTO, LEGAL, FONASA_CODIGOS } from '../../lib/contacto';
+import { PRESTADOR, CONTACTO, REDES, LEGAL, FONASA_CODIGOS } from '../../lib/contacto';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -197,6 +197,44 @@ function ColumnaContacto() {
         />
       </div>
 
+      <HeadingSecundario>Sígueme</HeadingSecundario>
+      <p
+        className="font-body"
+        style={{
+          fontSize: 13,
+          color: 'rgba(246, 241, 232, 0.6)',
+          margin: '0 0 10px',
+          lineHeight: 1.55,
+          maxWidth: '30ch',
+        }}
+      >
+        Contenido breve sobre bienestar y psicología. Para agendar, escríbeme por
+        WhatsApp.
+      </p>
+      <div
+        className="font-body"
+        style={{
+          fontSize: 14,
+          color: 'rgba(246, 241, 232, 0.85)',
+          lineHeight: 1.7,
+        }}
+      >
+        <LinkConIcono
+          href={REDES.instagramUrl}
+          icon={<InstagramIcon />}
+          label={`Instagram ${REDES.instagramHandle}`}
+          external
+          rel="me noopener noreferrer"
+        />
+        <LinkConIcono
+          href={REDES.facebookUrl}
+          icon={<FacebookIcon />}
+          label="Facebook"
+          external
+          rel="me noopener noreferrer"
+        />
+      </div>
+
       <HeadingSecundario>Navegar</HeadingSecundario>
       <NavLinks
         items={[
@@ -264,9 +302,9 @@ function HeadingSecundario({ children }) {
   );
 }
 
-function LinkConIcono({ href, icon, label, external = false }) {
+function LinkConIcono({ href, icon, label, external = false, rel }) {
   const extraProps = external
-    ? { target: '_blank', rel: 'noopener noreferrer' }
+    ? { target: '_blank', rel: rel || 'noopener noreferrer' }
     : {};
   return (
     <a
@@ -397,6 +435,47 @@ function WhatsAppIcon() {
       />
       <path
         d="M5.7 5.8c.15-.35.32-.36.45-.36.12 0 .25 0 .36 0 .12 0 .29.04.45.34.16.31.55 1.34.6 1.44.05.1.08.21.02.34-.06.13-.09.21-.17.32-.08.1-.17.23-.25.31-.08.09-.17.18-.07.36.1.18.42.7.91 1.13.62.55 1.15.72 1.33.81.18.09.28.07.39-.04.1-.11.45-.52.57-.7.12-.18.24-.15.4-.09.16.06 1.04.49 1.22.58.18.09.3.13.34.21.04.08.04.47-.11.92-.15.45-.86.86-1.23.91-.34.05-.77.07-1.24-.08-.29-.09-.66-.21-1.13-.42-1.99-.86-3.29-2.88-3.39-3.02-.1-.13-.81-1.07-.81-2.04 0-.97.51-1.45.69-1.65l.18-.2z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="1.8"
+        y="1.8"
+        width="12.4"
+        height="12.4"
+        rx="3.6"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="11.6" cy="4.4" r="0.9" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9.4 14.5V8.7h1.9l.3-2.3H9.4V5c0-.66.2-1.1 1.15-1.1H12V1.86c-.3-.04-1.05-.1-1.9-.1-1.9 0-3.15 1.13-3.15 3.2v1.45H5v2.3h1.95v5.8z"
         fill="currentColor"
       />
     </svg>

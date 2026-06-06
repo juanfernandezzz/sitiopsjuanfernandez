@@ -40,6 +40,18 @@ export const CONTACTO = {
   doxyUrl: 'https://doxy.me/psicologojuanfernandez',
 };
 
+/**
+ * Perfiles públicos en redes sociales. Función de presencia y prueba de marca,
+ * no de conversión: por eso viven solo en el footer y nunca en el header ni en
+ * el fold (ver decisión CRO en Footer.jsx). El handle se muestra como etiqueta
+ * legible; la URL canónica es la que abre el enlace.
+ */
+export const REDES = {
+  instagramHandle: '@ps.juanfernandez',
+  instagramUrl: 'https://www.instagram.com/ps.juanfernandez/',
+  facebookUrl: 'https://www.facebook.com/psicologojuanfernandez/',
+};
+
 export const LEGAL = {
   ultimaActualizacionPolitica: '26 de mayo de 2026',
   leyTelemedicina: 'Ley 21.541',
