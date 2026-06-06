@@ -22,7 +22,7 @@ const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 const ROTATING = [
   'un espacio donde eres protagonista',
   'sin salir de casa, a tu propio ritmo',
-  'con empatía y sin prejuicios',
+  'acompañamiento sin prejuicios',
 ];
 const LONGEST = 'sin salir de casa, a tu propio ritmo';
 const ROTATE_MS = 4500;
