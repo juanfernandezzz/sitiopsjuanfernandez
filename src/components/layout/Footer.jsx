@@ -222,7 +222,7 @@ function ColumnaContacto() {
         <LinkConIcono
           href={REDES.instagramUrl}
           icon={<InstagramIcon />}
-          label={`Instagram ${REDES.instagramHandle}`}
+          label="Instagram"
           external
           rel="me noopener noreferrer"
         />
