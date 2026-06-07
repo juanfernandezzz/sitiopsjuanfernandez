@@ -13,6 +13,10 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
 
+    <!-- Web App Manifest: habilita instalacion como PWA y es la fuente de
+         metadatos (nombre, iconos, colores) que leera la app Android (TWA). -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
     <!-- Preload del LCP (foto del hero). El navegador la descubre en el HTML,
          sin esperar a que React monte el componente. WebP con fallback JPG;
          la URL coincide exactamente con la que renderiza Hero.jsx. -->
@@ -33,6 +37,7 @@
     <meta property="og:image" content="https://psicologojuanfernandez.cl/og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Juan Fernández, psicólogo clínico, atención online en Chile" />
     <meta property="og:url" content="https://psicologojuanfernandez.cl/" />
     <meta property="og:locale" content="es_CL" />
 
@@ -41,6 +46,7 @@
     <meta name="twitter:title" content="Juan Fernández | Psicólogo Clínico Online en Chile" />
     <meta name="twitter:description" content="Atención psicológica online con bono Fonasa o particular. Sesiones de 45 minutos por videollamada." />
     <meta name="twitter:image" content="https://psicologojuanfernandez.cl/og.jpg" />
+    <meta name="twitter:image:alt" content="Juan Fernández, psicólogo clínico, atención online en Chile" />
 
     <!-- Fonts: Fraunces variable (eje SOFT para warmth) + Karla -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

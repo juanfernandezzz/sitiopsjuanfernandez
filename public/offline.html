@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3F5B4A" />
+    <title>Sin conexión | Psicólogo Juan Fernández</title>
+    <style>
+      :root {
+        --cream: #f6f1e8;
+        --sage: #3f5b4a;
+        --ink: #2a3b4c;
+        --terracota: #c97b5e;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--cream);
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card { width: 100%; max-width: 460px; text-align: center; }
+      h1 {
+        font-size: 28px;
+        line-height: 1.2;
+        margin: 0 0 12px;
+        color: var(--sage);
+      }
+      p {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+        color: rgba(42, 59, 76, 0.85);
+        margin: 0 0 24px;
+      }
+      .actions { display: flex; flex-direction: column; gap: 12px; }
+      a.btn, button.btn {
+        display: block;
+        width: 100%;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 15px 24px;
+        border: none;
+        cursor: pointer;
+      }
+      .primary { background: var(--terracota); color: var(--cream); }
+      .secondary {
+        background: transparent;
+        color: var(--sage);
+        border: 1px solid rgba(63, 91, 74, 0.4);
+      }
+      .small {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 14px;
+        color: rgba(42, 59, 76, 0.6);
+        margin-top: 24px;
+      }
+      .small a { color: var(--sage); }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Sin conexión</h1>
+      <p>
+        No pudimos cargar el sitio en este momento. Revisa tu conexión y vuelve
+        a intentar. Si necesitas escribir ahora, puedes hacerlo por estos medios.
+      </p>
+      <div class="actions">
+        <button class="btn primary" onclick="location.reload()">Reintentar</button>
+        <a
+          class="btn secondary"
+          href="https://wa.me/56973394530"
+          rel="noopener noreferrer"
+          >Escribir por WhatsApp</a
+        >
+      </div>
+      <p class="small">
+        WhatsApp +56 9 7339 4530<br />
+        <a href="mailto:juanfernandezpsicologo@gmail.com">juanfernandezpsicologo@gmail.com</a>
+      </p>
+    </main>
+  </body>
+</html>
