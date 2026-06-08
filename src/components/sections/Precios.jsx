@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
+import { PRECIOS } from '../../lib/precios';
 import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
 
@@ -114,7 +115,7 @@ export default function Precios() {
                 className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
                 style={{ fontVariationSettings: '"opsz" 144' }}
               >
-                $5.570
+                {PRECIOS.fonasaCopago.display}
               </p>
               <p className="font-body text-[16px] text-sage">
                 Copago Modalidad Libre Elección
@@ -173,7 +174,7 @@ export default function Precios() {
                   className="font-display text-2xl md:text-3xl text-ink"
                   style={{ fontVariationSettings: '"opsz" 144' }}
                 >
-                  $5.570
+                  {PRECIOS.fonasaCopago.display}
                 </span>
                 <span className="font-body text-[16px] text-sage ml-3">
                   Copago Modalidad Libre Elección
@@ -208,7 +209,7 @@ export default function Precios() {
                   className="font-display text-2xl md:text-3xl text-ink"
                   style={{ fontVariationSettings: '"opsz" 144' }}
                 >
-                  $5.570
+                  {PRECIOS.fonasaCopago.display}
                 </span>
                 <span className="font-body text-[16px] text-sage ml-3">
                   Copago Modalidad Libre Elección
@@ -243,7 +244,7 @@ export default function Precios() {
                   className="font-display text-2xl md:text-3xl text-ink"
                   style={{ fontVariationSettings: '"opsz" 144' }}
                 >
-                  $15.000
+                  {PRECIOS.particular.display}
                 </span>
                 <span className="font-body text-[16px] text-sage ml-3">
                   Con transferencia electrónica o WebPay
@@ -278,12 +279,12 @@ export default function Precios() {
                       className="inline-flex"
                     >
                       <input type="hidden" name="idFormulario" value="388212" />
-                      <input type="hidden" name="monto" value="15000" />
+                      <input type="hidden" name="monto" value={PRECIOS.particular.montoWebpay} />
                       <input
                         type="image"
                         name="button1"
                         src="/boton-webpay.svg"
-                        alt="Pagar la sesión particular de $15.000 con WebPay"
+                        alt={`Pagar la sesión particular de ${PRECIOS.particular.display} con WebPay`}
                         title="Pagar con WebPay"
                         className="block transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite rounded-md"
                         style={{ height: 56, width: 'auto' }}

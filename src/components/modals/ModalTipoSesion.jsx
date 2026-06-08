@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
+import { PRECIOS } from '../../lib/precios';
 
 /**
  * Modal que pregunta el tipo de usuario/pago ANTES de abrir Cal.com, para que el
@@ -17,23 +18,23 @@ const OPCIONES = [
   {
     key: 'primeraSesionFonasa',
     titulo: 'Primera sesión con bono Fonasa',
-    detalle: 'Si es tu primera vez conmigo. Copago $5.570.',
+    detalle: `Si es tu primera vez conmigo. Copago ${PRECIOS.fonasaCopago.display}.`,
     destacada: true,
   },
   {
     key: 'controlAvanceFonasa',
     titulo: 'Sesión de avance con bono Fonasa',
-    detalle: 'Si ya iniciaste tratamiento conmigo. Copago $5.570.',
+    detalle: `Si ya iniciaste tratamiento conmigo. Copago ${PRECIOS.fonasaCopago.display}.`,
   },
   {
     key: 'parejaFonasa',
     titulo: 'Sesión de pareja con bono Fonasa',
-    detalle: 'Con ambos miembros presentes. Copago $5.570.',
+    detalle: `Con ambos miembros presentes. Copago ${PRECIOS.fonasaCopago.display}.`,
   },
   {
     key: 'particular15000',
     titulo: 'Sesión particular',
-    detalle: 'Sin previsión requerida. $15.000.',
+    detalle: `Sin previsión requerida. ${PRECIOS.particular.display}.`,
   },
 ];
 

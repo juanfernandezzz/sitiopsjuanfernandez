@@ -1,0 +1,18 @@
+name: OTA Update (publica el JS tras cada push)
+
+# Se dispara con cada push a main. Publica el bundle JS de la app por OTA, sin
+# pasar por la tienda. La politica runtimeVersion "fingerprint" garantiza que
+# solo las instalaciones con cascara compatible reciban este update; si un
+# cambio toca lo nativo, la huella cambia y obliga a un build nuevo.
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  publicar_ota:
+    name: Publicar update de produccion
+    steps:
+      - uses: eas/checkout
+      - uses: eas/install_node_modules
+      - name: Publicar OTA
+        run: eas update --branch production --message "${{ github.event.head_commit.message }}"

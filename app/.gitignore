@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+*.log
+.DS_Store
+ios/
+android/
+# Copia generada del contenido del sitio (fuente única en /src/lib)
+src/contenido/

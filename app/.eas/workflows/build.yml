@@ -1,0 +1,21 @@
+name: Build app (Android AAB + iOS simulador)
+
+# Manual: se corre desde el panel de Expo (Workflows, boton Run). Genera el AAB
+# de Android firmado por EAS (listo para Play) y el build de iOS para simulador
+# (prueba que el codigo compila, sin requerir el programa de Apple).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  android:
+    name: Android AAB (produccion)
+    type: build
+    params:
+      platform: android
+      profile: production
+  ios_simulador:
+    name: iOS (simulador, sin credenciales Apple)
+    type: build
+    params:
+      platform: ios
+      profile: ios-simulator

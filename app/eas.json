@@ -1,0 +1,12 @@
+{
+  "cli": { "version": ">= 12.0.0", "appVersionSource": "remote" },
+  "build": {
+    "production": {
+      "android": { "buildType": "app-bundle", "autoIncrement": true }
+    },
+    "ios-simulator": {
+      "ios": { "simulator": true }
+    }
+  },
+  "submit": { "production": {} }
+}

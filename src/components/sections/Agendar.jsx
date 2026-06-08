@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE } from '../../lib/cal';
+import { PRECIOS } from '../../lib/precios';
 import { useUI } from '../../lib/uiContext';
 
 // Cal embed se carga lazy para no inflar el bundle inicial.
@@ -9,10 +10,10 @@ const Cal = lazy(() =>
 );
 
 const TABS = [
-  { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: '$5.570' },
-  { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: '$5.570' },
-  { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: '$5.570' },
-  { key: 'particular15000', label: 'Sesión particular', price: '$15.000' },
+  { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: PRECIOS.fonasaCopago.display },
+  { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: PRECIOS.fonasaCopago.display },
+  { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: PRECIOS.fonasaCopago.display },
+  { key: 'particular15000', label: 'Sesión particular', price: PRECIOS.particular.display },
 ];
 
 const REASSURANCES = [

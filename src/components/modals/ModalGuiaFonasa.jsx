@@ -20,6 +20,7 @@ import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useUI } from '../../lib/uiContext';
 import { PRESTADOR } from '../../lib/contacto';
+import { PRECIOS } from '../../lib/precios';
 import Button from '../ui/Button';
 
 // RUT del prestador: dato público, leído de la fuente única (contacto.js).
@@ -58,7 +59,7 @@ const PASOS = [
   {
     titulo: 'Selecciona el código de prestación',
     desc:
-      'Elige uno de los códigos disponibles según el tipo de sesión: 09 08 101 o 09 08 102 para individual, 09 08 103 para pareja. El copago para tramos B, C y D es de $5.570.',
+      `Elige uno de los códigos disponibles según el tipo de sesión: 09 08 101 o 09 08 102 para individual, 09 08 103 para pareja. El copago para tramos B, C y D es de ${PRECIOS.fonasaCopago.display}.`,
   },
   {
     titulo: 'Paga el bono en línea',

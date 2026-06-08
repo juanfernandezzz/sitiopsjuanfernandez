@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { PRECIOS } from '../../lib/precios';
 
 const WifiIcon = () => (
   <svg
@@ -193,7 +194,7 @@ export default function ComoFuncionaOnline() {
           variants={item}
           className="font-body text-[16px] text-ink/75 text-center max-w-[52ch] mx-auto leading-relaxed mb-6"
         >
-          El pago es simple: copago de $5.570 con bono Fonasa, o $15.000 en modalidad particular. Lo eliges al momento de agendar.
+          El pago es simple: copago de {PRECIOS.fonasaCopago.display} con bono Fonasa, o {PRECIOS.particular.display} en modalidad particular. Lo eliges al momento de agendar.
         </motion.p>
 
         {/* Closing line */}

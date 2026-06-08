@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
+import { PRECIOS } from '../../lib/precios';
 import { useUI } from '../../lib/uiContext';
 
 // La foto del hero se sirve desde /public con nombre fijo (juan-720.webp /
@@ -163,7 +164,7 @@ export default function Hero() {
               variants={item}
               className="mt-3 font-body text-[15px] text-ink/60"
             >
-              Primera sesión con bono Fonasa: copago $5.570.{' '}
+              Primera sesión con bono Fonasa: copago {PRECIOS.fonasaCopago.display}.{' '}
               <button
                 type="button"
                 data-cal-link={PARTICULAR_CAL_LINK}
@@ -177,7 +178,7 @@ export default function Hero() {
                 }}
                 className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
               >
-                ¿Sin Fonasa? Ver sesión particular ($15.000) →
+                ¿Sin Fonasa? Ver sesión particular ({PRECIOS.particular.display}) →
               </button>
             </motion.p>
 
