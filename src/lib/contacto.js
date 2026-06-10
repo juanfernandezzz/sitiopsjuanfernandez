@@ -57,6 +57,7 @@ export const LEGAL = {
   leyTelemedicina: 'Ley 21.541',
   leyDatosVigente: 'Ley 19.628',
   leyDatosFutura: 'Ley 21.719',
+  leySaludMental: 'Ley 21.331',
   vigenciaPlena21719: '1 de diciembre de 2026',
 };
 

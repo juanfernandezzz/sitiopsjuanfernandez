@@ -272,7 +272,11 @@ export default function Agendar() {
             border: '1px solid rgba(63,91,74,0.15)',
             borderRadius: 16,
             overflow: 'hidden',
-            minHeight: isMobile ? 0 : 760,
+            // C24 fixpack: el alto del calendario se reserva solo cuando hay
+            // una opción elegida; sin selección, la caja queda compacta en vez
+            // de un bloque blanco de 760px en escritorio.
+            minHeight: !isMobile && selectedKey ? 760 : 0,
+            transition: 'min-height 0.3s ease',
           }}
         >
           {isMobile ? (
@@ -344,11 +348,10 @@ export default function Agendar() {
           ) : (
             <div
               style={{
-                minHeight: 760,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '40px 24px',
+                padding: '48px 24px',
                 textAlign: 'center',
               }}
             >

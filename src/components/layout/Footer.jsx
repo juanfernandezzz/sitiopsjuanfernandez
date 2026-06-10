@@ -4,7 +4,7 @@ import { PRESTADOR, CONTACTO, REDES, LEGAL, FONASA_CODIGOS } from '../../lib/con
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
  *
  * Bg sage con texto cream. Tres columnas en desktop, stack en mobile.
- * Banda inferior con copyright y marco legal aplicable (Ley 21.541 + Ley 21.719).
+ * Banda inferior con copyright y marco legal aplicable (Ley 21.541 + Ley 21.719 + Ley 21.331).
  *
  * Iconos inline para evitar arrastrar lucide-react al bundle de las paginas legales.
  */
@@ -65,8 +65,9 @@ export default function Footer() {
               maxWidth: '60ch',
             }}
           >
-            Sitio realizado conforme a {LEGAL.leyTelemedicina} (Telemedicina) y{' '}
-            {LEGAL.leyDatosFutura} (Protección de Datos Personales).
+            Sitio realizado conforme a {LEGAL.leyTelemedicina} (Telemedicina),{' '}
+            {LEGAL.leyDatosFutura} (Protección de Datos Personales) y{' '}
+            {LEGAL.leySaludMental} (Derechos en la Atención de Salud Mental).
           </p>
         </div>
       </div>
@@ -124,8 +125,8 @@ function ColumnaIdentidad() {
           maxWidth: '30ch',
         }}
       >
-        Psicoterapia individual con enfoque integrativo. TCC y narrativa al
-        servicio de tu bienestar, en sesiones por videollamada.
+        Psicoterapia individual con enfoque integrativo. Sesiones de 45
+        minutos por videollamada segura.
       </p>
     </div>
   );
@@ -133,7 +134,7 @@ function ColumnaIdentidad() {
 
 function ColumnaCredenciales() {
   const items = [
-    `Psicólogo titulado, ${PRESTADOR.universidad}`,
+    `Psicólogo, ${PRESTADOR.universidad}`,
     `Registro en la Superintendencia de Salud N° ${PRESTADOR.rnpi}`,
     'Prestador inscrito en Fonasa (Modalidad Libre Elección)',
     'Plataforma certificada por Fonasa: Doxy.me',

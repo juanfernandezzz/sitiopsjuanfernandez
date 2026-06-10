@@ -53,7 +53,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Mis datos están protegidos?',
-    a: 'Sí. La plataforma de videollamadas está certificada por Fonasa y la conexión va cifrada. No grabo las sesiones. La ficha clínica se mantiene bajo los mismos estándares que una atención presencial, conforme a la Ley 21.541 de telemedicina y a la normativa de protección de datos vigente en Chile.',
+    a: 'Sí. La plataforma de videollamadas está certificada por Fonasa y la conexión va cifrada. No grabo las sesiones. La ficha clínica se mantiene bajo los mismos estándares que una atención presencial, conforme a la Ley 21.541 de telemedicina, a la Ley 21.331 sobre derechos en la atención de salud mental y a la normativa de protección de datos vigente en Chile.',
   },
   {
     q: '¿Con qué frecuencia se hacen las sesiones?',

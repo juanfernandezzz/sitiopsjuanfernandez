@@ -30,7 +30,7 @@ PARTE B. AUTORIZACIÓN DEL ADULTO RESPONSABLE
 
 1. Naturaleza del servicio. Autorizo que el adolescente a mi cargo reciba atención psicológica con Juan Fernández, Psicólogo Clínico, en modalidad de telemedicina (sesiones por videollamada de 45 minutos) a través de la plataforma Doxy.me, certificada por el Fondo Nacional de Salud (Fonasa) para esta finalidad.
 
-2. Marco legal. Comprendo que esta atención se rige por la Ley N° 21.541 (Telemedicina), la Ley N° 20.584 (derechos y deberes de las personas en su atención de salud) y el Código de Ética del Colegio de Psicólogas y Psicólogos de Chile. En mi calidad de madre, padre o representante legal, autorizo el tratamiento conforme al interés superior del adolescente.
+2. Marco legal. Comprendo que esta atención se rige por la Ley N° 21.541 (Telemedicina), la Ley N° 20.584 (derechos y deberes de las personas en su atención de salud), la Ley N° 21.331 (derechos de las personas en la atención de salud mental) y el Código de Ética del Colegio de Psicólogas y Psicólogos de Chile. En mi calidad de madre, padre o representante legal, autorizo el tratamiento conforme al interés superior del adolescente.
 
 3. Asentimiento del adolescente. Declaro que el contenido de este documento fue explicado al adolescente en un lenguaje acorde a su edad y desarrollo, y que ha expresado su acuerdo de participar. Su opinión será considerada durante todo el proceso.
 

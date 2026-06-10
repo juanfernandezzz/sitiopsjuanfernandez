@@ -10,7 +10,7 @@ export const TEXTO_CONSENTIMIENTO = `CONSENTIMIENTO INFORMADO PARA ATENCIÓN PSI
 
 1. Naturaleza del servicio. Acepto recibir atención psicológica con Juan Fernández, Psicólogo Clínico, en modalidad de telerehabilitación (sesiones por videollamada de 45 minutos) a través de la plataforma Doxy.me, certificada por el Fondo Nacional de Salud (Fonasa) para esta finalidad.
 
-2. Marco legal. Comprendo que esta modalidad de atención se rige por la Ley N° 21.541 (Telemedicina) y el Código de Ética del Colegio de Psicólogas y Psicólogos de Chile. La ficha clínica se mantendrá bajo los mismos estándares que una atención presencial.
+2. Marco legal. Comprendo que esta modalidad de atención se rige por la Ley N° 21.541 (Telemedicina), la Ley N° 21.331 (reconocimiento y protección de los derechos de las personas en la atención de salud mental) y el Código de Ética del Colegio de Psicólogas y Psicólogos de Chile. La ficha clínica se mantendrá bajo los mismos estándares que una atención presencial.
 
 3. Limitaciones de la modalidad online. Entiendo que la atención psicológica online no reemplaza atención de urgencia. En situaciones de crisis o riesgo vital, debo contactar Salud Responde (600 360 7777) o acudir a la urgencia más cercana.
 

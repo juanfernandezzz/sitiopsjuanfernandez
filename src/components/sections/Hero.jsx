@@ -193,7 +193,7 @@ export default function Hero() {
               className="anim-rise mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
               style={delay(450)}
             >
-              <li>Psicólogo clínico titulado</li>
+              <li>Psicólogo clínico</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
               <li>Inscrito en Fonasa</li>
               <li aria-hidden="true" className="text-sage/50">·</li>

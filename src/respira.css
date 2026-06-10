@@ -9,6 +9,11 @@
  * marcha. Así, pausar congela la figura donde está (no salta ni reinicia)
  * y reanudar continúa desde el mismo punto.
  *
+ * Lo único que pasa por JavaScript es el sorteo de la figura nueva en cada
+ * cambio de fase, y aun así el reloj es CSS: el marcador .respira-fase
+ * (5,5 s) avisa por animationiteration, así que hereda el patrón de pausa
+ * y nunca se desincroniza del ciclo.
+ *
  * Seguridad visual: opacidades bajas sobre cream, sin cambios de luminancia
  * bruscos, sin destellos. Con prefers-reduced-motion la figura queda fija
  * y el ritmo lo marcan solo las palabras (crossfade de opacidad).
@@ -33,15 +38,49 @@
   animation-play-state: paused;
 }
 
-/* Giro caleidoscópico muy lento: una vuelta cada 2 minutos. */
+/* Giro caleidoscópico muy lento. Cada capa recibe su duración y su sentido
+   por variables CSS que el componente sortea al montar (entre 95 y 230 s por
+   vuelta): dos capas contrarrotando a velocidades distintas hacen que la
+   composición evolucione y casi nunca se repita, sin un solo frame de JS. */
 .respira-rotor {
   transform-origin: 210px 210px;
-  animation: respira-giro 120s linear infinite;
+  animation: respira-giro var(--giro-dur, 120s) linear infinite;
+  animation-direction: var(--giro-dir, normal);
   animation-play-state: paused;
 }
 
 .is-running .respira-breath,
 .is-running .respira-rotor {
+  animation-play-state: running;
+}
+
+/* Dos ranuras de figura que cruzan opacidades en cada cambio de fase: la
+   entrante (is-activa) aparece mientras la saliente se desvanece. El fundido
+   es del conjunto, no de las formas individuales, y dura 2,6 s dentro de una
+   fase de 5,5 s: el cambio acompaña la respiración sin saltos. */
+.respira-figura {
+  opacity: 0;
+  transition: opacity 2.6s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.respira-figura.is-activa {
+  opacity: 1;
+}
+
+/* Marcador de fase: caja vacía e invisible cuya animación dura exactamente
+   media ciclo (5,5 s). Cada animationiteration le avisa a React que empieza
+   una inhalación o una exhalación, para sortear la figura nueva. Comparte el
+   patrón de pausa: en pausa no hay sorteos y nada se desincroniza. */
+.respira-fase {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  animation: respira-giro 5.5s linear infinite;
+  animation-play-state: paused;
+}
+
+.is-running .respira-fase {
   animation-play-state: running;
 }
 
@@ -152,6 +191,10 @@
     animation: none;
   }
   .respira-rotor {
+    animation: none;
+  }
+  /* Sin marcador de fase no hay resorteos: la figura queda fija de verdad. */
+  .respira-fase {
     animation: none;
   }
   .respira-nota-rm {

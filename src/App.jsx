@@ -17,6 +17,9 @@ const Precios = lazy(() => import('./components/sections/Precios'))
 const ComoFuncionaOnline = lazy(() => import('./components/sections/ComoFuncionaOnline'))
 const Agendar = lazy(() => import('./components/sections/Agendar'))
 const FAQ = lazy(() => import('./components/sections/FAQ'))
+// C24 fixpack: sección Respira conmigo en el inicio, justo antes de Preguntas
+// frecuentes. Comparte el visor generativo con la página /respira.
+const Respira = lazy(() => import('./components/sections/Respira'))
 const ModalGuiaFonasa = lazy(() => import('./components/modals/ModalGuiaFonasa'))
 // C24: el modal de tipo de sesión también va lazy. Junto con el Hero y el Header
 // sin Framer Motion, la librería de animación queda fuera del bundle crítico:
@@ -129,6 +132,7 @@ function AppShell() {
         <LazySection id="precios" minHeight={900}><Precios /></LazySection>
         <LazySection id="como-funciona" minHeight={760}><ComoFuncionaOnline /></LazySection>
         <LazySection id="agendar" minHeight={980}><Agendar /></LazySection>
+        <LazySection id="respira" minHeight={760}><Respira /></LazySection>
         <LazySection id="faq" minHeight={560}><FAQ /></LazySection>
       </main>
 
