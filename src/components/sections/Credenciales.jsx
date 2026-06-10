@@ -81,7 +81,7 @@ export default function Credenciales() {
           className="font-display text-2xl md:text-3xl text-ink mb-10 text-center text-balance max-w-[26ch] mx-auto"
           style={{ fontVariationSettings: '"opsz" 72, "SOFT" 50', lineHeight: 1.2 }}
         >
-          Atención a cargo de un psicólogo clínico titulado y registrado
+          Atención a cargo de un psicólogo clínico registrado
         </motion.h2>
 
         <motion.ul

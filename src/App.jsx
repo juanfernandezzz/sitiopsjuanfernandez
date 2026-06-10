@@ -5,7 +5,6 @@ import { UIProvider, useUI } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
-import ModalTipoSesion from './components/modals/ModalTipoSesion'
 
 // Hero queda EAGER: es el LCP y debe renderizar de inmediato.
 // El resto del cuerpo se carga lazy y solo se monta cuando se acerca al viewport
@@ -19,6 +18,10 @@ const ComoFuncionaOnline = lazy(() => import('./components/sections/ComoFunciona
 const Agendar = lazy(() => import('./components/sections/Agendar'))
 const FAQ = lazy(() => import('./components/sections/FAQ'))
 const ModalGuiaFonasa = lazy(() => import('./components/modals/ModalGuiaFonasa'))
+// C24: el modal de tipo de sesión también va lazy. Junto con el Hero y el Header
+// sin Framer Motion, la librería de animación queda fuera del bundle crítico:
+// solo viaja en los chunks diferidos (secciones bajo el fold y modales).
+const ModalTipoSesion = lazy(() => import('./components/modals/ModalTipoSesion'))
 
 /**
  * Envuelve una sección lazy. Monta el contenido cuando el wrapper se acerca al
@@ -135,7 +138,9 @@ function AppShell() {
         <ModalGuiaFonasa />
       </Suspense>
 
-      <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
+      <Suspense fallback={null}>
+        <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
+      </Suspense>
 
       {showWhatsApp && (
         <FloatingWhatsApp

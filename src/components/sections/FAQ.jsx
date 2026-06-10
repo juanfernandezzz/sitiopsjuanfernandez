@@ -86,7 +86,7 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
                         href={f.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-body text-[14px] text-ink/60 hover:text-sage underline decoration-sage/25 hover:decoration-sage underline-offset-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+                        className="font-body text-[14px] text-ink/75 hover:text-sage underline decoration-sage/25 hover:decoration-sage underline-offset-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
                       >
                         {f.label}
                       </a>
@@ -94,6 +94,14 @@ function AccordionItem({ item, index, isOpen, onToggle, reduce, onCtaAction }) {
                   ))}
                 </ul>
               </div>
+            )}
+            {item.link && (
+              <a
+                href={item.link.href}
+                className="inline-block ml-6 mb-6 font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+              >
+                {item.link.label}
+              </a>
             )}
             {item.cta && (
               <button
@@ -176,7 +184,7 @@ export default function FAQ() {
               Preguntas frecuentes
             </h2>
             <p
-              className="font-body text-ink/70"
+              className="font-body text-ink/75"
               style={{ fontSize: 18, maxWidth: 620 }}
             >
               Lo que más me preguntan antes de la primera sesión.
@@ -203,7 +211,7 @@ export default function FAQ() {
             variants={itemVariant}
             className="mt-12 flex flex-col items-center gap-4 text-center"
           >
-            <p className="font-body text-ink/70" style={{ fontSize: 16 }}>
+            <p className="font-body text-ink/75" style={{ fontSize: 16 }}>
               ¿Tienes otra pregunta? Escríbeme por WhatsApp y te respondo.
             </p>
             <Button

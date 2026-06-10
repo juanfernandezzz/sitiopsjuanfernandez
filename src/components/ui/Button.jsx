@@ -12,10 +12,12 @@ import { CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
 
 const variantClasses = {
   primary: [
-    'bg-terracota text-cream',
-    'border-b-2 border-[#A3603F]',
-    'shadow-[0_6px_20px_-8px_rgba(201,123,94,0.6)]',
-    'hover:bg-[#BE6F52] hover:shadow-[0_10px_28px_-10px_rgba(201,123,94,0.75)]',
+    // C24: fondo terracotta-deep para que el texto cream cumpla AA (4.62:1).
+    // El terracota de marca (#C97B5E) sigue vivo en bordes y acentos decorativos.
+    'bg-terracotta-deep text-cream',
+    'border-b-2 border-[#7C4129]',
+    'shadow-[0_6px_20px_-8px_rgba(164,88,59,0.55)]',
+    'hover:bg-[#8E4B33] hover:shadow-[0_10px_28px_-10px_rgba(164,88,59,0.7)]',
   ].join(' '),
   secondary: [
     'bg-transparent text-sage',

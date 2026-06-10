@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
@@ -9,6 +8,12 @@ import { useUI } from '../../lib/uiContext';
 // juan-720.jpg) para que coincida EXACTAMENTE con el <link rel="preload"> de
 // index.html. Así el navegador la descubre y descarga desde el parseo del HTML,
 // sin esperar a que React monte el componente (era la causa del LCP alto).
+//
+// C24: este componente ya no importa Framer Motion. La entrada escalonada y la
+// rotación de la frase del H1 se hacen con CSS (clases anim-rise / hero-rotor
+// en index.css) más un intervalo mínimo de React para alternar la frase.
+// Motivo: Hero es eager (LCP); sacar Framer de aquí, del Header y del modal
+// deja la librería solo en chunks diferidos y reduce el JS del bundle crítico.
 
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
 const WA_MESSAGE = encodeURIComponent(
@@ -27,32 +32,45 @@ const ROTATING = [
 ];
 const LONGEST = 'sin salir de casa, a tu propio ritmo';
 const ROTATE_MS = 4500;
+const LEAVE_MS = 300;
+
+// Detección de prefers-reduced-motion sin depender de Framer.
+function usePrefersReducedMotion() {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduce(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return reduce;
+}
 
 export default function Hero() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const { openTipoSesionModal } = useUI();
   const [idx, setIdx] = useState(0);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (reduce) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % ROTATING.length), ROTATE_MS);
-    return () => clearInterval(t);
+    let to;
+    const t = setInterval(() => {
+      setLeaving(true);
+      to = setTimeout(() => {
+        setIdx((i) => (i + 1) % ROTATING.length);
+        setLeaving(false);
+      }, LEAVE_MS);
+    }, ROTATE_MS);
+    return () => {
+      clearInterval(t);
+      clearTimeout(to);
+    };
   }, [reduce]);
 
-  const container = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: reduce ? 0 : 0.08, delayChildren: 0.05 },
-    },
-  };
-  const item = {
-    hidden: { opacity: 0, y: reduce ? 0 : 12 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
-  };
-  const photoVariant = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.7, delay: reduce ? 0 : 0.2, ease: 'easeOut' } },
-  };
+  // Escalonado de entrada: mismo ritmo que el stagger anterior (80 ms).
+  const delay = (ms) => ({ animationDelay: `${ms}ms` });
 
   return (
     <section
@@ -81,26 +99,21 @@ export default function Hero() {
       />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-8 lg:pt-14 pb-12 lg:pb-16">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="flex flex-col-reverse gap-8 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center"
-        >
+        <div className="flex flex-col-reverse gap-8 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center">
           {/* Columna texto */}
           <div className="lg:col-span-3">
-            <motion.span
-              variants={item}
-              className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
+            <span
+              className="anim-rise inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
+              style={delay(50)}
             >
               <span className="w-6 h-px bg-sage" aria-hidden="true" />
               Terapia online en Chile
-            </motion.span>
+            </span>
 
-            <motion.h1
-              variants={item}
-              className="font-display text-ink"
+            <h1
+              className="anim-rise font-display text-ink"
               style={{
+                ...delay(130),
                 fontWeight: 600,
                 fontVariationSettings: '"opsz" 144, "SOFT" 50, "WONK" 0',
                 fontSize: 'clamp(2.1rem, 5.2vw, 3.6rem)',
@@ -116,33 +129,27 @@ export default function Hero() {
                   {LONGEST}
                 </span>
                 <span className="absolute inset-0">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={idx}
-                      className="italic text-sage"
-                      style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 0' }}
-                      initial={reduce ? false : { opacity: 0, y: 14 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={reduce ? { opacity: 1 } : { opacity: 0, y: -14 }}
-                      transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      {ROTATING[idx]}
-                    </motion.span>
-                  </AnimatePresence>
+                  <span
+                    key={idx}
+                    className={`hero-rotor italic text-sage ${leaving ? 'is-leaving' : ''}`}
+                    style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 0' }}
+                  >
+                    {ROTATING[idx]}
+                  </span>
                 </span>
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              variants={item}
-              className="mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
+            <p
+              className="anim-rise mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
+              style={delay(210)}
             >
               Trabajemos lo que hoy te limita y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
-            </motion.p>
+            </p>
 
-            <motion.div
-              variants={item}
-              className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+            <div
+              className="anim-rise mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+              style={delay(290)}
             >
               <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
                 Agendar tu sesión
@@ -157,12 +164,12 @@ export default function Hero() {
               >
                 Conversemos por WhatsApp
               </Button>
-            </motion.div>
+            </div>
 
             {/* Microcopy: aclara restricción y ofrece ruta alternativa sin abandonar el fold. */}
-            <motion.p
-              variants={item}
-              className="mt-3 font-body text-[15px] text-ink/60"
+            <p
+              className="anim-rise mt-3 font-body text-[15px] text-ink/75"
+              style={delay(370)}
             >
               Primera sesión con bono Fonasa: copago {PRECIOS.fonasaCopago.display}.{' '}
               <button
@@ -180,24 +187,24 @@ export default function Hero() {
               >
                 ¿Sin Fonasa? Ver sesión particular ({PRECIOS.particular.display}) →
               </button>
-            </motion.p>
+            </p>
 
-            <motion.ul
-              variants={item}
-              className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
+            <ul
+              className="anim-rise mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
+              style={delay(450)}
             >
               <li>Psicólogo clínico titulado</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
               <li>Inscrito en Fonasa</li>
               <li aria-hidden="true" className="text-sage/50">·</li>
               <li>Videollamada cifrada</li>
-            </motion.ul>
+            </ul>
           </div>
 
           {/* Columna foto: borde fino sage definido (sin marco de relleno offwhite,
               que se leía como marco pálido de bajo contraste). Mobile más grande
               para reforzar la señal de competencia del headshot sin que domine el CTA. */}
-          <motion.div variants={photoVariant} className="lg:col-span-2">
+          <div className="anim-fade lg:col-span-2" style={delay(200)}>
             <div className="mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:max-w-none">
               <div
                 className="relative w-full overflow-hidden rounded-2xl ring-1 ring-sage/30 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
@@ -231,8 +238,8 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Sentinel heredado (ya no controla el header fijo, pero no estorba) */}

@@ -1,0 +1,160 @@
+/*
+ * Respira conmigo (C24): animación de respiración pausada en CSS puro.
+ *
+ * Ritmo: ciclo de 11 s = 5,5 s de inhalación (la figura crece) + 5,5 s de
+ * exhalación (la figura se recoge), es decir ~6 respiraciones por minuto.
+ *
+ * Patrón de pausa: las animaciones están SIEMPRE declaradas con
+ * animation-play-state: paused; la clase .is-running solo las pone en
+ * marcha. Así, pausar congela la figura donde está (no salta ni reinicia)
+ * y reanudar continúa desde el mismo punto.
+ *
+ * Seguridad visual: opacidades bajas sobre cream, sin cambios de luminancia
+ * bruscos, sin destellos. Con prefers-reduced-motion la figura queda fija
+ * y el ritmo lo marcan solo las palabras (crossfade de opacidad).
+ */
+
+.respira-stage {
+  position: relative;
+}
+
+.respira-svg {
+  width: min(78vw, 400px);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Grupo que respira: escala entre 0.68 (exhalado) y 1 (inhalado). */
+.respira-breath {
+  transform-origin: 210px 210px;
+  transform: scale(0.8); /* posición de reposo si no hay animación (reduced motion) */
+  animation: respira-ciclo 11s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-play-state: paused;
+}
+
+/* Giro caleidoscópico muy lento: una vuelta cada 2 minutos. */
+.respira-rotor {
+  transform-origin: 210px 210px;
+  animation: respira-giro 120s linear infinite;
+  animation-play-state: paused;
+}
+
+.is-running .respira-breath,
+.is-running .respira-rotor {
+  animation-play-state: running;
+}
+
+/* Palabras guía centradas sobre la figura. */
+.respira-cues {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  margin: 0;
+}
+
+.cue {
+  grid-area: 1 / 1;
+  font-size: clamp(22px, 4vw, 26px);
+  font-style: italic;
+  color: #3F5B4A;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  opacity: 0;
+}
+
+/* Inhala visible durante la primera mitad del ciclo; Exhala en la segunda.
+   El fundido dura 0,55 s (45% a 50% y 95% a 100% del ciclo de 11 s). */
+.cue-inhala {
+  animation: respira-cue-in 11s linear infinite;
+  animation-play-state: paused;
+}
+.cue-exhala {
+  animation: respira-cue-out 11s linear infinite;
+  animation-play-state: paused;
+}
+.is-running .cue-inhala,
+.is-running .cue-exhala {
+  animation-play-state: running;
+}
+
+/* En pausa, las palabras del ciclo se ocultan (aunque su animación quede
+   congelada) y aparece la invitación de reposo. */
+.respira-visor:not(.is-running) .cue-inhala,
+.respira-visor:not(.is-running) .cue-exhala {
+  visibility: hidden;
+}
+.cue-reposo {
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+.respira-visor:not(.is-running) .cue-reposo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Nota de reduced motion: oculta por defecto, visible solo bajo la media query. */
+.respira-nota-rm {
+  display: none;
+}
+
+@keyframes respira-ciclo {
+  0% {
+    transform: scale(0.68);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.68);
+  }
+}
+
+@keyframes respira-giro {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes respira-cue-in {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes respira-cue-out {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  50%,
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* La figura queda fija en posición media; el ritmo lo marcan solo las
+     palabras, que cambian únicamente de opacidad (sin movimiento). */
+  .respira-breath {
+    animation: none;
+  }
+  .respira-rotor {
+    animation: none;
+  }
+  .respira-nota-rm {
+    display: block;
+  }
+}

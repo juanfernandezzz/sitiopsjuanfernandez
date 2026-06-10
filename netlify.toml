@@ -17,6 +17,11 @@
   status = 301
 
 [[redirects]]
+  from   = "/respira"
+  to     = "/respira.html"
+  status = 301
+
+[[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200

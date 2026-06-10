@@ -12,6 +12,10 @@ export default {
         terracotta: {
           DEFAULT: '#C97B5E',
           dark: '#B0664A',
+          // Derivado de accesibilidad (C24): fondo de CTA con texto cream.
+          // 4.62:1 sobre cream y 5.12:1 sobre offwhite (AA texto normal).
+          // No reemplaza al terracota de marca: solo rellenos con texto encima.
+          deep: '#A4583B',
         },
         // alias un-t para los componentes C2+
         terracota: '#C97B5E',

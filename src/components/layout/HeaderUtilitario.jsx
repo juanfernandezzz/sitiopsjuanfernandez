@@ -33,7 +33,7 @@ export default function HeaderUtilitario() {
       </a>
       <a
         href="/"
-        className="font-body text-ink/60"
+        className="font-body text-ink/75"
         style={{
           fontSize: 13,
           textDecoration: 'underline',

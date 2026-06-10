@@ -102,7 +102,7 @@ export default function Precios() {
                 '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
             }}
           >
-            <span className="absolute -top-3 left-6 bg-terracotta text-cream font-body text-[12px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
+            <span className="absolute -top-3 left-6 bg-terracotta-deep text-cream font-body text-[12px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
               Para tu primera sesión
             </span>
 
@@ -134,7 +134,7 @@ export default function Precios() {
               ))}
             </ul>
 
-            <p className="font-body text-[15px] text-ink/60 leading-relaxed mb-7">
+            <p className="font-body text-[15px] text-ink/75 leading-relaxed mb-7">
               Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
             </p>
 
@@ -267,7 +267,7 @@ export default function Precios() {
                     preventDefault) y abre en pestaña nueva para no perder el sitio.
                     El SVG del botón se sirve local desde /public (sin hotlinking). */}
                 <div className="flex flex-col gap-3 pt-4 border-t border-sage/15">
-                  <p className="font-body text-[14px] text-ink/60 leading-snug">
+                  <p className="font-body text-[14px] text-ink/75 leading-snug">
                     ¿Prefieres pagar ahora? Hazlo con WebPay:
                   </p>
                   <div className="flex items-center gap-4">
@@ -311,7 +311,7 @@ export default function Precios() {
                       />
                     </a>
                   </div>
-                  <p className="hidden md:block font-body text-[14px] text-ink/55 leading-snug">
+                  <p className="hidden md:block font-body text-[14px] text-ink/75 leading-snug">
                     Pulsa el botón, o escanea el código con tu teléfono.
                   </p>
                 </div>

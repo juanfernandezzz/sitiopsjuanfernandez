@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
+
+// C24: sin Framer Motion. El overlay y el panel del menú móvil viven siempre
+// en el DOM y animan con las clases mobile-overlay / mobile-panel (index.css):
+// transform + visibility con delay, así el cierre también anima y el panel
+// cerrado queda fuera del árbol de accesibilidad (visibility: hidden).
 
 const NAV_ITEMS = [
   { label: 'Cómo trabajo', href: '#como-trabajo' },
@@ -75,71 +79,58 @@ export default function Header() {
       {/* Spacer: empuja el contenido para que no quede bajo el header fijo. */}
       <div aria-hidden="true" className="h-[52px] md:h-[60px]" />
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              key="mobile-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+      {/* Overlay y panel siempre montados; las clases is-open disparan la
+          transición CSS de apertura y cierre. */}
+      <div
+        aria-hidden="true"
+        onClick={() => setMobileOpen(false)}
+        className={`mobile-overlay fixed inset-0 bg-ink/40 z-50 ${mobileOpen ? 'is-open' : ''}`}
+      />
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+        className={`mobile-panel fixed top-0 right-0 bottom-0 z-50 w-[82%] max-w-sm bg-cream shadow-2xl flex flex-col ${mobileOpen ? 'is-open' : ''}`}
+      >
+        <div className="flex items-center justify-between px-6 py-5 border-b border-ink/5">
+          <Brand small dark />
+          <button
+            aria-label="Cerrar menú"
+            onClick={() => setMobileOpen(false)}
+            className="p-2 -mr-2 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light rounded"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <nav className="flex flex-col px-6 py-6 gap-1">
+          {NAV_ITEMS.map((item, i) => (
+            <a
+              key={item.href}
+              href={item.href}
+              ref={i === 0 ? firstMobileLinkRef : null}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-ink/40 z-50"
-            />
-            <motion.aside
-              key="mobile-panel"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Menú de navegación"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-[82%] max-w-sm bg-cream shadow-2xl flex flex-col"
+              className="font-display text-[22px] text-ink py-3 min-h-[48px] border-b border-ink/5 hover:text-terracota transition-colors"
             >
-              <div className="flex items-center justify-between px-6 py-5 border-b border-ink/5">
-                <Brand small dark />
-                <button
-                  aria-label="Cerrar menú"
-                  onClick={() => setMobileOpen(false)}
-                  className="p-2 -mr-2 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light rounded"
-                >
-                  <CloseIcon />
-                </button>
-              </div>
-              <nav className="flex flex-col px-6 py-6 gap-1">
-                {NAV_ITEMS.map((item, i) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    ref={i === 0 ? firstMobileLinkRef : null}
-                    onClick={() => setMobileOpen(false)}
-                    className="font-display text-[22px] text-ink py-3 min-h-[48px] border-b border-ink/5 hover:text-terracota transition-colors"
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
-              <div className="mt-auto px-6 pb-8">
-                <Button
-                  size="lg"
-                  variant="primary"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    // Pequeño delay: deja que el panel mobile cierre su animación
-                    // antes de abrir el modal, evitando dos overlays encimados.
-                    setTimeout(() => openTipoSesionModal(), 280);
-                  }}
-                  className="w-full"
-                >
-                  Agendar sesión
-                </Button>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <div className="mt-auto px-6 pb-8">
+          <Button
+            size="lg"
+            variant="primary"
+            onClick={() => {
+              setMobileOpen(false);
+              // Pequeño delay: deja que el panel mobile cierre su animación
+              // antes de abrir el modal, evitando dos overlays encimados.
+              setTimeout(() => openTipoSesionModal(), 280);
+            }}
+            className="w-full"
+          >
+            Agendar sesión
+          </Button>
+        </div>
+      </aside>
     </>
   );
 }

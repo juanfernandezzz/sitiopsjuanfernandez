@@ -158,7 +158,7 @@ export default function Agendar() {
         {/* Subtítulo */}
         <motion.p
           variants={item}
-          className="font-body text-ink/70"
+          className="font-body text-ink/75"
           style={{
             fontSize: 18,
             lineHeight: 1.55,
@@ -225,7 +225,7 @@ export default function Agendar() {
                 }}
                 className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
-                  backgroundColor: active ? '#C97B5E' : 'transparent',
+                  backgroundColor: active ? '#A4583B' : 'transparent',
                   color: active ? '#F6F1E8' : 'rgba(42,59,76,0.7)',
                   borderRadius: 10,
                   padding: '12px 16px',
@@ -253,7 +253,6 @@ export default function Agendar() {
                 <span
                   style={{
                     fontSize: 12,
-                    opacity: 0.85,
                     fontWeight: 500,
                     marginTop: 2,
                   }}
@@ -312,7 +311,7 @@ export default function Agendar() {
                 }}
                 className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
-                  backgroundColor: '#C97B5E',
+                  backgroundColor: '#A4583B',
                   color: '#F6F1E8',
                   border: 'none',
                   borderRadius: 999,
@@ -322,7 +321,7 @@ export default function Agendar() {
                   cursor: 'pointer',
                   width: '100%',
                   maxWidth: 340,
-                  boxShadow: '0 4px 12px rgba(201,123,94,0.25)',
+                  boxShadow: '0 4px 12px rgba(164,88,59,0.25)',
                 }}
               >
                 Ver disponibilidad
@@ -372,7 +371,7 @@ export default function Agendar() {
           {REASSURANCES.map((text) => (
             <li
               key={text}
-              className="font-body text-ink/65"
+              className="font-body text-ink/75"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -390,7 +389,7 @@ export default function Agendar() {
         {/* Nota discreta sobre consentimiento informado */}
         <motion.p
           variants={item}
-          className="font-body text-ink/55"
+          className="font-body text-ink/75"
           style={{ fontSize: 14, marginTop: 24, lineHeight: 1.5 }}
         >
           Si es tu primera sesión conmigo, recibirás un email con el link al

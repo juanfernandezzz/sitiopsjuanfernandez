@@ -67,7 +67,7 @@ export default function MotivosConsulta() {
 
         <motion.p
           variants={item}
-          className="font-body text-[16px] md:text-[17px] text-ink/70 leading-relaxed max-w-[46ch] mx-auto"
+          className="font-body text-[16px] md:text-[17px] text-ink/75 leading-relaxed max-w-[46ch] mx-auto"
         >
           Trabajamos juntos a tu ritmo, con un enfoque que combina psicología cognitivo-conductual y narrativa.
         </motion.p>

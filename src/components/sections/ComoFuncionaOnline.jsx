@@ -69,7 +69,7 @@ const STEPS = [
   {
     num: '02',
     title: 'Recibes el link de la sala',
-    text: 'Te envío por email el link a mi sala virtual en Doxy.me, plataforma certificada por Fonasa para teleconsulta. No necesitas descargar nada.',
+    text: 'Te envío por email el link a mi sala virtual en Doxy.me, la plataforma de teleconsulta que certifica Fonasa. No necesitas descargar nada.',
   },
   {
     num: '03',
@@ -79,7 +79,7 @@ const STEPS = [
   {
     num: '04',
     title: 'Yo te admito a la sesión',
-    text: 'Cuando estoy listo, te conecto. Hablamos 45 minutos como en cualquier consulta, solo que desde donde estés.',
+    text: 'Cuando estoy listo, te conecto. La sesión transcurre como en cualquier consulta, solo que desde donde estés.',
   },
 ];
 
@@ -158,7 +158,7 @@ export default function ComoFuncionaOnline() {
                 {s.text}
               </p>
               {s.nota && (
-                <p className="mt-3 font-body text-[14px] text-ink/60 leading-[1.6] border-l-2 border-sage/30 pl-3">
+                <p className="mt-3 font-body text-[14px] text-ink/75 leading-[1.6] border-l-2 border-sage/30 pl-3">
                   {s.nota}
                 </p>
               )}
@@ -183,7 +183,7 @@ export default function ComoFuncionaOnline() {
                 <p className="font-body text-xs uppercase tracking-[0.18em] text-sage mb-1.5">
                   {title}
                 </p>
-                <p className="font-body text-sm text-ink/65">{text}</p>
+                <p className="font-body text-sm text-ink/75">{text}</p>
               </div>
             </div>
           ))}
@@ -200,7 +200,7 @@ export default function ComoFuncionaOnline() {
         {/* Closing line */}
         <motion.p
           variants={item}
-          className="font-body text-[15px] italic text-ink/65 text-center max-w-[50ch] mx-auto leading-relaxed"
+          className="font-body text-[15px] italic text-ink/75 text-center max-w-[50ch] mx-auto leading-relaxed"
         >
           Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.
         </motion.p>

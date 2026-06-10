@@ -67,4 +67,11 @@ export const FAQ_ITEMS = [
     q: '¿Qué pasa si tengo una crisis fuera del horario de sesión?',
     a: 'Las sesiones son agendadas y no funciono como servicio de urgencia. Si estás en riesgo o tienes una crisis fuera de horario, por favor contacta Salud Responde 600 360 7777 (gratuito, 24/7) o acude a la urgencia más cercana. En la siguiente sesión podemos trabajar lo que ocurrió.',
   },
+  {
+    q: '¿Qué es "Respira conmigo"?',
+    // El campo `link` solo lo renderiza el sitio web; la app nativa muestra q y a.
+    // Por eso la respuesta nombra la URL: el texto queda autocontenido en ambas superficies.
+    a: 'Es una herramienta gratuita de este sitio, en psicologojuanfernandez.cl/respira: una figura que se expande y se recoge para guiar tu inhalación y tu exhalación a un ritmo lento, cercano a 6 respiraciones por minuto. La inicias y la pausas cuando quieras, y puedes usarla el tiempo que te acomode (entre 3 y 5 minutos funciona bien para la mayoría). Es un apoyo para la relajación: no es un tratamiento ni reemplaza un proceso de psicoterapia. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
+    link: { label: 'Abrir Respira conmigo →', href: '/respira' },
+  },
 ];

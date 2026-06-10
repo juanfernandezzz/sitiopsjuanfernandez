@@ -48,7 +48,7 @@ export default function Footer() {
             className="font-body"
             style={{
               fontSize: 13,
-              color: 'rgba(246, 241, 232, 0.6)',
+              color: 'rgba(246, 241, 232, 0.8)',
               margin: 0,
               lineHeight: 1.5,
             }}
@@ -59,7 +59,7 @@ export default function Footer() {
             className="font-body mx-auto"
             style={{
               fontSize: 12,
-              color: 'rgba(246, 241, 232, 0.45)',
+              color: 'rgba(246, 241, 232, 0.8)',
               margin: '6px auto 0',
               lineHeight: 1.55,
               maxWidth: '60ch',
@@ -108,7 +108,7 @@ function ColumnaIdentidad() {
         className="font-body"
         style={{
           fontSize: 14,
-          color: 'rgba(246, 241, 232, 0.7)',
+          color: 'rgba(246, 241, 232, 0.8)',
           margin: '8px 0 0',
         }}
       >
@@ -118,14 +118,14 @@ function ColumnaIdentidad() {
         className="font-body"
         style={{
           fontSize: 14,
-          color: 'rgba(246, 241, 232, 0.7)',
+          color: 'rgba(246, 241, 232, 0.8)',
           margin: '16px 0 0',
           lineHeight: 1.6,
           maxWidth: '30ch',
         }}
       >
-        Psicoterapia individual con enfoque integrativo. CBT y narrativa al
-        servicio de tu bienestar, en sesiones de 45 minutos por videollamada.
+        Psicoterapia individual con enfoque integrativo. TCC y narrativa al
+        servicio de tu bienestar, en sesiones por videollamada.
       </p>
     </div>
   );
@@ -161,7 +161,7 @@ function ColumnaCredenciales() {
           Códigos Fonasa:
           <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0' }}>
             {FONASA_CODIGOS.map(({ codigo, etiqueta }) => (
-              <li key={codigo} style={{ color: 'rgba(246, 241, 232, 0.7)' }}>
+              <li key={codigo} style={{ color: 'rgba(246, 241, 232, 0.8)' }}>
                 {codigo} ({etiqueta})
               </li>
             ))}
@@ -202,7 +202,7 @@ function ColumnaContacto() {
         className="font-body"
         style={{
           fontSize: 13,
-          color: 'rgba(246, 241, 232, 0.6)',
+          color: 'rgba(246, 241, 232, 0.8)',
           margin: '0 0 10px',
           lineHeight: 1.55,
           maxWidth: '30ch',
@@ -242,7 +242,8 @@ function ColumnaContacto() {
           { label: 'Cómo trabajo', href: '/#como-trabajo' },
           { label: 'Precios', href: '/#precios' },
           { label: 'Agendar', href: '/#agendar' },
-          { label: 'FAQ', href: '/#faq' },
+          { label: 'Preguntas frecuentes', href: '/#faq' },
+          { label: 'Respira conmigo', href: '/respira' },
         ]}
       />
 
@@ -292,7 +293,7 @@ function HeadingSecundario({ children }) {
         fontSize: 12,
         textTransform: 'uppercase',
         letterSpacing: '0.15em',
-        color: 'rgba(246, 241, 232, 0.55)',
+        color: 'rgba(246, 241, 232, 0.8)',
         margin: '24px 0 8px',
         fontWeight: 500,
       }}

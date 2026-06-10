@@ -107,7 +107,7 @@ export default function ModalTipoSesion({ open, onClose }) {
                 >
                   ¿Qué tipo de sesión quieres agendar?
                 </h2>
-                <p className="font-body text-ink/65" style={{ fontSize: 15, marginTop: 6, lineHeight: 1.5 }}>
+                <p className="font-body text-ink/75" style={{ fontSize: 15, marginTop: 6, lineHeight: 1.5 }}>
                   Elige una opción y te muestro el calendario con la hora que te acomode.
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function ModalTipoSesion({ open, onClose }) {
                   <span className="font-body font-semibold text-ink block" style={{ fontSize: 16 }}>
                     {op.titulo}
                   </span>
-                  <span className="font-body text-ink/60 block" style={{ fontSize: 14, marginTop: 2 }}>
+                  <span className="font-body text-ink/75 block" style={{ fontSize: 14, marginTop: 2 }}>
                     {op.detalle}
                   </span>
                 </button>

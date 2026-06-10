@@ -14,6 +14,77 @@
 }
 
 @layer utilities {
+  /*
+   * C24: animaciones de entrada del fold en CSS puro. Reemplazan a Framer
+   * Motion en Hero y Header para sacar la librería del bundle crítico
+   * (Framer sigue en las secciones lazy bajo el fold, donde su costo se
+   * paga recién al hacer scroll). El escalonado se logra con
+   * animation-delay inline en cada bloque.
+   */
+  .anim-rise {
+    opacity: 0;
+    animation: c24-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .anim-fade {
+    opacity: 0;
+    animation: c24-fade 0.65s ease-out forwards;
+  }
+
+  /* Frase rotatoria del H1: entra desde abajo al montar (key={idx}) y sale
+     hacia arriba con la clase is-leaving, replicando el wait-mode anterior. */
+  .hero-rotor {
+    display: inline-block;
+    animation: c24-rotor-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero-rotor.is-leaving {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+
+  /* Menú móvil sin Framer: overlay y panel viven siempre en el DOM y
+     transicionan con clases. visibility con delay permite animar el cierre
+     y a la vez sacar el panel del árbol de accesibilidad al terminar. */
+  .mobile-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+  .mobile-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.2s ease;
+  }
+  .mobile-panel {
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.32s;
+  }
+  .mobile-panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim-rise,
+    .anim-fade {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .hero-rotor {
+      animation: none;
+      transition: none;
+    }
+    .mobile-overlay,
+    .mobile-panel {
+      transition: none;
+    }
+  }
+
   /* Helper: Fraunces con eje SOFT activado para warmth editorial */
   .fraunces-soft {
     font-family: 'Fraunces', Georgia, serif;
@@ -38,5 +109,35 @@
     pointer-events: none;
     mix-blend-mode: multiply;
     z-index: 0;
+  }
+}
+
+@layer base {
+  /* C24: las keyframes viven fuera de @layer utilities para que Tailwind no
+     las pode; nombres con prefijo c24- para evitar colisiones. */
+  @keyframes c24-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes c24-fade {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes c24-rotor-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }
