@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import Button from '../ui/Button';
+import '../../respira.css';
 
 /**
  * RespiraVisor (C24 fixpack 2): caleidoscopio de morfosis geométrica continua.
