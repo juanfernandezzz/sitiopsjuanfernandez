@@ -1,22 +1,16 @@
 /*
- * Respira conmigo (C24): animación de respiración pausada en CSS puro.
+ * Respira conmigo (C24 fixpack 2): respiración pausada + morfosis geométrica.
  *
- * Ritmo: ciclo de 11 s = 5,5 s de inhalación (la figura crece) + 5,5 s de
- * exhalación (la figura se recoge), es decir ~6 respiraciones por minuto.
+ * Ritmo: ciclo de 11 s = 5,5 s de inhalación + 5,5 s de exhalación (~6
+ * respiraciones por minuto). La escala de respiración es la señal dominante.
  *
- * Patrón de pausa: las animaciones están SIEMPRE declaradas con
- * animation-play-state: paused; la clase .is-running solo las pone en
- * marcha. Así, pausar congela la figura donde está (no salta ni reinicia)
- * y reanudar continúa desde el mismo punto.
+ * Morfosis: tres capas giran a periodos inconmensurables (variables CSS
+ * sorteadas por el componente), las alas oscilan en tijera y los acentos
+ * pulsan radialmente. Solo transformaciones: cero opacidad animada en formas.
  *
- * Lo único que pasa por JavaScript es el sorteo de la figura nueva en cada
- * cambio de fase, y aun así el reloj es CSS: el marcador .respira-fase
- * (5,5 s) avisa por animationiteration, así que hereda el patrón de pausa
- * y nunca se desincroniza del ciclo.
- *
- * Seguridad visual: opacidades bajas sobre cream, sin cambios de luminancia
- * bruscos, sin destellos. Con prefers-reduced-motion la figura queda fija
- * y el ritmo lo marcan solo las palabras (crossfade de opacidad).
+ * Patrón de pausa: TODAS las animaciones se declaran con
+ * animation-play-state: paused; la clase .is-running las pone en marcha.
+ * Pausar congela la figura donde está; reanudar continúa del mismo punto.
  */
 
 .respira-stage {
@@ -33,54 +27,48 @@
 /* Grupo que respira: escala entre 0.68 (exhalado) y 1 (inhalado). */
 .respira-breath {
   transform-origin: 210px 210px;
-  transform: scale(0.8); /* posición de reposo si no hay animación (reduced motion) */
+  transform-box: view-box;
+  transform: scale(0.8); /* reposo si no hay animación (reduced motion) */
   animation: respira-ciclo 11s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   animation-play-state: paused;
 }
 
-/* Giro caleidoscópico muy lento. Cada capa recibe su duración y su sentido
-   por variables CSS que el componente sortea al montar (entre 95 y 230 s por
-   vuelta): dos capas contrarrotando a velocidades distintas hacen que la
-   composición evolucione y casi nunca se repita, sin un solo frame de JS. */
+/* Giro de cada capa: duración, sentido y fase llegan por variables. */
 .respira-rotor {
   transform-origin: 210px 210px;
-  animation: respira-giro var(--giro-dur, 120s) linear infinite;
-  animation-direction: var(--giro-dir, normal);
+  transform-box: view-box;
+  animation: respira-giro var(--dur, 120s) linear var(--fase, 0s) infinite;
+  animation-direction: var(--dir, normal);
+  animation-play-state: paused;
+}
+
+/* Tijera de alas: base y espejo oscilan en sentidos opuestos. */
+.respira-tijera {
+  transform-origin: 210px 210px;
+  transform-box: view-box;
+  animation: respira-tijera var(--tdur, 40s) ease-in-out var(--tfase, 0s) infinite alternate;
+  animation-play-state: paused;
+}
+.respira-tijera-inv {
+  transform-origin: 210px 210px;
+  transform-box: view-box;
+  animation: respira-tijera-inv var(--tdur, 40s) ease-in-out var(--tfase, 0s) infinite alternate;
+  animation-play-state: paused;
+}
+
+/* Pulso radial del anillo de acentos. */
+.respira-pulso {
+  transform-origin: 210px 210px;
+  transform-box: view-box;
+  animation: respira-pulso var(--pdur, 38s) ease-in-out var(--pfase, 0s) infinite alternate;
   animation-play-state: paused;
 }
 
 .is-running .respira-breath,
-.is-running .respira-rotor {
-  animation-play-state: running;
-}
-
-/* Dos ranuras de figura que cruzan opacidades en cada cambio de fase: la
-   entrante (is-activa) aparece mientras la saliente se desvanece. El fundido
-   es del conjunto, no de las formas individuales, y dura 2,6 s dentro de una
-   fase de 5,5 s: el cambio acompaña la respiración sin saltos. */
-.respira-figura {
-  opacity: 0;
-  transition: opacity 2.6s cubic-bezier(0.45, 0, 0.55, 1);
-}
-
-.respira-figura.is-activa {
-  opacity: 1;
-}
-
-/* Marcador de fase: caja vacía e invisible cuya animación dura exactamente
-   media ciclo (5,5 s). Cada animationiteration le avisa a React que empieza
-   una inhalación o una exhalación, para sortear la figura nueva. Comparte el
-   patrón de pausa: en pausa no hay sorteos y nada se desincroniza. */
-.respira-fase {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  animation: respira-giro 5.5s linear infinite;
-  animation-play-state: paused;
-}
-
-.is-running .respira-fase {
+.is-running .respira-rotor,
+.is-running .respira-tijera,
+.is-running .respira-tijera-inv,
+.is-running .respira-pulso {
   animation-play-state: running;
 }
 
@@ -103,8 +91,7 @@
   opacity: 0;
 }
 
-/* Inhala visible durante la primera mitad del ciclo; Exhala en la segunda.
-   El fundido dura 0,55 s (45% a 50% y 95% a 100% del ciclo de 11 s). */
+/* Inhala visible en la primera mitad del ciclo; Exhala en la segunda. */
 .cue-inhala {
   animation: respira-cue-in 11s linear infinite;
   animation-play-state: paused;
@@ -118,8 +105,7 @@
   animation-play-state: running;
 }
 
-/* En pausa, las palabras del ciclo se ocultan (aunque su animación quede
-   congelada) y aparece la invitación de reposo. */
+/* En pausa, las palabras del ciclo se ocultan y aparece la invitación. */
 .respira-visor:not(.is-running) .cue-inhala,
 .respira-visor:not(.is-running) .cue-exhala {
   visibility: hidden;
@@ -133,68 +119,54 @@
   visibility: visible;
 }
 
-/* Nota de reduced motion: oculta por defecto, visible solo bajo la media query. */
+/* Nota de reduced motion: visible solo bajo la media query. */
 .respira-nota-rm {
   display: none;
 }
 
 @keyframes respira-ciclo {
-  0% {
-    transform: scale(0.68);
-  }
-  50% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0.68);
-  }
+  0% { transform: scale(0.68); }
+  50% { transform: scale(1); }
+  100% { transform: scale(0.68); }
 }
 
 @keyframes respira-giro {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes respira-tijera {
+  from { transform: rotate(calc(var(--tdeg, 6deg) * -1)); }
+  to { transform: rotate(var(--tdeg, 6deg)); }
+}
+
+@keyframes respira-tijera-inv {
+  from { transform: rotate(var(--tdeg, 6deg)); }
+  to { transform: rotate(calc(var(--tdeg, 6deg) * -1)); }
+}
+
+@keyframes respira-pulso {
+  from { transform: scale(0.86); }
+  to { transform: scale(1); }
 }
 
 @keyframes respira-cue-in {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  50%,
-  95% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0%, 45% { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @keyframes respira-cue-out {
-  0%,
-  45% {
-    opacity: 0;
-  }
-  50%,
-  95% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  0%, 45% { opacity: 0; }
+  50%, 95% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* La figura queda fija en posición media; el ritmo lo marcan solo las
-     palabras, que cambian únicamente de opacidad (sin movimiento). */
-  .respira-breath {
-    animation: none;
-  }
-  .respira-rotor {
-    animation: none;
-  }
-  /* Sin marcador de fase no hay resorteos: la figura queda fija de verdad. */
-  .respira-fase {
+  .respira-breath,
+  .respira-rotor,
+  .respira-tijera,
+  .respira-tijera-inv,
+  .respira-pulso {
     animation: none;
   }
   .respira-nota-rm {

@@ -2,35 +2,27 @@ import React, { useId, useState } from 'react';
 import Button from '../ui/Button';
 
 /**
- * RespiraVisor (C24 fixpack): caleidoscopio generativo que pauta la respiración.
+ * RespiraVisor (C24 fixpack 2): caleidoscopio de morfosis geométrica continua.
  *
- * Qué lo hace caleidoscopio de verdad y no una estrella:
- * 1. Simetría especular: cada celda contiene una media-hoja ASIMÉTRICA y su
- *    reflejo (translate(420 0) scale(-1 1) espeja respecto del eje x=210).
- *    El par espejo crea las "alas" clásicas del caleidoscopio.
- * 2. Aleatoriedad acotada y continua: se sortean formas, colores, opacidades,
- *    cantidad de segmentos, velocidades y sentidos de giro. Y no solo al
- *    montar: al empezar cada inhalación y cada exhalación se sortea una
- *    figura NUEVA, como al girar el tubo de un caleidoscopio. Nunca es la
- *    misma figura agrandándose y achicándose.
- * 3. El cambio entra por fundido cruzado: hay dos ranuras de figura y en cada
- *    cambio de fase la oculta recibe la figura nueva y cruza opacidades con
- *    la saliente (2,6 s), de modo que la transición acompaña en vez de saltar.
- *    El reloj del cambio es un marcador CSS invisible de 5,5 s (media fase,
- *    .respira-fase): su animationiteration comparte play-state con el resto,
- *    así que pausar también congela los sorteos y no hay deriva entre figura
- *    y palabras.
+ * La figura cambia de forma TODO el tiempo, sin fundidos: solo transformaciones.
+ * 1. Tres capas (velos, hojas, acentos) giran a periodos sorteados distintos y
+ *    mutuamente inconmensurables (95-230 s por vuelta, sentidos mixtos): la
+ *    configuración relativa nunca se repite en una sesión realista.
+ * 2. Tijera de alas: las copias base y espejo de las hojas oscilan en sentidos
+ *    opuestos (±4 a 9 grados, periodo 34-52 s), como girar el tubo de un
+ *    caleidoscopio real.
+ * 3. Pulso radial: el anillo de acentos escala 0.86-1.0 con periodo propio.
+ * 4. Normalización de tamaño: cada sorteo se escala para que su elemento más
+ *    extenso bese exactamente RADIO_OBJETIVO a inhalación completa; un
+ *    clipPath en r=206 hace imposible pintar fuera del disco.
  *
- * Lo que la aleatoriedad NO puede tocar (criterios del ciclo):
- * - El ritmo: el ciclo de respiración es fijo, 11 s (5,5 s + 5,5 s), y la
- *   escala del conjunto sigue siendo la señal dominante. El giro es lentísimo
- *   y subordinado, para no competir con la pauta.
- * - La calma: paleta de marca con opacidades techo 0.3, sin animar color ni
- *   opacidad de las formas individuales (el fundido es del conjunto y es
- *   lento), sin destellos ni saltos de luminancia.
- * - La accesibilidad: arranca en pausa, pausar congela (animation-play-state),
- *   y con prefers-reduced-motion la figura queda fija y sin resorteos (única
- *   por visita) y el ritmo lo marcan solo las palabras.
+ * Lo que la aleatoriedad no toca: el ritmo (ciclo fijo de 11 s; la escala de
+ * respiración sigue siendo la señal dominante: las derivas son un orden de
+ * magnitud más lentas), la calma (paleta de marca, opacidades techo, cero
+ * animación de color u opacidad en las formas) y la accesibilidad (arranca en
+ * pausa, pausar congela todo con animation-play-state, y con
+ * prefers-reduced-motion la figura queda fija e igual única por visita).
+ * Cero JavaScript por frame: todo es CSS sobre grupos SVG.
  */
 
 const alea = (min, max) => min + Math.random() * (max - min);
@@ -45,9 +37,12 @@ const PALETA = [
   { fill: '#A4583B', op: [0.1, 0.16] },
 ];
 
-// Media-hoja asimétrica desde el centro (210,210). El sesgo inclina la punta;
-// el espejo de la celda convierte esa asimetría en un par de alas.
-function hojaPath() {
+// Radio que el elemento más extenso besa a inhalación completa
+// (disco r=206, aire de 14 px hasta el anillo).
+const RADIO_OBJETIVO = 192;
+
+// Media-hoja asimétrica desde el centro; el espejo la convierte en ala.
+function hoja() {
   const largo = alea(116, 158);
   const ancho = alea(10, 26);
   const sesgo = alea(4, 18);
@@ -55,7 +50,7 @@ function hojaPath() {
   const y0 = 210;
   const tx = x0 + sesgo;
   const ty = y0 - largo;
-  return [
+  const d = [
     `M ${x0} ${y0}`,
     `C ${r1(x0 - ancho)} ${r1(y0 - largo * 0.35)},`,
     `${r1(tx - ancho * 0.7)} ${r1(ty + largo * 0.25)},`,
@@ -64,79 +59,100 @@ function hojaPath() {
     `${r1(x0 + ancho * 0.55)} ${r1(y0 - largo * 0.3)},`,
     `${x0} ${y0} Z`,
   ].join(' ');
+  return { d, ext: Math.hypot(sesgo, largo) };
 }
 
 function generarCaleidoscopio() {
   const hojas = Array.from({ length: elegir([2, 3]) }, () => {
     const c = elegir(PALETA);
-    return { d: hojaPath(), fill: c.fill, op: r1(alea(c.op[0], c.op[1])) };
+    const h = hoja();
+    return { ...h, fill: c.fill, op: r1(alea(c.op[0], c.op[1])) };
   });
-  const puntos = Array.from({ length: elegir([1, 2]) }, () => {
+  const puntos = Array.from({ length: elegir([2, 3]) }, () => {
     const c = elegir(PALETA);
+    const cx = r1(210 + alea(-14, 14));
+    const cy = r1(210 - alea(72, 150));
+    const r = r1(alea(3.5, 8));
     return {
-      cx: r1(210 + alea(-14, 14)),
-      cy: r1(210 - alea(72, 150)),
-      r: r1(alea(3.5, 8)),
+      cx, cy, r,
+      ext: Math.hypot(cx - 210, cy - 210) + r,
       fill: c.fill,
       op: r1(alea(0.18, 0.3)),
     };
   });
   const velos = Array.from({ length: 2 }, () => {
     const c = elegir(PALETA);
+    const cx = r1(210 + alea(-10, 10));
+    const cy = r1(210 - alea(55, 100));
+    const rx = r1(alea(26, 48));
+    const ry = r1(alea(70, 115));
     return {
-      cx: r1(210 + alea(-10, 10)),
-      cy: r1(210 - alea(60, 112)),
-      rx: r1(alea(26, 50)),
-      ry: r1(alea(78, 138)),
+      cx, cy, rx, ry,
+      ext: Math.hypot(cx - 210, cy - 210) + Math.max(rx, ry),
       rot: r1(alea(-16, 16)),
       fill: c.fill,
       op: r1(alea(0.05, 0.1)),
     };
   });
+
+  // Normalización: TODO sorteo besa el mismo radio. Ni figuras perdidas en
+  // el disco ni pétalos desbordados, para cualquier combinación aleatoria.
+  const extMax = Math.max(
+    ...hojas.map((h) => h.ext),
+    ...puntos.map((p) => p.ext),
+    ...velos.map((v) => v.ext)
+  );
+  const ajuste = Math.round((RADIO_OBJETIVO / extMax) * 1000) / 1000;
+
   const dirA = elegir(['normal', 'reverse']);
   return {
     segA: elegir([10, 12, 14]),
     segB: elegir([6, 8]),
-    hojas,
-    puntos,
-    velos,
+    hojas, puntos, velos, ajuste,
+    // Periodos lentos y mutuamente inconmensurables.
     durA: Math.round(alea(95, 150)),
     durB: Math.round(alea(160, 230)),
+    durC: Math.round(alea(53, 89)),
+    durT: Math.round(alea(34, 52)),
+    durP: Math.round(alea(31, 47)),
     dirA,
     dirB: dirA === 'normal' ? 'reverse' : 'normal',
+    // Fases iniciales aleatorias: ni dos visitas empiezan igual.
+    faseA: r1(alea(0, 150)),
+    faseB: r1(alea(0, 230)),
+    faseC: r1(alea(0, 89)),
+    faseT: r1(alea(0, 52)),
+    faseP: r1(alea(0, 47)),
+    // Apertura máxima de la tijera de alas.
+    tdeg: r1(alea(4, 9)),
   };
 }
 
 export default function RespiraVisor() {
   const [running, setRunning] = useState(false);
-  // Dos ranuras de figura: la activa se ve, la otra espera oculta el próximo
-  // sorteo. Lazy initializer: ambas se sortean una vez al montar.
-  const [vista, setVista] = useState(() => ({
-    activa: 0,
-    figuras: [generarCaleidoscopio(), generarCaleidoscopio()],
-  }));
+  const [k] = useState(generarCaleidoscopio);
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
 
+  const idCeldaA = `celdaA-${uid}`;
+  const idCeldaB = `celdaB-${uid}`;
+  const idCeldaC = `celdaC-${uid}`;
   const idCentro = `centro-${uid}`;
+  const idClip = `clip-${uid}`;
 
-  // Inicio de cada inhalación y de cada exhalación (lo avisa el marcador
-  // .respira-fase): la ranura oculta recibe una figura recién sorteada y pasa
-  // a ser la visible; el fundido cruzado lo hace el CSS.
-  const cambiarFigura = () => {
-    setVista((v) => {
-      const entrante = 1 - v.activa;
-      const figuras = [...v.figuras];
-      figuras[entrante] = generarCaleidoscopio();
-      return { activa: entrante, figuras };
-    });
-  };
+  // n segmentos en simetría rotacional; mir=true agrega la copia espejada.
+  const segmentos = (id, n, mir) =>
+    Array.from({ length: n }, (_, i) => (
+      <g key={i} transform={`rotate(${(360 / n) * i} 210 210)`}>
+        <use
+          href={`#${id}`}
+          transform={mir ? 'translate(420 0) scale(-1 1)' : undefined}
+        />
+      </g>
+    ));
 
   return (
     <div className={`respira-visor ${running ? 'is-running' : ''}`}>
       <div className="respira-stage" aria-hidden="true">
-        {/* Marcador de fase: invisible, su animación dura media ciclo (5,5 s)
-            y cada iteración marca el inicio de una inhalación o exhalación. */}
-        <span className="respira-fase" onAnimationIteration={cambiarFigura} />
         <svg
           viewBox="0 0 420 420"
           className="respira-svg"
@@ -148,6 +164,33 @@ export default function RespiraVisor() {
               <stop offset="0%" stopColor="#A8B5A0" stopOpacity="0.5" />
               <stop offset="100%" stopColor="#A8B5A0" stopOpacity="0" />
             </radialGradient>
+            <clipPath id={idClip}>
+              <circle cx="210" cy="210" r="206" />
+            </clipPath>
+            <g id={idCeldaA}>
+              {k.hojas.map((h, i) => (
+                <path key={i} d={h.d} fill={h.fill} opacity={h.op} />
+              ))}
+            </g>
+            <g id={idCeldaC}>
+              {k.puntos.map((p, i) => (
+                <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill={p.fill} opacity={p.op} />
+              ))}
+            </g>
+            <g id={idCeldaB}>
+              {k.velos.map((v, i) => (
+                <ellipse
+                  key={i}
+                  cx={v.cx}
+                  cy={v.cy}
+                  rx={v.rx}
+                  ry={v.ry}
+                  fill={v.fill}
+                  opacity={v.op}
+                  transform={`rotate(${v.rot} 210 210)`}
+                />
+              ))}
+            </g>
           </defs>
 
           {/* Base */}
@@ -162,88 +205,70 @@ export default function RespiraVisor() {
             strokeWidth="1.5"
           />
 
-          {/* Todo el conjunto respira (escala). Dentro, las dos ranuras de
-              figura cruzan opacidades en cada fase y, dentro de cada figura,
-              dos capas giran en sentidos opuestos a velocidades sorteadas. */}
-          <g className="respira-breath">
-            {vista.figuras.map((k, ranura) => {
-              const idCeldaA = `celdaA-${uid}-${ranura}`;
-              const idCeldaB = `celdaB-${uid}-${ranura}`;
-              return (
+          <g clipPath={`url(#${idClip})`}>
+            {/* Todo el conjunto respira; dentro, la figura normalizada. */}
+            <g className="respira-breath">
+              <g transform={`translate(210 210) scale(${k.ajuste}) translate(-210 -210)`}>
+                {/* Capa de velos */}
                 <g
-                  key={ranura}
-                  className={`respira-figura${ranura === vista.activa ? ' is-activa' : ''}`}
+                  className="respira-rotor"
+                  style={{ '--dur': `${k.durB}s`, '--dir': k.dirB, '--fase': `-${k.faseB}s` }}
                 >
-                  <defs>
-                    {/* Celda de la capa principal: hojas + puntos sorteados */}
-                    <g id={idCeldaA}>
-                      {k.hojas.map((h, i) => (
-                        <path key={i} d={h.d} fill={h.fill} opacity={h.op} />
-                      ))}
-                      {k.puntos.map((p, i) => (
-                        <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill={p.fill} opacity={p.op} />
-                      ))}
-                    </g>
-                    {/* Celda de la capa de fondo: velos translúcidos grandes */}
-                    <g id={idCeldaB}>
-                      {k.velos.map((v, i) => (
-                        <ellipse
-                          key={i}
-                          cx={v.cx}
-                          cy={v.cy}
-                          rx={v.rx}
-                          ry={v.ry}
-                          fill={v.fill}
-                          opacity={v.op}
-                          transform={`rotate(${v.rot} 210 210)`}
-                        />
-                      ))}
-                    </g>
-                  </defs>
+                  {segmentos(idCeldaB, k.segB, false)}
+                  {segmentos(idCeldaB, k.segB, true)}
+                </g>
+                {/* Capa de hojas con tijera de alas */}
+                <g
+                  className="respira-rotor"
+                  style={{ '--dur': `${k.durA}s`, '--dir': k.dirA, '--fase': `-${k.faseA}s` }}
+                >
                   <g
-                    className="respira-rotor"
-                    style={{ '--giro-dur': `${k.durB}s`, '--giro-dir': k.dirB }}
+                    className="respira-tijera"
+                    style={{ '--tdur': `${k.durT}s`, '--tfase': `-${k.faseT}s`, '--tdeg': `${k.tdeg}deg` }}
                   >
-                    {Array.from({ length: k.segB }, (_, i) => (
-                      <g key={i} transform={`rotate(${(360 / k.segB) * i} 210 210)`}>
-                        <use href={`#${idCeldaB}`} />
-                        <use href={`#${idCeldaB}`} transform="translate(420 0) scale(-1 1)" />
-                      </g>
-                    ))}
+                    {segmentos(idCeldaA, k.segA, false)}
                   </g>
                   <g
-                    className="respira-rotor"
-                    style={{ '--giro-dur': `${k.durA}s`, '--giro-dir': k.dirA }}
+                    className="respira-tijera-inv"
+                    style={{ '--tdur': `${k.durT}s`, '--tfase': `-${k.faseT}s`, '--tdeg': `${k.tdeg}deg` }}
                   >
-                    {Array.from({ length: k.segA }, (_, i) => (
-                      <g key={i} transform={`rotate(${(360 / k.segA) * i} 210 210)`}>
-                        <use href={`#${idCeldaA}`} />
-                        <use href={`#${idCeldaA}`} transform="translate(420 0) scale(-1 1)" />
-                      </g>
-                    ))}
+                    {segmentos(idCeldaA, k.segA, true)}
                   </g>
                 </g>
-              );
-            })}
-            <circle cx="210" cy="210" r="60" fill={`url(#${idCentro})`} />
-            <circle
-              cx="210"
-              cy="210"
-              r="24"
-              fill="none"
-              stroke="#3F5B4A"
-              strokeOpacity="0.22"
-              strokeWidth="1"
-            />
+                {/* Capa de acentos con pulso radial */}
+                <g
+                  className="respira-rotor"
+                  style={{ '--dur': `${k.durC}s`, '--dir': k.dirB, '--fase': `-${k.faseC}s` }}
+                >
+                  <g
+                    className="respira-pulso"
+                    style={{ '--pdur': `${k.durP}s`, '--pfase': `-${k.faseP}s` }}
+                  >
+                    {segmentos(idCeldaC, k.segA, false)}
+                    {segmentos(idCeldaC, k.segA, true)}
+                  </g>
+                </g>
+              </g>
+              <circle cx="210" cy="210" r="60" fill={`url(#${idCentro})`} />
+              <circle
+                cx="210"
+                cy="210"
+                r="24"
+                fill="none"
+                stroke="#3F5B4A"
+                strokeOpacity="0.22"
+                strokeWidth="1"
+              />
+            </g>
           </g>
         </svg>
 
-        {/* Palabras guía superpuestas (el lector de pantalla recibe el estado
-            por la región aria-live de abajo, no por esto). */}
+        {/* Palabras guía (el lector de pantalla recibe el estado por la
+            región aria-live de abajo, no por esto). */}
         <p className="respira-cues font-display" aria-hidden="true">
           <span className="cue cue-inhala">Inhala</span>
           <span className="cue cue-exhala">Exhala</span>
-          <span className="cue cue-reposo">Listo cuando tú quieras</span>
+          <span className="cue cue-reposo">Comienza cuando quieras</span>
         </p>
       </div>
 

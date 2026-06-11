@@ -71,8 +71,8 @@ export default function Respira() {
             >
               La figura se expande cuando inhalas y se recoge cuando exhalas, a
               un ritmo lento, cercano a 6 respiraciones por minuto. Pruébala
-              aquí mismo: cada inhalación y cada exhalación dibujan una figura
-              nueva.
+              aquí mismo. La figura cambia de forma lentamente todo el tiempo:
+              nunca dibuja dos veces la misma.
             </p>
           </motion.div>
 
