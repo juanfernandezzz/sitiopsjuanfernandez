@@ -40,7 +40,7 @@ export default function RespiraApp() {
             className="font-body text-ink/80"
             style={{ fontSize: 18, lineHeight: 1.6, maxWidth: '58ch' }}
           >
-            Un ejercicio visual para bajar el ritmo: la figura se expande cuando inhalas y se recoge cuando exhalas, a un ritmo lento, cercano a 6 respiraciones por minuto. Respira de forma suave y silenciosa, sin forzar. La figura cambia de forma lentamente todo el tiempo: nunca dibuja dos veces la misma.
+            Un ejercicio visual para bajar el ritmo: la figura se expande cuando inhalas y se recoge cuando exhalas, a un ritmo lento, cercano a 6 respiraciones por minuto. Respira de forma suave y silenciosa, sin forzar.
           </p>
 
           {/* Visor compartido con la sección del inicio */}

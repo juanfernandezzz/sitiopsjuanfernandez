@@ -71,8 +71,7 @@ export default function Respira() {
             >
               La figura se expande cuando inhalas y se recoge cuando exhalas, a
               un ritmo lento, cercano a 6 respiraciones por minuto. Pruébala
-              aquí mismo. La figura cambia de forma lentamente todo el tiempo:
-              nunca dibuja dos veces la misma.
+              aquí mismo.
             </p>
           </motion.div>
 
@@ -96,7 +95,7 @@ export default function Respira() {
                 href="/respira"
                 className="font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
               >
-                Abrir Respira conmigo en su propia página →
+                Abrir herramienta en su propia página →
               </a>
             </p>
           </motion.div>
