@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
-import { PRECIOS } from '../../lib/precios';
+import { SESIONES } from '../../lib/sesiones';
 
 /**
  * Modal que pregunta el tipo de usuario/pago ANTES de abrir Cal.com, para que el
@@ -14,29 +14,8 @@ import { PRECIOS } from '../../lib/precios';
  * en el punto de decisión, sin sacar al usuario del sitio.
  */
 
-const OPCIONES = [
-  {
-    key: 'primeraSesionFonasa',
-    titulo: 'Primera sesión con bono Fonasa',
-    detalle: `Si es tu primera vez conmigo. Copago ${PRECIOS.fonasaCopago.display}.`,
-    destacada: true,
-  },
-  {
-    key: 'controlAvanceFonasa',
-    titulo: 'Sesión de avance con bono Fonasa',
-    detalle: `Si ya iniciaste tratamiento conmigo. Copago ${PRECIOS.fonasaCopago.display}.`,
-  },
-  {
-    key: 'parejaFonasa',
-    titulo: 'Sesión de pareja con bono Fonasa',
-    detalle: `Con ambos miembros presentes. Copago ${PRECIOS.fonasaCopago.display}.`,
-  },
-  {
-    key: 'particular15000',
-    titulo: 'Sesión particular',
-    detalle: `Sin previsión requerida. ${PRECIOS.particular.display}.`,
-  },
-];
+// Fuente unica compartida con la app (pantalla Agendar).
+const OPCIONES = SESIONES;
 
 export default function ModalTipoSesion({ open, onClose }) {
   const panelRef = useRef(null);
@@ -154,7 +133,7 @@ export default function ModalTipoSesion({ open, onClose }) {
                     {op.titulo}
                   </span>
                   <span className="font-body text-ink/75 block" style={{ fontSize: 14, marginTop: 2 }}>
-                    {op.detalle}
+                    {op.detalleModal}
                   </span>
                 </button>
               ))}

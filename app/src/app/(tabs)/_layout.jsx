@@ -28,6 +28,10 @@ export default function TabsLayout() {
         options={{ title: 'Agendar', tabBarIcon: ({ color }) => <Feather name="calendar" size={20} color={color} /> }}
       />
       <Tabs.Screen
+        name="respira"
+        options={{ title: 'Respira', tabBarIcon: ({ color }) => <Feather name="wind" size={20} color={color} /> }}
+      />
+      <Tabs.Screen
         name="informacion"
         options={{ title: 'Información', tabBarIcon: ({ color }) => <Feather name="book-open" size={20} color={color} /> }}
       />

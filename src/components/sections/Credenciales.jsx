@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
-import { PRESTADOR } from '../../lib/contacto';
+import { CREDENCIALES } from '../../lib/credenciales';
 
 /**
  * Franja compacta de autoridad. Sin testimonios (ética Colpsi 1999), la prueba
@@ -29,13 +29,6 @@ const CheckIcon = () => (
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
-
-const CREDENCIALES = [
-  `Psicólogo clínico titulado en la ${PRESTADOR.universidad}`,
-  `Inscrito en la Superintendencia de Salud (N° ${PRESTADOR.rnpi})`,
-  'Formación continua en terapia cognitivo-conductual, cuidado clínico (Harvard) y primeros auxilios psicológicos (UAB)',
-  'Inglés nivel C1 (EF-SET): atención también en inglés',
-];
 
 export default function Credenciales() {
   const ref = useRef(null);

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
-import { PRECIOS } from '../../lib/precios';
+import { PROCESO_ONLINE } from '../../lib/proceso';
 
 const WifiIcon = () => (
   <svg
@@ -59,35 +59,19 @@ const LockIcon = () => (
   </svg>
 );
 
-const STEPS = [
-  {
-    num: '01',
-    title: 'Tu reserva queda confirmada',
-    text: 'Recibes en tu email la confirmación con fecha, hora y enlace de la sesión. Todo desde Cal.com.',
-    nota: 'Antes de la sesión: compras tu bono Fonasa y me envías el folio, o pagas la sesión particular por transferencia o WebPay. Te lo recuerdo en el mismo correo.',
-  },
-  {
-    num: '02',
-    title: 'Recibes el link de la sala',
-    text: 'Te envío por email el link a mi sala virtual en Doxy.me, la plataforma de teleconsulta que certifica Fonasa. No necesitas descargar nada.',
-  },
-  {
-    num: '03',
-    title: 'A tu hora, abres el link',
-    text: 'Desde cualquier navegador (Chrome, Safari, Firefox). Das permiso a cámara y micrófono. Quedas en sala de espera.',
-  },
-  {
-    num: '04',
-    title: 'Yo te admito a la sesión',
-    text: 'Cuando estoy listo, te conecto. La sesión transcurre como en cualquier consulta, solo que desde donde estés.',
-  },
-];
+const STEPS = PROCESO_ONLINE.pasos;
 
-const TRUST_ITEMS = [
-  { Icon: WifiIcon, title: 'Conexión estable', text: 'Wi-Fi recomendado' },
-  { Icon: HeadphonesIcon, title: 'Privacidad', text: 'Lugar tranquilo y solo tú' },
-  { Icon: LockIcon, title: 'Llamada cifrada', text: 'Conexión protegida' },
-];
+const ICONOS_CONFIANZA = {
+  conexion: WifiIcon,
+  privacidad: HeadphonesIcon,
+  cifrado: LockIcon,
+};
+
+const TRUST_ITEMS = PROCESO_ONLINE.confianza.map((c) => ({
+  Icon: ICONOS_CONFIANZA[c.clave],
+  title: c.titulo,
+  text: c.texto,
+}));
 
 export default function ComoFuncionaOnline() {
   const ref = useRef(null);
@@ -127,16 +111,16 @@ export default function ComoFuncionaOnline() {
           className="text-center mb-12 md:mb-14 max-w-2xl mx-auto"
         >
           <p className="text-sage text-[13px] uppercase tracking-[0.18em] font-body mb-4">
-            Teleconsulta paso a paso
+            {PROCESO_ONLINE.eyebrow}
           </p>
           <h2
             className="font-display text-4xl md:text-5xl text-ink mb-5"
             style={{ fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
           >
-            Cómo funciona una sesión online
+            {PROCESO_ONLINE.titulo}
           </h2>
           <p className="font-body text-[18px] md:text-[20px] text-ink/80 leading-relaxed">
-            Es más simple de lo que parece. En 4 pasos.
+            {PROCESO_ONLINE.sub}
           </p>
         </motion.div>
 
@@ -153,9 +137,9 @@ export default function ComoFuncionaOnline() {
               >
                 {s.num}
               </span>
-              <h3 className="font-display text-xl text-ink mb-3">{s.title}</h3>
+              <h3 className="font-display text-xl text-ink mb-3">{s.titulo}</h3>
               <p className="font-body text-[16px] md:text-[17px] text-ink/78 leading-[1.65]">
-                {s.text}
+                {s.texto}
               </p>
               {s.nota && (
                 <p className="mt-3 font-body text-[14px] text-ink/75 leading-[1.6] border-l-2 border-sage/30 pl-3">
@@ -194,7 +178,7 @@ export default function ComoFuncionaOnline() {
           variants={item}
           className="font-body text-[16px] text-ink/75 text-center max-w-[52ch] mx-auto leading-relaxed mb-6"
         >
-          El pago es simple: copago de {PRECIOS.fonasaCopago.display} con bono Fonasa, o {PRECIOS.particular.display} en modalidad particular. Lo eliges al momento de agendar.
+          {PROCESO_ONLINE.notaPago}
         </motion.p>
 
         {/* Closing line */}
@@ -202,7 +186,7 @@ export default function ComoFuncionaOnline() {
           variants={item}
           className="font-body text-[15px] italic text-ink/75 text-center max-w-[50ch] mx-auto leading-relaxed"
         >
-          Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.
+          {PROCESO_ONLINE.cierre}
         </motion.p>
       </motion.div>
     </section>

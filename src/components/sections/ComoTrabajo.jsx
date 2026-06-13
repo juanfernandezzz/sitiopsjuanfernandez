@@ -2,24 +2,9 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
+import { PROCESO_TRABAJO } from '../../lib/proceso';
 
-const PASOS = [
-  {
-    num: '01',
-    titulo: 'Agendas tu sesión',
-    cuerpo: 'Eliges horario y modalidad, con bono Fonasa o particular. Si usas bono Fonasa, lo emites y lo envías por WhatsApp antes del horario de la sesión. Recibes el enlace de videollamada al confirmar la reserva.',
-  },
-  {
-    num: '02',
-    titulo: 'Primera sesión',
-    cuerpo: 'Exploramos juntos el motivo de tu consulta, evaluamos tu situación actual y definimos los objetivos del proceso terapéutico.',
-  },
-  {
-    num: '03',
-    titulo: 'Sesiones de avance',
-    cuerpo: 'Trabajamos en los objetivos definidos, revisamos avances y obstáculos, y dejamos espacio para lo que necesites traer al proceso.',
-  },
-];
+const PASOS = PROCESO_TRABAJO.pasos;
 
 export default function ComoTrabajo() {
   const reduce = useReducedMotion();
@@ -69,7 +54,7 @@ export default function ComoTrabajo() {
             className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
           >
             <span className="w-6 h-px bg-sage" aria-hidden="true" />
-            Cómo trabajo
+            {PROCESO_TRABAJO.eyebrow}
           </motion.span>
 
           {/* Headline */}
@@ -85,7 +70,7 @@ export default function ComoTrabajo() {
               textWrap: 'balance',
             }}
           >
-            Un proceso simple, paso por paso.
+            {PROCESO_TRABAJO.titulo}
           </motion.h2>
 
           {/* Subheadline */}
@@ -93,7 +78,7 @@ export default function ComoTrabajo() {
             variants={item}
             className="mt-5 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[44ch]"
           >
-            Acompañamiento individual por videollamada. Sesiones de 45 minutos.
+            {PROCESO_TRABAJO.sub}
           </motion.p>
         </motion.div>
 
@@ -162,7 +147,7 @@ export default function ComoTrabajo() {
             variants={item}
             className="font-body text-[15px] text-sage max-w-[44ch] leading-[1.55]"
           >
-            Videollamada por Doxy.me, plataforma certificada por Fonasa para teleconsulta. Conexión segura, sin descargas ni instalaciones.
+            {PROCESO_TRABAJO.cierreTrust}
           </motion.p>
           <motion.div variants={item} className="shrink-0">
             <Button size="lg" variant="primary" onClick={openTipoSesionModal}>

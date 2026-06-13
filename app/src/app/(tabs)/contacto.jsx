@@ -4,11 +4,15 @@ import { Feather } from '@expo/vector-icons';
 import { CONTACTO, REDES } from '@contenido/contacto';
 import { COLORS, FONTS } from '../../theme/tokens';
 import Boton from '../../components/Boton';
+import Aparece from '../../components/Aparece';
 import { abrirUrl } from '../../lib/abrir';
 
 function FilaEnlace({ icono, etiqueta, valor, onPress }) {
   return (
-    <Pressable onPress={onPress} style={styles.fila}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.fila, pressed && { opacity: 0.6 }]}
+    >
       <Feather name={icono} size={18} color={COLORS.sage} />
       <View style={{ flex: 1 }}>
         <Text style={styles.etiqueta}>{etiqueta}</Text>
@@ -27,33 +31,39 @@ export default function Contacto() {
       contentContainerStyle={[styles.contenido, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.titulo}>Contacto</Text>
-      <Text style={styles.bajada}>Para agendar, usa la sección Agendar. Para dudas, escríbeme por WhatsApp.</Text>
+      <Aparece>
+        <Text style={styles.titulo}>Contacto</Text>
+        <Text style={styles.bajada}>Para agendar, usa la sección Agendar. Para dudas, escríbeme por WhatsApp.</Text>
+      </Aparece>
 
-      <Boton onPress={() => abrirUrl(CONTACTO.whatsappUrl)}>Escribir por WhatsApp</Boton>
+      <Aparece delay={90}>
+        <Boton onPress={() => abrirUrl(CONTACTO.whatsappUrl)}>Escribir por WhatsApp</Boton>
+      </Aparece>
 
-      <View style={styles.tarjeta}>
-        <FilaEnlace
-          icono="mail"
-          etiqueta="Correo"
-          valor={CONTACTO.email}
-          onPress={() => abrirUrl('mailto:' + CONTACTO.email)}
-        />
-        <View style={styles.sep} />
-        <FilaEnlace
-          icono="instagram"
-          etiqueta="Instagram"
-          valor={REDES.instagramHandle}
-          onPress={() => abrirUrl(REDES.instagramUrl)}
-        />
-        <View style={styles.sep} />
-        <FilaEnlace
-          icono="facebook"
-          etiqueta="Facebook"
-          valor="Psicólogo Juan Fernández"
-          onPress={() => abrirUrl(REDES.facebookUrl)}
-        />
-      </View>
+      <Aparece delay={170}>
+        <View style={styles.tarjeta}>
+          <FilaEnlace
+            icono="mail"
+            etiqueta="Correo"
+            valor={CONTACTO.email}
+            onPress={() => abrirUrl('mailto:' + CONTACTO.email)}
+          />
+          <View style={styles.sep} />
+          <FilaEnlace
+            icono="instagram"
+            etiqueta="Instagram"
+            valor={REDES.instagramHandle}
+            onPress={() => abrirUrl(REDES.instagramUrl)}
+          />
+          <View style={styles.sep} />
+          <FilaEnlace
+            icono="facebook"
+            etiqueta="Facebook"
+            valor="Psicólogo Juan Fernández"
+            onPress={() => abrirUrl(REDES.facebookUrl)}
+          />
+        </View>
+      </Aparece>
     </ScrollView>
   );
 }

@@ -1,50 +1,19 @@
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
 import { CAL_EVENTS } from '@contenido/cal';
 import { CONTACTO } from '@contenido/contacto';
-import { PRECIOS } from '@contenido/precios';
+import { SESIONES } from '@contenido/sesiones';
+import { PROCESO_ONLINE } from '@contenido/proceso';
 import { COLORS, FONTS } from '../../theme/tokens';
 import TarjetaSesion from '../../components/TarjetaSesion';
 import Boton from '../../components/Boton';
+import Aparece from '../../components/Aparece';
 import { abrirAgenda, abrirUrl } from '../../lib/abrir';
 
-const SESIONES = [
-  {
-    key: CAL_EVENTS.primeraSesionFonasa,
-    titulo: 'Primera sesión con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Si es tu primera vez. Conversamos y entendemos juntos qué te trae.',
-    destacada: true,
-    cta: 'Agendar primera sesión',
-  },
-  {
-    key: CAL_EVENTS.controlAvanceFonasa,
-    titulo: 'Sesión de avance con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Si ya iniciaste tratamiento conmigo.',
-    cta: 'Agendar sesión de avance',
-  },
-  {
-    key: CAL_EVENTS.parejaFonasa,
-    titulo: 'Sesión de pareja con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Con ambos miembros presentes.',
-    cta: 'Agendar sesión de pareja',
-  },
-  {
-    key: CAL_EVENTS.particular15000,
-    titulo: 'Sesión particular',
-    precio: PRECIOS.particular.display,
-    detalle: 'Sin previsión requerida. Comprobante para reembolso de Isapre cuando aplique.',
-    cta: 'Agendar sesión particular',
-  },
-];
-
-const PASOS = [
-  'Eliges el tipo de sesión y la hora que te acomode.',
-  'Recibes confirmación inmediata y recordatorios por correo.',
-  'Te conectas por videollamada a la plataforma certificada por Fonasa.',
-];
+// Las claves de confianza vienen del nucleo compartido; aqui solo se mapean al
+// set de iconos de la app (Feather). El texto se sincroniza, el icono no.
+const ICONO_CONFIANZA = { conexion: 'wifi', privacidad: 'user', cifrado: 'lock' };
 
 export default function Agendar() {
   const insets = useSafeAreaInsets();
@@ -54,43 +23,65 @@ export default function Agendar() {
       contentContainerStyle={[styles.contenido, { paddingTop: insets.top + 18 }]}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.titulo}>Agendar</Text>
-      <Text style={styles.bajada}>Elige el tipo de sesión. Abro la agenda y reservas en el mismo flujo.</Text>
+      <Aparece>
+        <Text style={styles.titulo}>Agendar</Text>
+        <Text style={styles.bajada}>Elige el tipo de sesión. Abro la agenda y reservas en el mismo flujo.</Text>
+      </Aparece>
 
-      {SESIONES.map((s) => (
-        <TarjetaSesion
-          key={s.key}
-          titulo={s.titulo}
-          precio={s.precio}
-          detalle={s.detalle}
-          destacada={s.destacada}
-          cta={s.cta}
-          onPress={() => abrirAgenda(s.key)}
-        />
+      {SESIONES.map((s, i) => (
+        <Aparece key={s.key} delay={80 + i * 70}>
+          <TarjetaSesion
+            titulo={s.titulo}
+            precio={s.precio}
+            detalle={s.detalleApp}
+            destacada={s.destacada}
+            cta={s.cta}
+            onPress={() => abrirAgenda(CAL_EVENTS[s.key])}
+          />
+        </Aparece>
       ))}
 
-      <View style={styles.bloque}>
-        <Text style={styles.bloqueTitulo}>Cómo es el proceso</Text>
-        {PASOS.map((p, i) => (
-          <View key={i} style={styles.paso}>
-            <Text style={styles.pasoNum}>{i + 1}</Text>
-            <Text style={styles.pasoTexto}>{p}</Text>
+      <Aparece delay={120}>
+        <View style={styles.bloque}>
+          <Text style={styles.bloqueTitulo}>Cómo es el proceso</Text>
+          {PROCESO_ONLINE.pasos.map((p) => (
+            <View key={p.num} style={styles.paso}>
+              <Text style={styles.pasoNum}>{p.num}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.pasoTitulo}>{p.titulo}</Text>
+                <Text style={styles.pasoTexto}>{p.texto}</Text>
+                {p.nota ? <Text style={styles.pasoNota}>{p.nota}</Text> : null}
+              </View>
+            </View>
+          ))}
+        </View>
+      </Aparece>
+
+      <Aparece delay={120}>
+        <View style={styles.bloque}>
+          <Text style={styles.bloqueTitulo}>Una sesión protegida</Text>
+          <View style={styles.trio}>
+            {PROCESO_ONLINE.confianza.map((c) => (
+              <View key={c.clave} style={styles.trioItem}>
+                <Feather name={ICONO_CONFIANZA[c.clave]} size={22} color={COLORS.sage} />
+                <Text style={styles.trioTitulo}>{c.titulo}</Text>
+                <Text style={styles.trioTexto}>{c.texto}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
+          <Text style={styles.trioPie}>
+            La videollamada usa Doxy.me, plataforma certificada por Fonasa, con cifrado en tránsito y
+            sin descargas.
+          </Text>
+        </View>
+      </Aparece>
 
-      <View style={styles.bloque}>
-        <Text style={styles.bloqueTitulo}>Confidencialidad</Text>
-        <Text style={styles.parrafo}>
-          Tus datos están protegidos. La videollamada usa una plataforma certificada por Fonasa,
-          con cifrado en tránsito.
-        </Text>
-      </View>
-
-      <Text style={styles.dudas}>¿Tienes dudas antes de agendar?</Text>
-      <Boton variant="secondary" onPress={() => abrirUrl(CONTACTO.whatsappUrl)}>
-        Conversar por WhatsApp
-      </Boton>
+      <Aparece delay={120}>
+        <Text style={styles.dudas}>¿Tienes dudas antes de agendar?</Text>
+        <Boton variant="secondary" onPress={() => abrirUrl(CONTACTO.whatsappUrl)}>
+          Conversar por WhatsApp
+        </Boton>
+      </Aparece>
     </ScrollView>
   );
 }
@@ -108,21 +99,55 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 14,
   },
-  bloqueTitulo: { fontFamily: FONTS.display, fontSize: 18, color: COLORS.ink, marginBottom: 12 },
-  paso: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 12 },
+  bloqueTitulo: { fontFamily: FONTS.display, fontSize: 18, color: COLORS.ink, marginBottom: 14 },
+  paso: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, gap: 12 },
   pasoNum: {
     fontFamily: FONTS.bodyBold,
     fontSize: 13,
     color: COLORS.onSage,
     backgroundColor: COLORS.sage,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26,
     overflow: 'hidden',
   },
-  pasoTexto: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.inkSoft, flex: 1, lineHeight: 22 },
-  parrafo: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.inkSoft, lineHeight: 22 },
+  pasoTitulo: { fontFamily: FONTS.bodyBold, fontSize: 15, color: COLORS.ink, marginBottom: 3 },
+  pasoTexto: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.inkSoft, lineHeight: 22 },
+  pasoNota: {
+    fontFamily: FONTS.body,
+    fontSize: 13.5,
+    color: COLORS.inkSoft,
+    lineHeight: 20,
+    marginTop: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: 'rgba(63,91,74,0.3)',
+    paddingLeft: 10,
+  },
+  trio: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, marginBottom: 4 },
+  trioItem: { flex: 1, alignItems: 'center' },
+  trioTitulo: {
+    fontFamily: FONTS.bodyMed,
+    fontSize: 12.5,
+    color: COLORS.ink,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  trioTexto: {
+    fontFamily: FONTS.body,
+    fontSize: 12.5,
+    color: COLORS.inkSoft,
+    marginTop: 2,
+    textAlign: 'center',
+    lineHeight: 17,
+  },
+  trioPie: {
+    fontFamily: FONTS.body,
+    fontSize: 14,
+    color: COLORS.inkSoft,
+    lineHeight: 21,
+    marginTop: 14,
+  },
   dudas: { fontFamily: FONTS.bodyMed, fontSize: 15, color: COLORS.ink, textAlign: 'center', marginTop: 8, marginBottom: 12 },
 });

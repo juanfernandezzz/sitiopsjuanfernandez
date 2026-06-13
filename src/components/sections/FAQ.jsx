@@ -171,7 +171,7 @@ export default function FAQ() {
               className="font-body uppercase tracking-widest text-sage mb-3"
               style={{ fontSize: 13 }}
             >
-              Preguntas frecuentes
+              ¿Tienes dudas?
             </p>
             <h2
               id="faq-heading"

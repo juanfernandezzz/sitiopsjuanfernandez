@@ -1,9 +1,18 @@
 import React, { useId, useState } from 'react';
 import Button from '../ui/Button';
+import { generarCaleidoscopio, RESPIRA_RITMO } from '../../lib/respiraNucleo';
 import '../../respira.css';
 
 /**
- * RespiraVisor (C24 fixpack 2): caleidoscopio de morfosis geométrica continua.
+ * RespiraVisor (C24 fixpack 2; C25 extrae el nucleo): caleidoscopio de
+ * morfosis geométrica continua.
+ *
+ * C25: la geometría, el sorteo y los números del ritmo viven ahora en
+ * src/lib/respiraNucleo.js, compartidos con la app nativa (que renderiza el
+ * MISMO caleidoscopio con react-native-svg). Aquí queda solo el render web y
+ * su driver CSS. El ritmo se inyecta como variables CSS desde RESPIRA_RITMO;
+ * respira.css las consume con fallback idéntico, así un cambio en el núcleo
+ * mueve a la vez el sitio y la app.
  *
  * La figura cambia de forma TODO el tiempo, sin fundidos: solo transformaciones.
  * 1. Tres capas (velos, hojas, acentos) giran a periodos sorteados distintos y
@@ -14,7 +23,7 @@ import '../../respira.css';
  *    caleidoscopio real.
  * 3. Pulso radial: el anillo de acentos escala 0.86-1.0 con periodo propio.
  * 4. Normalización de tamaño: cada sorteo se escala para que su elemento más
- *    extenso bese exactamente RADIO_OBJETIVO a inhalación completa; un
+ *    extenso bese exactamente el radio objetivo a inhalación completa; un
  *    clipPath en r=206 hace imposible pintar fuera del disco.
  *
  * Lo que la aleatoriedad no toca: el ritmo (ciclo fijo de 11 s; la escala de
@@ -26,108 +35,18 @@ import '../../respira.css';
  * Cero JavaScript por frame: todo es CSS sobre grupos SVG.
  */
 
-const alea = (min, max) => min + Math.random() * (max - min);
-const r1 = (n) => Math.round(n * 10) / 10;
-const elegir = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-// Paleta de marca con techo de opacidad por color (seguridad visual).
-const PALETA = [
-  { fill: '#3F5B4A', op: [0.1, 0.18] },
-  { fill: '#A8B5A0', op: [0.16, 0.26] },
-  { fill: '#C97B5E', op: [0.1, 0.18] },
-  { fill: '#A4583B', op: [0.1, 0.16] },
-];
-
-// Radio que el elemento más extenso besa a inhalación completa
-// (disco r=206, aire de 14 px hasta el anillo).
-const RADIO_OBJETIVO = 192;
-
-// Media-hoja asimétrica desde el centro; el espejo la convierte en ala.
-function hoja() {
-  const largo = alea(116, 158);
-  const ancho = alea(10, 26);
-  const sesgo = alea(4, 18);
-  const x0 = 210;
-  const y0 = 210;
-  const tx = x0 + sesgo;
-  const ty = y0 - largo;
-  const d = [
-    `M ${x0} ${y0}`,
-    `C ${r1(x0 - ancho)} ${r1(y0 - largo * 0.35)},`,
-    `${r1(tx - ancho * 0.7)} ${r1(ty + largo * 0.25)},`,
-    `${r1(tx)} ${r1(ty)}`,
-    `C ${r1(tx + ancho * 0.45)} ${r1(ty + largo * 0.3)},`,
-    `${r1(x0 + ancho * 0.55)} ${r1(y0 - largo * 0.3)},`,
-    `${x0} ${y0} Z`,
-  ].join(' ');
-  return { d, ext: Math.hypot(sesgo, largo) };
-}
-
-function generarCaleidoscopio() {
-  const hojas = Array.from({ length: elegir([2, 3]) }, () => {
-    const c = elegir(PALETA);
-    const h = hoja();
-    return { ...h, fill: c.fill, op: r1(alea(c.op[0], c.op[1])) };
-  });
-  const puntos = Array.from({ length: elegir([2, 3]) }, () => {
-    const c = elegir(PALETA);
-    const cx = r1(210 + alea(-14, 14));
-    const cy = r1(210 - alea(72, 150));
-    const r = r1(alea(3.5, 8));
-    return {
-      cx, cy, r,
-      ext: Math.hypot(cx - 210, cy - 210) + r,
-      fill: c.fill,
-      op: r1(alea(0.18, 0.3)),
-    };
-  });
-  const velos = Array.from({ length: 2 }, () => {
-    const c = elegir(PALETA);
-    const cx = r1(210 + alea(-10, 10));
-    const cy = r1(210 - alea(55, 100));
-    const rx = r1(alea(26, 48));
-    const ry = r1(alea(70, 115));
-    return {
-      cx, cy, rx, ry,
-      ext: Math.hypot(cx - 210, cy - 210) + Math.max(rx, ry),
-      rot: r1(alea(-16, 16)),
-      fill: c.fill,
-      op: r1(alea(0.05, 0.1)),
-    };
-  });
-
-  // Normalización: TODO sorteo besa el mismo radio. Ni figuras perdidas en
-  // el disco ni pétalos desbordados, para cualquier combinación aleatoria.
-  const extMax = Math.max(
-    ...hojas.map((h) => h.ext),
-    ...puntos.map((p) => p.ext),
-    ...velos.map((v) => v.ext)
-  );
-  const ajuste = Math.round((RADIO_OBJETIVO / extMax) * 1000) / 1000;
-
-  const dirA = elegir(['normal', 'reverse']);
-  return {
-    segA: elegir([10, 12, 14]),
-    segB: elegir([6, 8]),
-    hojas, puntos, velos, ajuste,
-    // Periodos lentos y mutuamente inconmensurables.
-    durA: Math.round(alea(95, 150)),
-    durB: Math.round(alea(160, 230)),
-    durC: Math.round(alea(53, 89)),
-    durT: Math.round(alea(34, 52)),
-    durP: Math.round(alea(31, 47)),
-    dirA,
-    dirB: dirA === 'normal' ? 'reverse' : 'normal',
-    // Fases iniciales aleatorias: ni dos visitas empiezan igual.
-    faseA: r1(alea(0, 150)),
-    faseB: r1(alea(0, 230)),
-    faseC: r1(alea(0, 89)),
-    faseT: r1(alea(0, 52)),
-    faseP: r1(alea(0, 47)),
-    // Apertura máxima de la tijera de alas.
-    tdeg: r1(alea(4, 9)),
-  };
-}
+// Variables CSS del ritmo, derivadas del núcleo compartido. respira.css trae
+// estos mismos valores como fallback: si algo fallara al inyectarlas, el
+// ejercicio no cambia.
+const VARS_RITMO = {
+  '--respira-ciclo': `${RESPIRA_RITMO.cicloS}s`,
+  '--respira-bezier': `cubic-bezier(${RESPIRA_RITMO.bezier.join(', ')})`,
+  '--respira-esc-ex': RESPIRA_RITMO.escalaExhalado,
+  '--respira-esc-in': RESPIRA_RITMO.escalaInhalado,
+  '--respira-esc-reposo': RESPIRA_RITMO.escalaReposo,
+  '--respira-pulso-min': RESPIRA_RITMO.pulsoMin,
+  '--respira-pulso-max': RESPIRA_RITMO.pulsoMax,
+};
 
 export default function RespiraVisor() {
   const [running, setRunning] = useState(false);
@@ -152,7 +71,7 @@ export default function RespiraVisor() {
     ));
 
   return (
-    <div className={`respira-visor ${running ? 'is-running' : ''}`}>
+    <div className={`respira-visor ${running ? 'is-running' : ''}`} style={VARS_RITMO}>
       <div className="respira-stage" aria-hidden="true">
         <svg
           viewBox="0 0 420 420"

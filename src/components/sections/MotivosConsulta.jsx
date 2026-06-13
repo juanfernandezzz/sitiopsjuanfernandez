@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { MOTIVOS } from '../../lib/motivos';
 
 /**
  * Franja delgada justo bajo el hero. Reconocimiento en 5 segundos: el visitante
@@ -10,8 +11,6 @@ import { motion, useInView, useReducedMotion } from 'framer-motion';
  * cognitivos distintos (reconocimiento emocional vs autoridad) y fusionarlas
  * sobrecargaría un solo bloque. No compite con el CTA del fold: vive debajo.
  */
-
-const MOTIVOS = ['Ansiedad', 'Depresión', 'Relaciones', 'Duelo', 'Estrés'];
 
 export default function MotivosConsulta() {
   const ref = useRef(null);

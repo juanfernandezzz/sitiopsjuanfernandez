@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
-import { PRECIOS } from '../../lib/precios';
+import { HERO } from '../../lib/hero';
 import { useUI } from '../../lib/uiContext';
 
 // La foto del hero se sirve desde /public con nombre fijo (juan-720.webp /
@@ -16,23 +16,18 @@ import { useUI } from '../../lib/uiContext';
 // deja la librería solo en chunks diferidos y reduce el JS del bundle crítico.
 
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
-const WA_MESSAGE = encodeURIComponent(
-  'Hola Juan, vi tu sitio y me gustaría conversar sobre una primera sesión.'
-);
+const WA_MESSAGE = encodeURIComponent(HERO.mensajeWhatsApp);
 const WA_HREF = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
 const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 
-// Frases que rotan en el cierre del H1. La primera se renderiza en la carga
-// (es el LCP y lo que lee Google). La más larga reserva la altura del bloque.
-const ROTATING = [
-  'un espacio donde eres protagonista',
-  'sin salir de casa, a tu propio ritmo',
-  'acompañamiento sin prejuicios',
-];
-const LONGEST = 'sin salir de casa, a tu propio ritmo';
-const ROTATE_MS = 4500;
-const LEAVE_MS = 300;
+// Frases del cierre del H1, desde la fuente unica compartida con la app. La
+// primera se renderiza en la carga (es el LCP y lo que lee Google). La mas
+// larga reserva la altura del bloque.
+const ROTATING = HERO.rotativas;
+const LONGEST = HERO.rotativaMasLarga;
+const ROTATE_MS = HERO.rotacionMs;
+const LEAVE_MS = HERO.salidaMs;
 
 // Detección de prefers-reduced-motion sin depender de Framer.
 function usePrefersReducedMotion() {
@@ -107,7 +102,7 @@ export default function Hero() {
               style={delay(50)}
             >
               <span className="w-6 h-px bg-sage" aria-hidden="true" />
-              Terapia online en Chile
+              {HERO.eyebrow}
             </span>
 
             <h1
@@ -122,7 +117,7 @@ export default function Hero() {
                 textWrap: 'balance',
               }}
             >
-              Terapia psicológica online,
+              {HERO.lineaFija}
               {/* Bloque rotante: el ghost reserva altura para evitar saltos (CLS 0). */}
               <span className="block relative mt-1">
                 <span className="invisible" aria-hidden="true">
@@ -144,7 +139,7 @@ export default function Hero() {
               className="anim-rise mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
               style={delay(210)}
             >
-              Trabajemos lo que hoy te limita y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.
+              {HERO.sub}
             </p>
 
             <div
@@ -152,7 +147,7 @@ export default function Hero() {
               style={delay(290)}
             >
               <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
-                Agendar tu sesión
+                {HERO.ctaPrimario}
               </Button>
               <Button
                 size="lg"
@@ -162,7 +157,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Conversemos por WhatsApp
+                {HERO.ctaSecundario}
               </Button>
             </div>
 
@@ -171,7 +166,7 @@ export default function Hero() {
               className="anim-rise mt-3 font-body text-[15px] text-ink/75"
               style={delay(370)}
             >
-              Primera sesión con bono Fonasa: copago {PRECIOS.fonasaCopago.display}.{' '}
+              {HERO.microcopia}{' '}
               <button
                 type="button"
                 data-cal-link={PARTICULAR_CAL_LINK}
@@ -185,7 +180,7 @@ export default function Hero() {
                 }}
                 className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
               >
-                ¿Sin Fonasa? Ver sesión particular ({PRECIOS.particular.display}) →
+                {HERO.enlaceParticular}
               </button>
             </p>
 
@@ -193,11 +188,14 @@ export default function Hero() {
               className="anim-rise mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
               style={delay(450)}
             >
-              <li>Psicólogo clínico</li>
-              <li aria-hidden="true" className="text-sage/50">·</li>
-              <li>Inscrito en Fonasa</li>
-              <li aria-hidden="true" className="text-sage/50">·</li>
-              <li>Videollamada cifrada</li>
+              {HERO.chips.map((chip, i) => (
+                <React.Fragment key={chip}>
+                  {i > 0 && (
+                    <li aria-hidden="true" className="text-sage/50">·</li>
+                  )}
+                  <li>{chip}</li>
+                </React.Fragment>
+              ))}
             </ul>
           </div>
 

@@ -1,9 +1,12 @@
 name: OTA Update (publica el JS tras cada push)
 
 # Se dispara con cada push a main. Publica el bundle JS de la app por OTA, sin
-# pasar por la tienda. La politica runtimeVersion "fingerprint" garantiza que
-# solo las instalaciones con cascara compatible reciban este update; si un
-# cambio toca lo nativo, la huella cambia y obliga a un build nuevo.
+# pasar por la tienda. runtimeVersion es un string FIJO en app/app.json (no
+# fingerprint): el update solo llega a instalaciones cuyo binario declara ese
+# mismo string. Regla: si un cambio toca lo nativo (modulo nuevo, SDK, plugin,
+# permiso, icono empaquetado), sube el string a mano y haz un build nuevo;
+# si no lo subes, las instalaciones viejas cargarian JS que referencia codigo
+# nativo ausente y la app crashea al abrir.
 on:
   push:
     branches: ['main']
