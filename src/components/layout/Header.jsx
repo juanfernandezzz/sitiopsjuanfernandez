@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Button from '../ui/Button';
-import { useUI } from '../../lib/uiContext';
+import HeaderAgendarMenu, { OpcionesAgendar } from './HeaderAgendarMenu';
 
 // C24: sin Framer Motion. El overlay y el panel del menú móvil viven siempre
 // en el DOM y animan con las clases mobile-overlay / mobile-panel (index.css):
@@ -15,7 +14,6 @@ const NAV_ITEMS = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { openTipoSesionModal } = useUI();
   const firstMobileLinkRef = useRef(null);
 
   // Lock body scroll mientras el menú móvil está abierto.
@@ -56,14 +54,7 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={openTipoSesionModal}
-              className="text-sm font-semibold !px-5 !py-3"
-            >
-              Agendar
-            </Button>
+            <HeaderAgendarMenu />
             <button
               aria-label="Abrir menú"
               aria-expanded={mobileOpen}
@@ -116,19 +107,13 @@ export default function Header() {
           ))}
         </nav>
         <div className="mt-auto px-6 pb-8">
-          <Button
-            size="lg"
-            variant="primary"
-            onClick={() => {
-              setMobileOpen(false);
-              // Pequeño delay: deja que el panel mobile cierre su animación
-              // antes de abrir el modal, evitando dos overlays encimados.
-              setTimeout(() => openTipoSesionModal(), 280);
-            }}
-            className="w-full"
+          <p
+            className="font-display text-ink mb-3"
+            style={{ fontSize: 18, fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
           >
-            Agendar sesión
-          </Button>
+            Agenda tu sesión
+          </p>
+          <OpcionesAgendar onPick={() => setMobileOpen(false)} />
         </div>
       </aside>
     </>

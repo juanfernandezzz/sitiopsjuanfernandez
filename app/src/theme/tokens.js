@@ -5,6 +5,7 @@ export const COLORS = {
   sage: '#3F5B4A',
   sageLight: '#A8B5A0',
   terracota: '#C97B5E',
+  terracotaDeep: '#A4583B',
   ink: '#2A3B4C',
   inkSoft: 'rgba(42,59,76,0.72)',
   inkFaint: 'rgba(42,59,76,0.52)',

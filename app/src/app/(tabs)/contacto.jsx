@@ -1,8 +1,8 @@
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { CONTACTO, REDES } from '@contenido/contacto';
 import { COLORS, FONTS } from '../../theme/tokens';
+import EncabezadoApp from '../../components/EncabezadoApp';
 import Boton from '../../components/Boton';
 import Aparece from '../../components/Aparece';
 import { abrirUrl } from '../../lib/abrir';
@@ -24,13 +24,14 @@ function FilaEnlace({ icono, etiqueta, valor, onPress }) {
 }
 
 export default function Contacto() {
-  const insets = useSafeAreaInsets();
   return (
-    <ScrollView
-      style={{ backgroundColor: COLORS.cream }}
-      contentContainerStyle={[styles.contenido, { paddingTop: insets.top + 18 }]}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={styles.pantalla}>
+      <EncabezadoApp />
+      <ScrollView
+        style={{ backgroundColor: COLORS.cream }}
+        contentContainerStyle={styles.contenido}
+        showsVerticalScrollIndicator={false}
+      >
       <Aparece>
         <Text style={styles.titulo}>Contacto</Text>
         <Text style={styles.bajada}>Para agendar, usa la sección Agendar. Para dudas, escríbeme por WhatsApp.</Text>
@@ -64,12 +65,14 @@ export default function Contacto() {
           />
         </View>
       </Aparece>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  contenido: { paddingHorizontal: 22, paddingBottom: 44 },
+  pantalla: { flex: 1, backgroundColor: COLORS.cream },
+  contenido: { paddingHorizontal: 22, paddingTop: 18, paddingBottom: 44 },
   titulo: { fontFamily: FONTS.display, fontSize: 28, color: COLORS.ink, marginTop: 18, marginBottom: 6 },
   bajada: { fontFamily: FONTS.body, fontSize: 15, color: COLORS.inkSoft, marginBottom: 22, lineHeight: 22 },
   tarjeta: {

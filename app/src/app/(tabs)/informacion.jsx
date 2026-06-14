@@ -9,11 +9,11 @@ import {
   Easing,
   AccessibilityInfo,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { FAQ_ITEMS } from '@contenido/faqData';
 import { COLORS, FONTS } from '../../theme/tokens';
+import EncabezadoApp from '../../components/EncabezadoApp';
 import Aparece from '../../components/Aparece';
 import { abrirUrl } from '../../lib/abrir';
 
@@ -120,7 +120,6 @@ function ItemFAQ({ q, a, link, reduce }) {
 }
 
 export default function Informacion() {
-  const insets = useSafeAreaInsets();
   const [reduce, setReduce] = useState(false);
 
   useEffect(() => {
@@ -140,11 +139,13 @@ export default function Informacion() {
   }, []);
 
   return (
-    <ScrollView
-      style={{ backgroundColor: COLORS.cream }}
-      contentContainerStyle={[styles.contenido, { paddingTop: insets.top + 18 }]}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={styles.pantalla}>
+      <EncabezadoApp />
+      <ScrollView
+        style={{ backgroundColor: COLORS.cream }}
+        contentContainerStyle={styles.contenido}
+        showsVerticalScrollIndicator={false}
+      >
       <Aparece>
         <Text style={styles.titulo}>Información</Text>
       </Aparece>
@@ -175,12 +176,14 @@ export default function Informacion() {
           <ItemFAQ key={i} q={item.q} a={item.a} link={item.link} reduce={reduce} />
         ))}
       </Aparece>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  contenido: { paddingHorizontal: 22, paddingBottom: 44 },
+  pantalla: { flex: 1, backgroundColor: COLORS.cream },
+  contenido: { paddingHorizontal: 22, paddingTop: 18, paddingBottom: 44 },
   titulo: { fontFamily: FONTS.display, fontSize: 28, color: COLORS.ink, marginTop: 18, marginBottom: 18 },
   bloque: {
     backgroundColor: COLORS.offwhite,

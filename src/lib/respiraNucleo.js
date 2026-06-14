@@ -43,6 +43,34 @@ export const RESPIRA_RITMO = {
   pulsoMax: 1,
 };
 
+/**
+ * Copy canonico de "Respira conmigo". Fuente unica para las tres superficies:
+ * la seccion del inicio del sitio (Respira.jsx), la pagina /respira
+ * (RespiraApp.jsx) y la pestana Respira de la app (respira.jsx). Antes cada una
+ * tenia su propio texto y derivaban entre si; al centralizarlo aqui, una sola
+ * edicion mueve el sitio en el mismo deploy y la app en el siguiente OTA (este
+ * archivo ya viaja en el sync de contenido).
+ *
+ * Encuadre (verificado): "respiracion coherente" es el nombre divulgado de la
+ * tecnica de respiracion a frecuencia de resonancia (cercana a 0,1 Hz, ~6 rpm),
+ * que sincroniza respiracion y ritmo cardiaco (coherencia cardiaca) y eleva la
+ * variabilidad de la frecuencia cardiaca. Hay evidencia de ensayos en estres,
+ * ansiedad y cognicion. El verbo "puede ayudar" mantiene la afirmacion honesta;
+ * el encuadre de seguridad deja claro que es apoyo, no tratamiento.
+ *
+ * CRITICO: cero em-dashes y cero en-dashes.
+ */
+export const RESPIRA_TEXTO = {
+  eyebrow: 'Una pausa para ti',
+  titulo: 'Respira conmigo',
+  intro:
+    'Este ejercicio llamado "respiración coherente" es una técnica que sincroniza la respiración con el ritmo cardíaco para equilibrar el sistema nervioso. La figura se expande cuando debes inhalar y se recoge cuando debes exhalar, a un ritmo lento, cercano a 6 respiraciones por minuto. Puede ayudar con autoregulación emocional, estrés, ansiedad o concentración.',
+  seguridad:
+    'Es una herramienta de relajación para momentos puntuales, no es un tratamiento ni reemplaza la psicoterapia o sanación. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
+  puenteTexto: '¿Sientes que necesitas más que una pausa? Podemos trabajarlo juntos en sesión.',
+  puenteCta: 'Agendar una sesión',
+};
+
 const alea = (min, max) => min + Math.random() * (max - min);
 const r1 = (n) => Math.round(n * 10) / 10;
 const elegir = (arr) => arr[Math.floor(Math.random() * arr.length)];

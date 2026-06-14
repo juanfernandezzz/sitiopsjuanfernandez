@@ -3,6 +3,7 @@ import HeaderUtilitario from './components/layout/HeaderUtilitario';
 import Footer from './components/layout/Footer';
 import Button from './components/ui/Button';
 import RespiraVisor from './components/respira/RespiraVisor';
+import { RESPIRA_TEXTO } from './lib/respiraNucleo';
 
 /**
  * Respira conmigo (C24; visor extraído a componente compartido en el fixpack).
@@ -25,7 +26,7 @@ export default function RespiraApp() {
         <div className="mx-auto max-w-3xl px-5 md:px-8 pt-6 md:pt-10 pb-16 md:pb-20">
           {/* Cabecera */}
           <p className="font-body uppercase tracking-widest text-sage mb-3" style={{ fontSize: 13 }}>
-            Una pausa para ti
+            {RESPIRA_TEXTO.eyebrow}
           </p>
           <h1
             className="font-display text-ink text-balance mb-4"
@@ -34,13 +35,13 @@ export default function RespiraApp() {
               fontVariationSettings: '"opsz" 144, "SOFT" 50',
             }}
           >
-            Respira conmigo
+            {RESPIRA_TEXTO.titulo}
           </h1>
           <p
             className="font-body text-ink/80"
             style={{ fontSize: 18, lineHeight: 1.6, maxWidth: '58ch' }}
           >
-            Un ejercicio visual para bajar el ritmo: la figura se expande cuando inhalas y se recoge cuando exhalas, a un ritmo lento, cercano a 6 respiraciones por minuto. La figura cambia de forma lentamente todo el tiempo: nunca dibuja dos veces la misma. Respira de forma suave y silenciosa, sin forzar.
+            {RESPIRA_TEXTO.intro}
           </p>
 
           {/* Visor compartido con la sección del inicio */}
@@ -53,7 +54,7 @@ export default function RespiraApp() {
             className="font-body text-ink/75 mt-10"
             style={{ fontSize: 15, lineHeight: 1.65, maxWidth: '58ch' }}
           >
-            Esta es una herramienta de apoyo para la relajación: no es un tratamiento ni reemplaza un proceso de psicoterapia. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.
+            {RESPIRA_TEXTO.seguridad}
           </p>
 
           {/* Vía suave hacia agendar */}
@@ -62,10 +63,10 @@ export default function RespiraApp() {
               className="font-body text-ink/80 mb-5"
               style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '50ch' }}
             >
-              ¿Sientes que necesitas más que una pausa? Podemos trabajarlo juntos en sesión.
+              {RESPIRA_TEXTO.puenteTexto}
             </p>
             <Button as="a" href="/#agendar" size="lg" variant="primary">
-              Agendar una sesión
+              {RESPIRA_TEXTO.puenteCta}
             </Button>
           </div>
         </div>

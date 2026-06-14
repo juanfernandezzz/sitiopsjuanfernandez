@@ -94,6 +94,10 @@ export default function ConsentimientoInformado() {
   const [exito, setExito] = useState(false);
   const [pdfBlobParaDescarga, setPdfBlobParaDescarga] = useState(null);
 
+  // Descarga del consentimiento en blanco para llenar a mano (C26).
+  const [generandoImprimible, setGenerandoImprimible] = useState(false);
+  const [errorImprimible, setErrorImprimible] = useState(false);
+
   const [canvasWidth, setCanvasWidth] = useState(400);
   const [recovery, setRecovery] = useState(null);
 
@@ -375,6 +379,24 @@ export default function ConsentimientoInformado() {
     }
   }
 
+  async function descargarParaImprimir() {
+    if (generandoImprimible) return;
+    setErrorImprimible(false);
+    setGenerandoImprimible(true);
+    try {
+      const [{ generarPDFConsentimientoImprimible }, { descargarPDF }] = await Promise.all([
+        import('../../lib/generarPDFConsentimientoImprimible'),
+        import('../../lib/descargarPDF'),
+      ]);
+      const blob = await generarPDFConsentimientoImprimible();
+      descargarPDF(blob, 'consentimiento-para-imprimir.pdf');
+    } catch {
+      setErrorImprimible(true);
+    } finally {
+      setGenerandoImprimible(false);
+    }
+  }
+
   if (exito) {
     return <PantallaExito pdfBlob={pdfBlobParaDescarga} />;
   }
@@ -414,6 +436,51 @@ export default function ConsentimientoInformado() {
         Es el documento legal que respalda nuestra atención por videollamada. Te
         llegará una copia firmada a tu email y la podrás descargar en PDF.
       </p>
+
+      {/* Alternativa en papel: descarga el consentimiento en blanco, llénalo a
+          mano y envía una foto. Acción secundaria, no compite con el flujo
+          online (que sigue siendo la vía principal y más rápida). */}
+      <div
+        style={{
+          background: 'rgba(63, 91, 74, 0.05)',
+          border: '1px solid rgba(63, 91, 74, 0.2)',
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 32,
+        }}
+      >
+        <p
+          className="font-body text-ink/75"
+          style={{ fontSize: 14, lineHeight: 1.55, marginBottom: 12, maxWidth: '60ch' }}
+        >
+          ¿Prefieres llenarlo a mano? Descarga el consentimiento en PDF, imprímelo,
+          complétalo y fírmalo. Luego envíame una foto o el archivo por WhatsApp o correo.
+        </p>
+        <button
+          type="button"
+          onClick={descargarParaImprimir}
+          disabled={generandoImprimible}
+          className="font-body inline-flex items-center gap-2"
+          style={{
+            background: 'transparent',
+            color: '#3F5B4A',
+            border: '1.5px solid #3F5B4A',
+            borderRadius: 999,
+            padding: '9px 18px',
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: generandoImprimible ? 'default' : 'pointer',
+            opacity: generandoImprimible ? 0.6 : 1,
+          }}
+        >
+          {generandoImprimible ? 'Generando PDF...' : 'Descargar consentimiento para imprimir (PDF)'}
+        </button>
+        {errorImprimible && (
+          <p className="font-body" style={{ fontSize: 13, color: '#A4583B', marginTop: 10 }}>
+            No se pudo generar el PDF. Vuelve a intentarlo en un momento.
+          </p>
+        )}
+      </div>
 
       {recovery && (
         <div
