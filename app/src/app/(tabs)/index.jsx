@@ -14,7 +14,7 @@ import Aparece from '../../components/Aparece';
 import { abrirUrl } from '../../lib/abrir';
 
 // La foto va empaquetada (require): viaja por OTA, sin enlazar a la fuente.
-const FOTO = require('../../assets/juan.jpg');
+const FOTO = require('../../../assets/juan.jpg');
 
 export default function Inicio() {
   const router = useRouter();
