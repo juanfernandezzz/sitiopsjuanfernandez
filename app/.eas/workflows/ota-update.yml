@@ -7,6 +7,12 @@ name: OTA Update (publica el JS tras cada push)
 # permiso, icono empaquetado), sube el string a mano y haz un build nuevo;
 # si no lo subes, las instalaciones viejas cargarian JS que referencia codigo
 # nativo ausente y la app crashea al abrir.
+#
+# Usa el job built-in `type: update`: trae el eas-cli y la autenticacion del
+# proyecto ya resueltas, corre checkout + npm install (postinstall sync que
+# regenera app/src/contenido) y publica con `eas update` usando el mensaje del
+# commit. Antes esto era un step `run: eas update ...` que fallaba con
+# "eas: command not found" porque el CLI no esta en el PATH de un run crudo.
 on:
   push:
     branches: ['main']
@@ -14,8 +20,6 @@ on:
 jobs:
   publicar_ota:
     name: Publicar update de produccion
-    steps:
-      - uses: eas/checkout
-      - uses: eas/install_node_modules
-      - name: Publicar OTA
-        run: eas update --branch production --message "${{ github.event.head_commit.message }}"
+    type: update
+    params:
+      branch: production
