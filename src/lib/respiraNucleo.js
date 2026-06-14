@@ -66,7 +66,7 @@ export const RESPIRA_TEXTO = {
   intro:
     'Este ejercicio llamado "respiración coherente" es una técnica que sincroniza la respiración con el ritmo cardíaco para equilibrar el sistema nervioso. La figura se expande cuando debes inhalar y se recoge cuando debes exhalar, a un ritmo lento, cercano a 6 respiraciones por minuto. Puede ayudar con autoregulación emocional, estrés, ansiedad o concentración.',
   seguridad:
-    'Es una herramienta de relajación para momentos puntuales, no es un tratamiento ni reemplaza la psicoterapia o sanación. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
+    'Es una herramienta de relajación para momentos puntuales, no es un tratamiento ni reemplaza la psicoterapia o un proceso de sanación. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
   puenteTexto: '¿Sientes que necesitas más que una pausa? Podemos trabajarlo juntos en sesión.',
   puenteCta: 'Agendar una sesión',
 };
