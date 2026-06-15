@@ -39,6 +39,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="reservar" options={{ animation: 'slide_from_bottom' }} />
       </Stack>
       {!splashListo && <SplashAnimado onDone={() => setSplashListo(true)} />}
     </SafeAreaProvider>

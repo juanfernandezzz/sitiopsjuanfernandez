@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
-import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE } from '../../lib/cal';
+import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
 import { useUI } from '../../lib/uiContext';
 
@@ -306,7 +306,7 @@ export default function Agendar() {
                   ? {
                       'data-cal-link': calLink,
                       'data-cal-namespace': CAL_NAMESPACE,
-                      'data-cal-config': '{"layout":"month_view","theme":"light"}',
+                      'data-cal-config': JSON.stringify(CAL_EMBED_CONFIG),
                     }
                   : {})}
                 onClick={() => {
@@ -342,7 +342,7 @@ export default function Agendar() {
                   height: '760px',
                   overflow: 'scroll',
                 }}
-                config={{ layout: 'month_view', theme: 'light' }}
+                config={CAL_EMBED_CONFIG}
               />
             </Suspense>
           ) : (

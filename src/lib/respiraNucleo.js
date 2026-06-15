@@ -55,8 +55,15 @@ export const RESPIRA_RITMO = {
  * tecnica de respiracion a frecuencia de resonancia (cercana a 0,1 Hz, ~6 rpm),
  * que sincroniza respiracion y ritmo cardiaco (coherencia cardiaca) y eleva la
  * variabilidad de la frecuencia cardiaca. Hay evidencia de ensayos en estres,
- * ansiedad y cognicion. El verbo "puede ayudar" mantiene la afirmacion honesta;
- * el encuadre de seguridad deja claro que es apoyo, no tratamiento.
+ * ansiedad y cognicion.
+ *
+ * Divulgacion progresiva (C27): el texto de la funcion es minimo y solo dice
+ * que hacer (sigue la figura, inhala al expandirse, exhala al recogerse). El
+ * detalle clinico (nombre de la tecnica, mecanismo, beneficios y duracion
+ * sugerida) se difiere a la pregunta frecuente "Que es Respira conmigo" en
+ * faqData.js, para bajar la carga cognitiva en el momento de uso. El verbo
+ * "puede ayudar" mantiene la afirmacion honesta; la nota de seguridad deja
+ * claro que es apoyo, no tratamiento.
  *
  * CRITICO: cero em-dashes y cero en-dashes.
  */
@@ -64,9 +71,9 @@ export const RESPIRA_TEXTO = {
   eyebrow: 'Una pausa para ti',
   titulo: 'Respira conmigo',
   intro:
-    'Este ejercicio llamado "respiración coherente" es una técnica que sincroniza la respiración con el ritmo cardíaco para equilibrar el sistema nervioso. La figura se expande cuando debes inhalar y se recoge cuando debes exhalar, a un ritmo lento, cercano a 6 respiraciones por minuto. Puede ayudar con autoregulación emocional, estrés, ansiedad o concentración.',
+    'Sigue la figura con tu respiración: inhala mientras se expande y exhala mientras se recoge, a un ritmo lento y suave. Déjate llevar por unos minutos.',
   seguridad:
-    'Es una herramienta de relajación para momentos puntuales, no es un tratamiento ni reemplaza la psicoterapia o un proceso de sanación. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
+    'Es un apoyo para relajarte, no un tratamiento. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
   puenteTexto: '¿Sientes que necesitas más que una pausa? Podemos trabajarlo juntos en sesión.',
   puenteCta: 'Agendar una sesión',
 };

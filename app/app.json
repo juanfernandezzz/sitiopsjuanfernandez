@@ -4,12 +4,12 @@
     "slug": "psicologo-juan-fernandez",
     "owner": "psjuanfernandez",
     "scheme": "psicojuan",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/icon.png",
     "backgroundColor": "#F6F1E8",
-    "runtimeVersion": "1.0.1",
+    "runtimeVersion": "1.0.2",
     "updates": {
       "url": "https://u.expo.dev/66dd747b-757f-4f4c-9261-130841d532df"
     },
@@ -23,8 +23,8 @@
     "android": {
       "package": "cl.psicologojuanfernandez.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#3F5B4A"
+        "foregroundImage": "./assets/icon-adaptive.png",
+        "backgroundColor": "#2A3B4C"
       }
     },
     "plugins": [

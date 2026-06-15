@@ -23,14 +23,14 @@ import { abrirAgenda } from '../lib/abrir';
  * Garamond (igual que el wordmark del sitio) y un boton "Agendar" en
  * terracota-deep (#A4583B, el mismo tono AA del CTA primario del sitio). El
  * boton despliega una hoja inferior con las cuatro sesiones; cada una abre la
- * agenda de Cal.com en el navegador dentro de la app.
+ * agenda de Cal.com embebida en la pantalla /reservar (sin navegador externo).
  *
  * Coherencia: las sesiones, claves y enlaces vienen del mismo nucleo compartido
  * que el desplegable "Agendar" del header web (SESIONES + CAL_EVENTS). La
  * interfaz es nativa; los datos son los mismos.
  *
- * Cero dependencias nativas nuevas: la hoja usa Modal y Animated del nucleo de
- * React Native, asi que el cambio viaja por OTA sin recompilar.
+ * La hoja en si usa Modal y Animated del nucleo de React Native; la reserva se
+ * muestra embebida en /reservar (react-native-webview).
  */
 export default function EncabezadoApp() {
   const insets = useSafeAreaInsets();

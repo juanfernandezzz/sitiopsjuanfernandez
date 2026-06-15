@@ -5,14 +5,17 @@ acción, dónde se hace y el resultado que debes ver. Sigue el orden.
 
 ## Contexto y supuestos
 
-- La app NO cambia su capa nativa en este ciclo (no hay módulos nativos nuevos,
-  ni permisos, ni bump de SDK). La foto del inicio viaja como recurso empaquetado
-  por OTA. Por eso `runtimeVersion` sigue en `"1.0.1"` en `app/app.json`. No lo
-  cambies.
+- En este ciclo (C27) SÍ cambia la capa nativa por dos motivos: (1) el ícono
+  empaquetado se reemplazó (nuevo ícono adaptativo en `app/assets/icon-adaptive.png`
+  y color de fondo Ink en `app/app.json`), y (2) se agregó la dependencia nativa
+  `react-native-webview` para mostrar la reserva de Cal.com embebida dentro de la
+  app. Ambos viajan dentro del binario, no por OTA, así que necesitas un AAB
+  nuevo. Por eso `runtimeVersion` ya subió a `"1.0.2"` en `app/app.json`. No lo
+  bajes.
 - `versionCode` de Android lo sube EAS solo, porque el perfil `production` de
   `app/eas.json` tiene `autoIncrement: true`. No tienes que tocarlo a mano.
-- La versión visible (`version` en `app/app.json`) puede quedarse en `"1.0.0"`
-  para esta primera subida.
+- La versión visible (`version` en `app/app.json`) ya subió a `"1.0.1"` para
+  acompañar este cambio.
 - Tu cuenta de desarrollador es personal y se creó después del 13 de noviembre
   de 2023. Por eso Google exige una fase de prueba cerrada: al menos 12 testers
   aceptados y 14 días seguidos de prueba antes de poder publicar en producción.
@@ -136,8 +139,8 @@ Dónde: Play Console, "Pruebas", "Prueba cerrada".
   pantallas, estilos) se envían sin recompilar con
   `npx eas-cli update --channel production`.
 - El `runtimeVersion` del update debe coincidir con el del build instalado
-  (`"1.0.1"`). Si algún ciclo futuro toca la capa nativa (módulo nativo nuevo,
-  permiso, bump de SDK, ícono empaquetado), ahí sí subes `runtimeVersion`,
+  (`"1.0.2"`). Si algún ciclo futuro vuelve a tocar la capa nativa (módulo nativo
+  nuevo, permiso, bump de SDK, ícono empaquetado), ahí sí subes `runtimeVersion`,
   recompilas el AAB y vuelves a subir a Play.
 
 ## Opcional: enlace de la app con el dominio (assetlinks.json)

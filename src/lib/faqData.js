@@ -71,7 +71,7 @@ export const FAQ_ITEMS = [
     q: '¿Qué es "Respira conmigo"?',
     // El campo `link` solo lo renderiza el sitio web; la app nativa muestra q y a.
     // Por eso la respuesta nombra la URL: el texto queda autocontenido en ambas superficies.
-    a: 'Es una herramienta gratuita de este sitio, en psicologojuanfernandez.cl/respira: una figura que se expande y se recoge para guiar tu inhalación y tu exhalación a un ritmo lento, cercano a 6 respiraciones por minuto. La inicias y la pausas cuando quieras, y puedes usarla el tiempo que te acomode (entre 3 y 5 minutos funciona bien para la mayoría). Es un apoyo para la relajación: no es un tratamiento ni reemplaza un proceso de psicoterapia. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
+    a: 'Es una herramienta gratuita de este sitio, en psicologojuanfernandez.cl/respira: una figura que se expande y se recoge para guiar tu inhalación y tu exhalación a un ritmo lento, cercano a 6 respiraciones por minuto. Esta técnica, conocida como respiración coherente, sincroniza la respiración con el ritmo cardíaco y puede ayudar con la autoregulación emocional, el estrés, la ansiedad o la concentración. La inicias y la pausas cuando quieras, y puedes usarla el tiempo que te acomode (entre 3 y 5 minutos funciona bien para la mayoría). Es un apoyo para la relajación: no es un tratamiento ni reemplaza un proceso de psicoterapia. Si sientes mareo o incomodidad, detente y vuelve a tu ritmo natural.',
     link: { label: 'Abrir Respira conmigo →', href: '/respira' },
   },
 ];
