@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "icon": "./assets/icon.png",
     "backgroundColor": "#F6F1E8",
-    "runtimeVersion": "1.0.2",
+    "runtimeVersion": { "policy": "fingerprint" },
     "updates": {
       "url": "https://u.expo.dev/66dd747b-757f-4f4c-9261-130841d532df"
     },

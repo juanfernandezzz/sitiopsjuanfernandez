@@ -1,0 +1,52 @@
+name: Desplegar app (OTA o build, automatico)
+
+# Se dispara con cada push a main y decide solo entre OTA y build nativo:
+#  1. Calcula el fingerprint del proyecto nativo (hash de dependencias, plugins,
+#     permisos, iconos y config). runtimeVersion usa policy "fingerprint" en
+#     app/app.json, asi el hash ES la version de runtime.
+#  2. Busca si ya existe un APK (perfil preview) para ese fingerprint.
+#  3a. Si EXISTE -> el cambio es solo JS o assets: publica OTA. Llega a las
+#      instalaciones que comparten ese fingerprint apenas se reabre la app.
+#  3b. Si NO existe -> el cambio toco lo nativo (modulo nuevo, plugin, permiso,
+#      icono empaquetado, SDK): construye un APK nuevo de descarga directa. Hay
+#      que instalarlo a mano; un OTA no puede entregar codigo nativo.
+#
+# Como el runtime sale del fingerprint, un OTA nunca baja a un binario
+# incompatible: si el nativo cambio, el fingerprint cambia y el workflow buildea
+# en vez de publicar un update que crashearia la app vieja.
+#
+# El build manual de Play Store / iOS sigue en build.yml (boton Run del panel).
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  fingerprint:
+    name: Calcular fingerprint
+    type: fingerprint
+
+  buscar_build_android:
+    name: Buscar APK existente para este fingerprint
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      profile: preview
+
+  build_android:
+    name: Build APK (hubo cambio nativo)
+    needs: [buscar_build_android]
+    if: ${{ !needs.buscar_build_android.outputs.build_id }}
+    type: build
+    params:
+      platform: android
+      profile: preview
+
+  ota_android:
+    name: Publicar OTA (cambio solo de JS)
+    needs: [buscar_build_android]
+    if: ${{ needs.buscar_build_android.outputs.build_id }}
+    type: update
+    params:
+      branch: production
+      platform: android
