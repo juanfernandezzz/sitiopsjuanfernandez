@@ -28,11 +28,19 @@ export function OpcionesAgendar({ onPick, autoFocusFirst = false }) {
   }, [autoFocusFirst]);
 
   const handle = (key) => {
-    // Fallback: si Cal no se inicializó, abrimos la URL directa.
+    // Fallback: si Cal no se inicializó, abrimos la URL directa y cerramos.
     if (typeof window !== 'undefined' && !window.Cal) {
       window.open(calFullUrl(CAL_EVENTS[key]), '_blank', 'noopener,noreferrer');
+      if (onPick) onPick(key);
+      return;
     }
-    if (onPick) onPick(key);
+    // Cal escucha data-cal-link con un listener DELEGADO en document: el clic
+    // abre el calendario recién cuando burbujea hasta ahí. Si cerramos el menú
+    // en este mismo tick, React desmonta el botón antes de que el clic llegue a
+    // document y Cal nunca ve el data-cal-link (por eso "no hacía nada"). Cerrar
+    // en el próximo tick deja el botón montado mientras se procesa el clic; es
+    // el mismo motivo por el que el modal (con animación de salida) sí abría.
+    if (onPick) setTimeout(() => onPick(key), 0);
   };
 
   return (
