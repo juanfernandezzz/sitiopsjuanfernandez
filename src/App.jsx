@@ -82,6 +82,54 @@ function AppShell() {
   const [showWhatsApp, setShowWhatsApp] = useState(false)
   const { isTipoSesionOpen, closeTipoSesionModal } = useUI()
 
+  // Deep-link por hash al abrir el inicio directo en /#agendar, /#precios, etc.
+  // El navegador intenta el salto nativo antes de que React monte las secciones,
+  // así que cae al top. Lo reproducimos desde JS y lo sostenemos un instante: las
+  // secciones lazy y el Hero terminan de fijar su alto unos frames después, por lo
+  // que saltar una sola vez dejaría el destino corrido. Anulamos el
+  // scroll-behavior: smooth global durante el ajuste (con smooth, reasentar cada
+  // frame daría tirones). Si el usuario hace scroll, toca o teclea, soltamos el
+  // control. No escuchamos hashchange a propósito: los clics de navegación dentro
+  // de la página conservan el scroll suave nativo; este efecto solo actúa al cargar.
+  useEffect(() => {
+    const hash = window.location.hash
+    if (!hash || hash === '#top') return
+    const raw = decodeURIComponent(hash.slice(1))
+    // Anclas cuyo slug público no coincide con el id en el DOM: #dudas lleva a la
+    // sección de Preguntas frecuentes (id="faq"). El alias deja /#dudas operativo
+    // sin romper /#faq (que usa el footer). #respira y #precios usan su propio id.
+    const ALIAS = { dudas: 'faq' }
+    const id = ALIAS[raw] || raw
+
+    const root = document.documentElement
+    const prevBehavior = root.style.scrollBehavior
+    root.style.scrollBehavior = 'auto'
+
+    let raf = 0
+    let done = false
+    const ABORT = ['wheel', 'touchmove', 'keydown', 'pointerdown']
+    const release = () => {
+      if (done) return
+      done = true
+      cancelAnimationFrame(raf)
+      ABORT.forEach((e) => window.removeEventListener(e, release))
+      root.style.scrollBehavior = prevBehavior
+    }
+    ABORT.forEach((e) => window.addEventListener(e, release, { passive: true }))
+
+    const start = performance.now()
+    const step = (now) => {
+      if (done) return
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView({ block: 'start' })
+      if (now - start < 1500) raf = requestAnimationFrame(step)
+      else release()
+    }
+    raf = requestAnimationFrame(step)
+
+    return release
+  }, [])
+
   useEffect(() => {
     const onScroll = () => setShowWhatsApp(window.scrollY > 200)
     window.addEventListener('scroll', onScroll, { passive: true })
