@@ -13,6 +13,7 @@ export default defineConfig({
         asentimiento: resolve(__dirname, 'asentimientoinformado.html'),
         politica: resolve(__dirname, 'politica-privacidad.html'),
         respira: resolve(__dirname, 'respira.html'),
+        citaAgendada: resolve(__dirname, 'cita-agendada.html'),
       },
     },
   },

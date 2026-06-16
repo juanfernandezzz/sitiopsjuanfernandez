@@ -5,6 +5,12 @@ import { LEGAL, CONTACTO, PRESTADOR, URLS_EXTERNAS } from '../lib/contacto';
  *
  * El texto es cita textual del bloque canonico definido en C9.
  * No parafrasear sin permiso explicito de Juan.
+ *
+ * Enmienda C27 (medicion de Google Ads): al instalar la etiqueta de Google en
+ * las paginas publicas, dos bloques se actualizaron para reflejar la realidad y
+ * cumplir la transparencia de la Ley 21.719: la nota de la seccion 2 (antes
+ * afirmaba que no se usa Google Analytics) y la seccion 9 (cookies y rastreo).
+ * Cambio pendiente de validacion de wording por Juan.
  */
 
 const STYLES = {
@@ -149,7 +155,15 @@ export default function PoliticaPrivacidad() {
         </li>
       </ul>
       <p style={STYLES.p}>
-        No uso Google Analytics ni herramientas de tracking publicitario.
+        En las páginas públicas del sitio (el inicio, la página
+        &ldquo;Respira conmigo&rdquo; y la página de confirmación de reserva)
+        uso la etiqueta de Google: Google Analytics 4 para entender cuántas
+        personas visitan el sitio, y la medición de conversiones de Google Ads
+        para saber cuántas llegan a reservar una sesión. No la uso en las
+        páginas del consentimiento informado, del asentimiento ni en esta
+        política: esas quedan libres de medición publicitaria. Esta medición no
+        recibe ningún dato clínico ni de salud, ni el motivo de tu consulta, ni
+        el tipo de sesión que reservas.
       </p>
 
       {/* 3 */}
@@ -309,10 +323,27 @@ export default function PoliticaPrivacidad() {
         9. Cookies y rastreo
       </h2>
       <p style={STYLES.p}>
-        Este sitio no usa cookies de rastreo publicitario ni cookies de
-        marketing. Solo usa cookies estrictamente necesarias para el
-        funcionamiento del formulario de consentimiento informado
+        En las páginas del consentimiento informado y del asentimiento solo uso
+        cookies estrictamente necesarias para el funcionamiento del formulario
         (recuperación de sesión si el envío falla; expira a los 10 minutos).
+      </p>
+      <p style={STYLES.p}>
+        En las páginas públicas (el inicio, &ldquo;Respira conmigo&rdquo; y la
+        página de confirmación de reserva) la etiqueta de Google instala cookies
+        para medir visitas y conversiones de la campaña de Google Ads. Estas
+        cookies no leen información clínica ni el contenido de los formularios.
+        Puedes bloquearlas desde la configuración de tu navegador o instalando
+        el complemento de inhabilitación de Google Analytics en{' '}
+        <a
+          href="https://tools.google.com/dlpage/gaoptout"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkStyle}
+        >
+          tools.google.com/dlpage/gaoptout
+        </a>
+        . El tratamiento de estos datos se rige por la {LEGAL.leyDatosVigente} y,
+        desde el {LEGAL.vigenciaPlena21719}, por la {LEGAL.leyDatosFutura}.
       </p>
 
       {/* 10 */}

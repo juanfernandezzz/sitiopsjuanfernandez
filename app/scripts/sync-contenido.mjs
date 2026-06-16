@@ -10,7 +10,7 @@ const aqui = dirname(fileURLToPath(import.meta.url)); // /app/scripts
 const origen = resolve(aqui, '..', '..', 'src', 'lib'); // /repo/src/lib
 const destino = resolve(aqui, '..', 'src', 'contenido'); // /app/src/contenido
 
-const archivos = ['contacto.js', 'cal.js', 'faqData.js', 'precios.js', 'motivos.js', 'credenciales.js', 'respiraNucleo.js', 'hero.js', 'sesiones.js', 'proceso.js'];
+const archivos = ['contacto.js', 'cal.js', 'faqData.js', 'precios.js', 'motivos.js', 'credenciales.js', 'respiraNucleo.js', 'hero.js', 'sesiones.js', 'proceso.js', 'postReserva.js'];
 
 mkdirSync(destino, { recursive: true });
 let copiados = 0;

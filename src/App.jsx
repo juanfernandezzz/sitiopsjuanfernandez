@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { FloatingWhatsApp } from 'react-floating-whatsapp'
 import { CAL_NAMESPACE } from './lib/cal'
+import { iniciarCapturaSlug, registrarConversionReserva } from './lib/seguimiento'
 import { UIProvider, useUI } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -87,6 +88,11 @@ function AppShell() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // C27: captura el slug de la ultima sesion con la que se interactuo (clics en
+  // elementos con data-cal-link), para que /cita-agendada muestre el bloque de
+  // pago correcto. El slug vive solo en sessionStorage, nunca en la URL.
+  useEffect(() => iniciarCapturaSlug(), [])
+
   // Cal.com se carga al primer evento de interacción del usuario. El dynamic
   // import saca @calcom/embed-react del chunk principal y el listener once:true
   // garantiza una sola inicialización. Si un usuario clickea un CTA antes de
@@ -113,6 +119,10 @@ function AppShell() {
           },
         },
       })
+      // C27: ante una reserva exitosa, Cal navega a /cita-agendada (esa carga
+      // dispara la conversion de Google Ads por URL). Una sola instancia global
+      // para todos los CTAs, que comparten el namespace 'psicojuan'.
+      registrarConversionReserva(cal)
       cleanup()
     }
     const events = ['click', 'scroll', 'touchstart', 'keydown']

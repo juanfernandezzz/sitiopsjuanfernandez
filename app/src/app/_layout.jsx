@@ -40,6 +40,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="reservar" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="cita-agendada" options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
       </Stack>
       {!splashListo && <SplashAnimado onDone={() => setSplashListo(true)} />}
     </SafeAreaProvider>

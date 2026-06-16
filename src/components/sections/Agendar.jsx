@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
+import { recordarSlug } from '../../lib/seguimiento';
 import { useUI } from '../../lib/uiContext';
 
 // Cal embed se carga lazy para no inflar el bundle inicial.
@@ -87,6 +88,13 @@ export default function Agendar() {
   }, [pendingAgendarTab, clearPendingAgendarTab]);
 
   const calLink = selectedKey ? `${CAL_USERNAME}/${CAL_EVENTS[selectedKey]}` : null;
+
+  // C27: el embed inline de escritorio reserva dentro del iframe, sin un clic
+  // con data-cal-link que capturar. Guardamos aqui el slug elegido para que la
+  // pagina de confirmacion sepa que sesion fue (mismo canal: sessionStorage).
+  useEffect(() => {
+    if (selectedKey) recordarSlug(CAL_EVENTS[selectedKey]);
+  }, [selectedKey]);
 
   const pedirSeleccion = () => {
     setShowChooseWarning(true);

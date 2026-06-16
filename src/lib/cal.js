@@ -66,6 +66,19 @@ export const calInlineEmbedHtml = (slug) => {
 Cal("init", "${ns}", { origin: "https://cal.com" });
 Cal.ns["${ns}"]("inline", { elementOrSelector: "#cal-inline", calLink: "${calLink}", config: ${cfg} });
 Cal.ns["${ns}"]("ui", ${cfg});
+// La app (react-native-webview) escucha este mensaje para navegar a la pantalla
+// de confirmacion. Un candado evita avisar dos veces si Cal dispara los dos
+// nombres de evento (bookingSuccessful quedo deprecado por bookingSuccessfulV2).
+var _avisado = false;
+function _avisarExito() {
+  if (_avisado) return;
+  _avisado = true;
+  if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+    window.ReactNativeWebView.postMessage(JSON.stringify({ tipo: "reserva-exitosa" }));
+  }
+}
+Cal.ns["${ns}"]("on", { action: "bookingSuccessful", callback: _avisarExito });
+Cal.ns["${ns}"]("on", { action: "bookingSuccessfulV2", callback: _avisarExito });
 </script>
 </body>
 </html>`;

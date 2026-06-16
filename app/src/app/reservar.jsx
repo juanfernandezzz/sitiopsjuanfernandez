@@ -35,6 +35,22 @@ export default function Reservar() {
   const html = useMemo(() => (slugStr ? calInlineEmbedHtml(slugStr) : ''), [slugStr]);
   const titulo = useMemo(() => tituloDeSlug(slugStr), [slugStr]);
 
+  // C27: el embed de Cal en el WebView avisa cuando la reserva se concreta.
+  // Reemplazamos la pantalla por la de confirmacion (replace, no push: no tiene
+  // sentido volver al calendario despues de reservar). El slug viaja para que
+  // la confirmacion muestre el bloque de pago correcto.
+  const alMensaje = (evento) => {
+    let datos = null;
+    try {
+      datos = JSON.parse(evento?.nativeEvent?.data || '{}');
+    } catch {
+      datos = null;
+    }
+    if (datos && datos.tipo === 'reserva-exitosa') {
+      router.replace({ pathname: '/cita-agendada', params: { slug: slugStr } });
+    }
+  };
+
   return (
     <View style={styles.pantalla}>
       <View style={[styles.barra, { paddingTop: insets.top + 8 }]}>
@@ -68,6 +84,7 @@ export default function Reservar() {
             setSupportMultipleWindows={false}
             scrollEnabled
             nestedScrollEnabled
+            onMessage={alMensaje}
             onLoadEnd={() => setCargando(false)}
             onError={() => {
               setError(true);
