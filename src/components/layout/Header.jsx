@@ -8,6 +8,7 @@ import HeaderAgendarMenu, { OpcionesAgendar } from './HeaderAgendarMenu';
 
 const NAV_ITEMS = [
   { label: 'Cómo trabajo', href: '#como-trabajo' },
+  { label: 'Sobre mí', href: '#bio' },
   { label: 'Precios', href: '#precios' },
   { label: 'Agendar', href: '#agendar' },
 ];

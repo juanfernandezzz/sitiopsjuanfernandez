@@ -241,6 +241,7 @@ function ColumnaContacto() {
         items={[
           { label: 'Inicio', href: '/' },
           { label: 'Cómo trabajo', href: '/#como-trabajo' },
+          { label: 'Sobre mí', href: '/#bio' },
           { label: 'Precios', href: '/#precios' },
           { label: 'Agendar', href: '/#agendar' },
           { label: 'Preguntas frecuentes', href: '/#faq' },

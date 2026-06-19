@@ -19,5 +19,6 @@ export const CREDENCIALES = [
   `Psicólogo clínico titulado en la ${PRESTADOR.universidad}`,
   `Inscrito en la Superintendencia de Salud (N° ${PRESTADOR.rnpi})`,
   'Formación continua en terapia cognitivo-conductual, cuidado clínico (Harvard) y primeros auxilios psicológicos (UAB)',
+  'Supervisión clínica continua',
   'Inglés nivel C1 (EF-SET): atención también en inglés',
 ];

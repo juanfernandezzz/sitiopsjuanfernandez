@@ -13,9 +13,8 @@ import Hero from './components/sections/Hero'
 // y posterga el TBT hasta que cada sección entra en pantalla.
 const MotivosConsulta = lazy(() => import('./components/sections/MotivosConsulta'))
 const ComoTrabajo = lazy(() => import('./components/sections/ComoTrabajo'))
-const Credenciales = lazy(() => import('./components/sections/Credenciales'))
+const SobreMi = lazy(() => import('./components/sections/SobreMi'))
 const Precios = lazy(() => import('./components/sections/Precios'))
-const ComoFuncionaOnline = lazy(() => import('./components/sections/ComoFuncionaOnline'))
 const Agendar = lazy(() => import('./components/sections/Agendar'))
 const FAQ = lazy(() => import('./components/sections/FAQ'))
 // C24 fixpack: sección Respira conmigo en el inicio, justo antes de Preguntas
@@ -96,9 +95,10 @@ function AppShell() {
     if (!hash || hash === '#top') return
     const raw = decodeURIComponent(hash.slice(1))
     // Anclas cuyo slug público no coincide con el id en el DOM: #dudas lleva a la
-    // sección de Preguntas frecuentes (id="faq"). El alias deja /#dudas operativo
-    // sin romper /#faq (que usa el footer). #respira y #precios usan su propio id.
-    const ALIAS = { dudas: 'faq' }
+    // sección de Preguntas frecuentes (id="faq"). #como-funciona apuntaba a la
+    // antigua sección de teleconsulta, hoy fusionada en Cómo trabajo: el alias
+    // mantiene vivos los enlaces externos (anuncios, marcadores) sin romper nada.
+    const ALIAS = { dudas: 'faq', 'como-funciona': 'como-trabajo' }
     const id = ALIAS[raw] || raw
 
     const root = document.documentElement
@@ -185,10 +185,9 @@ function AppShell() {
       <main>
         <Hero />
         <LazySection minHeight={220}><MotivosConsulta /></LazySection>
-        <LazySection id="como-trabajo" minHeight={720}><ComoTrabajo /></LazySection>
-        <LazySection minHeight={420}><Credenciales /></LazySection>
+        <LazySection id="como-trabajo" minHeight={1100}><ComoTrabajo /></LazySection>
+        <LazySection id="bio" minHeight={620}><SobreMi /></LazySection>
         <LazySection id="precios" minHeight={900}><Precios /></LazySection>
-        <LazySection id="como-funciona" minHeight={760}><ComoFuncionaOnline /></LazySection>
         <LazySection id="agendar" minHeight={980}><Agendar /></LazySection>
         <LazySection id="respira" minHeight={760}><Respira /></LazySection>
         <LazySection id="faq" minHeight={560}><FAQ /></LazySection>

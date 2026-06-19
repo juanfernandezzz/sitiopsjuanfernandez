@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { FAQ_ITEMS } from '@contenido/faqData';
+import { SOBRE_MI } from '@contenido/sobreMi';
 import { COLORS, FONTS } from '../../theme/tokens';
 import EncabezadoApp from '../../components/EncabezadoApp';
 import Aparece from '../../components/Aparece';
@@ -152,25 +153,26 @@ export default function Informacion() {
 
       <Aparece delay={80}>
         <View style={styles.bloque}>
-          <Text style={styles.bloqueTitulo}>El enfoque</Text>
-          <Text style={styles.parrafo}>
-            Trabajo con un enfoque integrativo que combina la terapia cognitivo conductual y la
-            psicología narrativa, para adultos. Cada proceso parte de lo que te trae y se ajusta a ti.
-          </Text>
+          <Text style={styles.bloqueTitulo}>{SOBRE_MI.eyebrow}</Text>
+          <Text style={styles.parrafo}>{SOBRE_MI.bio}</Text>
         </View>
       </Aparece>
 
       <Aparece delay={150}>
         <View style={styles.bloque}>
-          <Text style={styles.bloqueTitulo}>El formato</Text>
-          <Text style={styles.parrafo}>
-            Las sesiones duran 45 minutos y son por videollamada. La primera es para conocernos y
-            entender juntos qué te trae. Si después no quieres continuar, no hay compromiso.
-          </Text>
+          <Text style={styles.bloqueTitulo}>{SOBRE_MI.enfoque.titulo}</Text>
+          <Text style={styles.parrafo}>{SOBRE_MI.enfoque.texto}</Text>
         </View>
       </Aparece>
 
       <Aparece delay={210}>
+        <View style={styles.bloque}>
+          <Text style={styles.bloqueTitulo}>{SOBRE_MI.formato.titulo}</Text>
+          <Text style={styles.parrafo}>{SOBRE_MI.formato.texto}</Text>
+        </View>
+      </Aparece>
+
+      <Aparece delay={260}>
         <Text style={[styles.bloqueTitulo, { marginTop: 8, marginBottom: 6 }]}>Preguntas frecuentes</Text>
         {FAQ_ITEMS.map((item, i) => (
           <ItemFAQ key={i} q={item.q} a={item.a} link={item.link} reduce={reduce} />

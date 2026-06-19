@@ -1,14 +1,16 @@
 /**
  * Proceso y confianza. Fuente unica de copy consumida por el sitio
- * (ComoFuncionaOnline y ComoTrabajo) y por la app (pantalla Agendar). Los
+ * (ComoTrabajo, que fusiona el arco terapeutico y la logistica de conexion) y
+ * por la app (pantalla Agendar). Los
  * iconos NO viven aqui: cada superficie mapea la clave a su set (SVG propios en
  * el sitio, Feather en la app), porque la presentacion difiere; lo que se
  * sincroniza es el texto.
  */
 import { PRECIOS } from './precios';
 
-// Como funciona una sesion online (logistica). Sitio: ComoFuncionaOnline.
-// App: pantalla Agendar (bloque "Como es el proceso" y trio de confianza).
+// Como funciona una sesion online (logistica). Sitio: bloque de conexion dentro
+// de ComoTrabajo. App: pantalla Agendar (bloque "Como es el proceso" y trio de
+// confianza).
 export const PROCESO_ONLINE = {
   eyebrow: 'Teleconsulta paso a paso',
   titulo: 'Cómo funciona una sesión online',
