@@ -17,7 +17,7 @@
 export const SOBRE_MI = {
   eyebrow: 'Sobre mí',
   titulo: 'Quién te acompaña en cada sesión.',
-  bio: 'La vida moderna nos mantiene siempre en movimiento, pero mereces un espacio seguro y profesional donde tú seas protagonista. Soy Juan Fernández, psicólogo clínico, y te acompaño a modificar lo que hoy te limita, dándole un nuevo sentido a tus experiencias. Da el primer paso hacia tu bienestar desde la comodidad de tu hogar.',
+  bio: 'La vida moderna nos mantiene siempre en movimiento, pero mereces un espacio seguro y profesional centrado en ti. Soy Juan Fernández, psicólogo clínico, y te acompaño a lidiar con aquello que te frena, dando un nuevo significado a tus experiencias. Toma el primer paso hacia tu bienestar desde la comodidad de tu hogar.',
   enfoque: {
     titulo: 'El enfoque',
     texto: 'Trabajo con un enfoque integrativo que combina la terapia cognitivo conductual y la psicología narrativa. Cada proceso parte de lo que te trae y se ajusta a ti.',
