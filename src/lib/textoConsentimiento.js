@@ -22,13 +22,7 @@ export const TEXTO_CONSENTIMIENTO = `CONSENTIMIENTO INFORMADO PARA ATENCIÓN PSI
 
 7. Cancelaciones. Puedo cancelar o reagendar hasta 6 horas antes sin costo. Cancelaciones con menos de 6 horas se reagendan caso a caso.
 
-8. Voluntariedad. Mi participación es voluntaria y puedo discontinuar el proceso terapéutico en cualquier momento.
-
-DECLARO:
-[X] Ser mayor de 18 años
-[X] Haber leído y comprendido este consentimiento
-[X] Aceptar libremente recibir atención psicológica en modalidad online
-[X] Comprender las limitaciones de esta modalidad`;
+8. Voluntariedad. Mi participación es voluntaria y puedo discontinuar el proceso terapéutico en cualquier momento.`;
 
 export const CHECKBOXES_DECLARACION = [
   'Soy mayor de 18 años',

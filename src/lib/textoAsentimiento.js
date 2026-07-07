@@ -44,13 +44,7 @@ PARTE B. AUTORIZACIÓN DEL ADULTO RESPONSABLE
 
 8. Cancelaciones. Puedo cancelar o reagendar hasta 6 horas antes sin costo. Cancelaciones con menos de 6 horas se reagendan caso a caso.
 
-9. Voluntariedad. La participación es voluntaria y puede discontinuarse en cualquier momento, considerando la opinión del adolescente.
-
-DECLARA EL ADULTO RESPONSABLE:
-[X] Ser madre, padre o representante legal del adolescente
-[X] Haber leído y comprendido este documento
-[X] Haber explicado su contenido al adolescente y contar con su acuerdo de participar
-[X] Autorizar la atención psicológica online y comprender sus limitaciones`;
+9. Voluntariedad. La participación es voluntaria y puede discontinuarse en cualquier momento, considerando la opinión del adolescente.`;
 
 export const CHECKBOXES_ASENTIMIENTO = [
   'Soy madre, padre o representante legal del adolescente',
