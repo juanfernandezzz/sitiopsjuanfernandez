@@ -13,9 +13,10 @@ import { CREDENCIALES } from '../../lib/credenciales';
  * la evidencia en credibilidad web recomienda presentarlos (persona real +
  * experiencia declarada).
  *
- * Decision deliberada: NO repetir la foto del Hero. El rostro ya ancla la
- * portada; duplicarlo a media pagina resta y se lee como plantilla. Aqui pesa
- * la palabra (bio como declaracion) y la prueba (tarjeta de credenciales).
+ * Foto: un retrato pequeno acompana la bio para poner cara a la declaracion.
+ * Es deliberadamente chico (thumbnail junto al texto, no a media pagina) y con
+ * un encuadre distinto al del Hero, para que siga pesando la palabra y no se
+ * lea como plantilla ni compita con el rostro que ancla la portada.
  *
  * Restricciones duras heredadas de credenciales.js: ingles C1, nunca C2; nunca
  * el registro Mineduc de Educacion Especial en contexto clinico. El texto de
@@ -102,15 +103,27 @@ export default function SobreMi() {
             {SOBRE_MI.titulo}
           </motion.h2>
 
-          {/* Bio canónica: regla terracota a la izquierda, tratamiento de
-              declaración. Texto literal, sin reescritura. */}
+          {/* Bio canónica: retrato pequeño + regla terracota a la izquierda,
+              tratamiento de declaración. Texto literal, sin reescritura. En
+              móvil la foto va arriba; desde sm queda a un costado del texto. */}
           <motion.div
             variants={item}
-            className="mt-8 border-l-2 border-terracota/55 pl-5 lg:pl-6"
+            className="mt-8 flex flex-col sm:flex-row sm:items-start gap-5 lg:gap-6"
           >
-            <p className="font-body text-[18px] lg:text-[20px] leading-[1.7] text-ink/85 max-w-[52ch]">
-              {SOBRE_MI.bio}
-            </p>
+            <img
+              src="/juan-sobremi-400.webp"
+              alt="Juan Fernández"
+              width={400}
+              height={400}
+              loading="lazy"
+              decoding="async"
+              className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover ring-1 ring-sage/30 shadow-[0_18px_36px_-22px_rgba(63,91,74,0.45)]"
+            />
+            <div className="border-l-2 border-terracota/55 pl-5 lg:pl-6">
+              <p className="font-body text-[18px] lg:text-[20px] leading-[1.7] text-ink/85 max-w-[52ch]">
+                {SOBRE_MI.bio}
+              </p>
+            </div>
           </motion.div>
 
           {/* Enfoque y formato: mismo texto que la app (fuente única sobreMi.js).
