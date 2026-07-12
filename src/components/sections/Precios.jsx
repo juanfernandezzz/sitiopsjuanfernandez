@@ -110,16 +110,33 @@ export default function Precios() {
               Primera sesión con bono Fonasa
             </h3>
 
-            <div className="mb-8">
-              <p
-                className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
-                style={{ fontVariationSettings: '"opsz" 144' }}
-              >
-                {PRECIOS.fonasaCopago.display}
-              </p>
-              <p className="font-body text-[16px] text-sage">
-                Copago Modalidad Libre Elección
-              </p>
+            {/* C31: logo institucional de Fonasa como señal simbólica de
+                confianza, par del botón WebPay. El archivo oficial vive en
+                public/logos/; si faltara, la imagen se oculta sola. */}
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p
+                  className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  {PRECIOS.fonasaCopago.display}
+                </p>
+                <p className="font-body text-[16px] text-sage">
+                  Copago Modalidad Libre Elección
+                </p>
+              </div>
+              <img
+                src="/logos/fonasa.svg"
+                alt="Fonasa"
+                width={96}
+                height={32}
+                loading="lazy"
+                decoding="async"
+                className="h-7 md:h-8 w-auto flex-shrink-0 mb-1"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
             </div>
 
             <ul className="space-y-3 mb-5">
