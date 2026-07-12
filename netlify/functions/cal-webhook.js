@@ -6,8 +6,17 @@ import crypto from 'crypto';
  *
  * Flujo:
  *   1. Valida la firma HMAC-SHA-256 del payload con CAL_WEBHOOK_SECRET.
- *   2. Extrae nombre y email del attendee.
- *   3. Envía email al paciente con link pre-rellenado al consentimiento.
+ *   2. Descarta reagendamientos (ver nota abajo) para no reenviar el consentimiento.
+ *   3. Extrae nombre y email del attendee.
+ *   4. Envía email al paciente con link pre-rellenado al consentimiento.
+ *
+ * NOTA sobre reagendamientos:
+ *   Al reagendar una sesión, Cal.com crea un booking nuevo (uid nuevo) y dispara
+ *   BOOKING_CREATED igual que en una reserva nueva. La diferencia es que el payload
+ *   de un reagendamiento trae rescheduleUid (uid del booking original) y campos
+ *   hermanos (rescheduleId, rescheduleStartTime), que una reserva genuinamente nueva
+ *   no tiene. Un paciente que reagenda ya firmó el consentimiento al reservar la
+ *   primera vez, así que en ese caso NO reenviamos el correo.
  *
  * Variables de entorno requeridas:
  *   - CAL_WEBHOOK_SECRET   (string aleatorio, mismo configurado en Cal.com)
@@ -74,6 +83,23 @@ export const handler = async (event) => {
   }
 
   const booking = payload.payload || {};
+
+  // Reagendamiento: si el payload trae marcas de reschedule, el paciente ya firmó
+  // el consentimiento al reservar la primera vez. No reenviamos el correo.
+  const esReagendamiento = Boolean(
+    booking.rescheduleUid ||
+      booking.rescheduleId ||
+      booking.fromReschedule ||
+      booking.rescheduled === true
+  );
+  if (esReagendamiento) {
+    console.log(
+      'Reagendamiento detectado (rescheduleUid=%s); no se reenvía consentimiento',
+      booking.rescheduleUid || booking.rescheduleId || booking.fromReschedule || 'true'
+    );
+    return { statusCode: 200, body: 'Reschedule ignored' };
+  }
+
   const attendee = booking.attendees?.[0];
 
   if (!attendee?.name || !attendee?.email) {
