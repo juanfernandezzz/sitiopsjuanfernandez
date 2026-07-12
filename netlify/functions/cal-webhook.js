@@ -1,22 +1,36 @@
 import { Resend } from 'resend';
+import { getStore } from '@netlify/blobs';
 import crypto from 'crypto';
 
 /**
  * Webhook que Cal.com llama tras BOOKING_CREATED.
  *
+ * Regla de negocio: el correo pidiendo el consentimiento se envía UNA sola vez por
+ * persona, en su primer evento. Nunca en los siguientes, sea un reagendamiento, un
+ * control nuevo o una sesión que el propio Juan agenda manualmente a un paciente ya
+ * en tratamiento. El consentimiento se firma una vez y sigue vigente.
+ *
  * Flujo:
  *   1. Valida la firma HMAC-SHA-256 del payload con CAL_WEBHOOK_SECRET.
- *   2. Descarta reagendamientos (ver nota abajo) para no reenviar el consentimiento.
- *   3. Extrae nombre y email del attendee.
- *   4. Envía email al paciente con link pre-rellenado al consentimiento.
+ *   2. Descarta reagendamientos por las marcas del payload (early-out barato, ver nota).
+ *   3. Consulta el registro persistente (Netlify Blobs) por email: si a esa persona ya
+ *      se le pidió el consentimiento antes, no reenvía.
+ *   4. Envía el correo con link pre-rellenado y, si el envío fue exitoso, deja al email
+ *      registrado para no volver a molestarlo en futuros eventos.
  *
  * NOTA sobre reagendamientos:
  *   Al reagendar una sesión, Cal.com crea un booking nuevo (uid nuevo) y dispara
- *   BOOKING_CREATED igual que en una reserva nueva. La diferencia es que el payload
- *   de un reagendamiento trae rescheduleUid (uid del booking original) y campos
- *   hermanos (rescheduleId, rescheduleStartTime), que una reserva genuinamente nueva
- *   no tiene. Un paciente que reagenda ya firmó el consentimiento al reservar la
- *   primera vez, así que en ese caso NO reenviamos el correo.
+ *   BOOKING_CREATED igual que una reserva nueva. La diferencia es que el payload de un
+ *   reagendamiento trae rescheduleUid (uid del booking original) y campos hermanos
+ *   (rescheduleId, rescheduleStartTime), que una reserva genuinamente nueva no tiene.
+ *   El registro por email (paso 3) ya cubriría este caso, pero el early-out evita el
+ *   trabajo y sigue funcionando aunque el almacén esté temporalmente caído.
+ *
+ * Registro (Netlify Blobs):
+ *   Store 'consentimiento-solicitado', clave = email en minúsculas. Si el almacén no
+ *   está disponible se degrada de forma segura ENVIANDO igual (el consentimiento es un
+ *   requisito legal: preferimos un correo repetido a que un paciente nuevo se quede sin
+ *   pedírselo). El único riesgo residual es un correo extra en esa rara ventana.
  *
  * Variables de entorno requeridas:
  *   - CAL_WEBHOOK_SECRET   (string aleatorio, mismo configurado en Cal.com)
@@ -25,9 +39,33 @@ import crypto from 'crypto';
  *   - EMAIL_REPLY_TO
  *   - SITIO_URL            (default: https://psicologojuanfernandez.cl)
  *
+ * Variable de entorno opcional:
+ *   - CONSENTIMIENTO_YA_OBTENIDO  Lista de emails (separados por coma o salto de línea)
+ *       de pacientes que ya firmaron el consentimiento antes de existir el registro.
+ *       Nunca reciben el correo. Útil para no molestar a pacientes en tratamiento al
+ *       momento de desplegar esto. Se deja fuera del repo por ser dato de pacientes.
+ *
  * Retorna 200 incluso ante errores no críticos para evitar reintentos de Cal.com
  * que solo generarían ruido sin resolver el problema raíz.
  */
+
+// Fábrica del almacén, aislada para poder inyectar un doble en las pruebas.
+let _crearRegistro = () => getStore('consentimiento-solicitado');
+
+/** Solo para tests: sustituye la fábrica del registro por un doble en memoria. */
+export function _setRegistroFactory(fn) {
+  _crearRegistro = fn;
+}
+
+// Devuelve el store o null si Blobs no está disponible (degradación segura: enviar).
+function obtenerRegistro() {
+  try {
+    return _crearRegistro();
+  } catch (err) {
+    console.warn('Netlify Blobs no disponible, se enviará sin registrar:', err?.message);
+    return null;
+  }
+}
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -105,6 +143,37 @@ export const handler = async (event) => {
   if (!attendee?.name || !attendee?.email) {
     console.error('Webhook sin attendee data:', booking);
     return { statusCode: 200, body: 'No attendee data' };
+  }
+
+  // Registro por persona: si a este email ya se le pidió el consentimiento en un
+  // evento anterior, no reenviamos. Clave normalizada a minúsculas.
+  const emailKey = attendee.email.trim().toLowerCase();
+
+  // Lista opcional de emails que YA tienen el consentimiento firmado desde antes de
+  // existir este registro (típicamente pacientes en tratamiento al desplegar esto).
+  // Se configura en la env var CONSENTIMIENTO_YA_OBTENIDO de Netlify, separada por
+  // comas o saltos de línea. Va fuera del repo a propósito: son datos de pacientes.
+  const emailsPrevios = (process.env.CONSENTIMIENTO_YA_OBTENIDO || '')
+    .split(/[,\n]/)
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (emailsPrevios.includes(emailKey)) {
+    console.log('Email %s marcado con consentimiento previo (env); no se envía', emailKey);
+    return { statusCode: 200, body: 'Consent on file (preseed)' };
+  }
+
+  const registro = obtenerRegistro();
+  if (registro) {
+    try {
+      const yaSolicitado = await registro.get(emailKey);
+      if (yaSolicitado) {
+        console.log('Consentimiento ya solicitado antes a %s; no se reenvía', emailKey);
+        return { statusCode: 200, body: 'Consent already requested' };
+      }
+    } catch (err) {
+      // Lectura fallida: degradación segura, seguimos y enviamos.
+      console.warn('No se pudo leer el registro (se enviará igual):', err?.message);
+    }
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -335,7 +404,26 @@ export const handler = async (event) => {
 
     if (result.error) {
       console.error('Resend error en cal-webhook:', result.error);
+      // No registramos: al no haberse enviado, un evento futuro debe reintentar.
       return { statusCode: 200, body: 'Email send failed but webhook acknowledged' };
+    }
+
+    // Envío exitoso: dejamos constancia para no volver a pedirle el consentimiento
+    // a esta persona. Best-effort: si el registro falla, ya se envió, así que solo
+    // logueamos (a lo sumo se arriesga un correo repetido en un evento futuro).
+    if (registro) {
+      try {
+        await registro.set(
+          emailKey,
+          JSON.stringify({
+            solicitadoEn: new Date().toISOString(),
+            evento: eventTitle,
+            uid: booking.uid || null,
+          })
+        );
+      } catch (err) {
+        console.warn('Consentimiento enviado pero no se pudo registrar:', err?.message);
+      }
     }
 
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };

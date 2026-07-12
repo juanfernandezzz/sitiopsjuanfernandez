@@ -98,6 +98,11 @@ Configurar workflows en cal.com con dos triggers:
 ### Política de reagendamiento
 Definir la política en cada event type (Booking Limits / Reschedule Policy). El copy del sitio en la sección Agendar dice "reagendamiento flexible según mi política" para no contradecir la config real.
 
+### Correo de consentimiento: una sola vez por persona
+El webhook `cal-webhook` envía el correo pidiendo el consentimiento **solo en el primer evento de cada persona**. Los siguientes (reagendamientos, controles nuevos, sesiones que agendas tú manualmente) no lo reenvían: se apoya en un registro persistente (Netlify Blobs, store `consentimiento-solicitado`) por email.
+
+Para pacientes que ya estaban en tratamiento cuando esto se desplegó, el registro arranca vacío, así que su próximo evento *nuevo* podría dispararles el correo una vez. Para evitarlo, agrega sus emails en la env var opcional de Netlify `CONSENTIMIENTO_YA_OBTENIDO` (separados por coma o salto de línea): esos correos nunca reciben la solicitud. No va en el repo por ser dato de pacientes.
+
 ## SEO y verificación de motores de búsqueda
 
 ### Estado actual (C10)

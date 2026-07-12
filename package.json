@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
+    "@netlify/blobs": "^10.7.9",
     "framer-motion": "^11.11.0",
     "jspdf": "^2.5.2",
     "lucide-react": "^0.453.0",
