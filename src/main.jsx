@@ -1,13 +1,22 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// C31: si el build prerenderizo la pagina (SSG), la raiz llega con HTML y
+// React hidrata sobre ese DOM en vez de montarlo desde cero. En desarrollo
+// la raiz llega vacia y se monta como antes.
+const raiz = document.getElementById('root')
+const elemento = (
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
+  </React.StrictMode>
 )
+if (raiz.firstElementChild) {
+  hydrateRoot(raiz, elemento)
+} else {
+  createRoot(raiz).render(elemento)
+}
 
 // Registro del service worker. Habilita el respaldo offline y la instalabilidad
 // como PWA, requisito para empaquetar el sitio como app Android (TWA). El SW no

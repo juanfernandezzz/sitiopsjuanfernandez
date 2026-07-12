@@ -34,11 +34,23 @@ const ModalTipoSesion = lazy(() => import('./components/modals/ModalTipoSesion')
  * enlaces ancla (#precios, #agendar, etc.) funcionen aunque la sección todavía
  * no se haya montado.
  */
+// C31: el build prerenderiza el HTML (SSG). En servidor las secciones se
+// renderizan de inmediato (los crawlers no ejecutan JS ni disparan
+// IntersectionObserver). En cliente, si la raiz ya trae contenido, se hidrata
+// visible desde el primer render para que React conserve ese DOM; los chunks
+// diferidos se hidratan solos al llegar (hidratacion selectiva de React 18).
+// En desarrollo (raiz vacia, sin prerender) se conserva el montaje diferido
+// por IntersectionObserver de C24.
+const CONTENIDO_PRERRENDERIZADO =
+  typeof document === 'undefined' ||
+  !!document.getElementById('root')?.firstElementChild
+
 function LazySection({ id, scrollMarginTop = '80px', minHeight, children }) {
   const ref = useRef(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(CONTENIDO_PRERRENDERIZADO)
 
   useEffect(() => {
+    if (CONTENIDO_PRERRENDERIZADO) return
     const el = ref.current
     if (!el) return
     if (typeof IntersectionObserver === 'undefined') {
