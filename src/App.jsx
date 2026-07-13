@@ -1,5 +1,10 @@
 import { useEffect, useState, useRef, lazy, Suspense } from 'react'
-import { FloatingWhatsApp } from 'react-floating-whatsapp'
+// C31 fix pack: react-floating-whatsapp incrusta ~196 KB de imagenes en base64
+// dentro de su modulo. Cargarlo diferido lo saca del bundle critico; como el
+// widget recien se muestra tras hacer scroll, el cambio es invisible.
+const FloatingWhatsApp = lazy(() =>
+  import('react-floating-whatsapp').then((m) => ({ default: m.FloatingWhatsApp }))
+)
 import { CAL_NAMESPACE } from './lib/cal'
 import { iniciarCapturaSlug, registrarConversionReserva } from './lib/seguimiento'
 import { UIProvider, useUI } from './lib/uiContext'
@@ -216,17 +221,19 @@ function AppShell() {
       </Suspense>
 
       {showWhatsApp && (
-        <FloatingWhatsApp
-          phoneNumber="56973394530"
-          accountName="Juan Fernández"
-          statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
-          chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
-          placeholder="Escribe tu mensaje..."
-          avatar="/juan.jpg"
-          notification={false}
-          allowClickAway
-          allowEsc
-        />
+        <Suspense fallback={null}>
+          <FloatingWhatsApp
+            phoneNumber="56973394530"
+            accountName="Juan Fernández"
+            statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
+            chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
+            placeholder="Escribe tu mensaje..."
+            avatar="/juan.jpg"
+            notification={false}
+            allowClickAway
+            allowEsc
+          />
+        </Suspense>
       )}
     </div>
   )
