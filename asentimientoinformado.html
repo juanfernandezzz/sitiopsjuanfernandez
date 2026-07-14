@@ -22,14 +22,11 @@
     <link rel="canonical" href="https://psicologojuanfernandez.cl/asentimientoinformado.html" />
 
     <!-- Fonts: mismo set que el sitio principal -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- C31 fix pack: la hoja de fuentes deja de bloquear el primer render.
-         Se precarga con prioridad y se aplica al terminar de descargar; el
-         noscript conserva las fuentes cuando no hay JavaScript. -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Karla:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Karla:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Karla:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" /></noscript>
+    <!-- C31 fix pack 2: fuentes propias servidas desde este dominio (OFL, en
+         public/fonts). Se elimina la cadena de Google Fonts; las caras se
+         declaran en el CSS del sitio y las dos criticas se precargan aqui. -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/fraunces-variable.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/karla-variable.woff2" />
   </head>
   <body>
     <div id="root-asentimiento"></div>

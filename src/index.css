@@ -1,3 +1,30 @@
+/* C31 fix pack 2: fuentes propias (OFL) servidas desde /fonts. Se elimina la
+   cadena de terceros de Google Fonts: sin preconnect, sin hoja externa y con
+   preload directo de las dos caras criticas desde el HTML. El archivo de
+   Fraunces es la variable completa (ejes opsz, wght, SOFT y WONK, todos en
+   uso). EB Garamond solo se usa en el wordmark, peso 400. */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Karla';
+  src: url('/fonts/karla-variable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/fonts/eb-garamond-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
