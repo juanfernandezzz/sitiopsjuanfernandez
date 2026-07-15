@@ -71,102 +71,131 @@
     <meta name="twitter:image" content="https://psicologojuanfernandez.cl/og.jpg" />
     <meta name="twitter:image:alt" content="Juan Fernández, psicólogo clínico, atención online en Chile" />
 
-    <!-- JSON-LD #1: Physician -->
+    <!-- JSON-LD #1: grafo de entidad profesional y servicio (C35, BLUEPRINT Fase 2) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Physician",
-      "@id": "https://psicologojuanfernandez.cl/#prestador",
-      "name": "Juan Fernández",
-      "givenName": "Juan",
-      "familyName": "Fernández",
-      "honorificPrefix": "Psic.",
-      "jobTitle": "Psicólogo Clínico",
-      "medicalSpecialty": "Psychology",
-      "additionalType": "https://schema.org/Psychologist",
-      "description": "Psicólogo clínico con enfoque integrativo (cognitivo-conductual y narrativo). Atención online por videollamada con bono Fonasa MLE o particular.",
-      "image": "https://psicologojuanfernandez.cl/juan.jpg",
-      "url": "https://psicologojuanfernandez.cl/",
-      "telephone": "+56973394530",
-      "email": "juanfernandezpsicologo@gmail.com",
-      "knowsLanguage": ["es", "en"],
-      "sameAs": [
-        "https://www.instagram.com/ps.juanfernandez/",
-        "https://www.facebook.com/psicologojuanfernandez/"
-      ],
-      "areaServed": { "@type": "Country", "name": "Chile" },
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Valparaíso",
-        "addressRegion": "Región de Valparaíso",
-        "addressCountry": "CL"
-      },
-      "availableService": [
+      "@graph": [
         {
-          "@type": "MedicalTherapy",
-          "name": "Psicoterapia individual online (Fonasa MLE)",
-          "description": "Sesión de 45 minutos por videollamada. Cubierta por bono Fonasa MLE códigos 09 08 101 y 09 08 102.",
-          "offers": {
-            "@type": "Offer",
-            "price": "5570",
-            "priceCurrency": "CLP",
-            "description": "Copago con bono Fonasa MLE"
-          }
+          "@type": "MedicalBusiness",
+          "@id": "https://psicologojuanfernandez.cl/#consulta",
+          "name": "Juan Fernández, Psicólogo Clínico",
+          "description": "Consulta psicológica 100% online para adultos en Chile. Sesiones de 45 minutos por videollamada, con bono Fonasa MLE o particular.",
+          "url": "https://psicologojuanfernandez.cl/",
+          "image": "https://psicologojuanfernandez.cl/juan.jpg",
+          "telephone": "+56973394530",
+          "email": "juanfernandezpsicologo@gmail.com",
+          "location": {
+            "@type": "VirtualLocation",
+            "name": "Teleconsulta por Doxy.me, plataforma certificada por Fonasa",
+            "url": "https://doxy.me/psicologojuanfernandez"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Valparaíso",
+            "addressRegion": "Región de Valparaíso",
+            "addressCountry": "CL"
+          },
+          "areaServed": { "@type": "Country", "name": "Chile" },
+          "founder": { "@id": "https://psicologojuanfernandez.cl/#prestador" },
+          "currenciesAccepted": "CLP"
         },
         {
-          "@type": "MedicalTherapy",
-          "name": "Psicoterapia individual particular",
-          "description": "Sesión de 45 minutos por videollamada. Sin previsión.",
-          "offers": {
-            "@type": "Offer",
-            "price": "15000",
-            "priceCurrency": "CLP"
-          }
+          "@type": "Person",
+          "@id": "https://psicologojuanfernandez.cl/#prestador",
+          "name": "Juan Fernández",
+          "givenName": "Juan",
+          "familyName": "Fernández",
+          "honorificPrefix": "Psic.",
+          "jobTitle": "Psicólogo Clínico",
+          "description": "Psicólogo clínico con enfoque integrativo (cognitivo-conductual y narrativo). Atención online por videollamada con bono Fonasa MLE o particular.",
+          "image": "https://psicologojuanfernandez.cl/juan.jpg",
+          "url": "https://psicologojuanfernandez.cl/",
+          "telephone": "+56973394530",
+          "email": "juanfernandezpsicologo@gmail.com",
+          "knowsLanguage": ["es", "en"],
+          "knowsAbout": [
+            "Terapia cognitivo conductual",
+            "Psicología narrativa",
+            "Ansiedad",
+            "Depresión",
+            "Telepsicología"
+          ],
+          "sameAs": [
+            "https://www.instagram.com/ps.juanfernandez/",
+            "https://www.facebook.com/psicologojuanfernandez/"
+          ],
+          "identifier": {
+            "@type": "PropertyValue",
+            "propertyID": "RNPI",
+            "value": "876085"
+          },
+          "hasCredential": [
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Título Profesional",
+              "name": "Título Profesional de Psicólogo, Universidad Viña del Mar (enero 2025)"
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              "credentialCategory": "Registro Nacional de Prestadores Individuales",
+              "name": "RNPI N° 876085",
+              "recognizedBy": {
+                "@type": "Organization",
+                "name": "Superintendencia de Salud de Chile"
+              }
+            }
+          ],
+          "worksFor": { "@id": "https://psicologojuanfernandez.cl/#consulta" }
         },
         {
-          "@type": "MedicalTherapy",
-          "name": "Psicoterapia de pareja online (Fonasa MLE)",
-          "description": "Cubierta por bono Fonasa MLE código 09 08 103.",
-          "offers": {
-            "@type": "Offer",
-            "price": "5570",
-            "priceCurrency": "CLP"
-          }
-        }
-      ],
-      "hasCredential": [
-        {
-          "@type": "EducationalOccupationalCredential",
-          "credentialCategory": "Título Profesional",
-          "name": "Psicólogo Clínico, Universidad Viña del Mar (2025)"
+          "@type": "HealthcareService",
+          "@id": "https://psicologojuanfernandez.cl/#servicio",
+          "name": "Psicoterapia online por videollamada",
+          "description": "Sesiones de psicoterapia de 45 minutos por videollamada, en modalidad Fonasa MLE (códigos 09 08 101, 09 08 102 y 09 08 103) o particular.",
+          "provider": { "@id": "https://psicologojuanfernandez.cl/#consulta" },
+          "serviceType": "Psicoterapia",
+          "areaServed": { "@type": "Country", "name": "Chile" },
+          "availableChannel": {
+            "@type": "ServiceChannel",
+            "name": "Agenda online",
+            "serviceUrl": "https://cal.com/psicologojuanfernandez",
+            "availableLanguage": {
+              "@type": "Language",
+              "name": "Español",
+              "alternateName": "es"
+            }
+          },
+          "offers": [
+            {
+              "@type": "Offer",
+              "name": "Sesión con bono Fonasa MLE",
+              "description": "Copago con bono Fonasa Modalidad Libre Elección, códigos 09 08 101, 09 08 102 y 09 08 103. Sesión de 45 minutos por videollamada.",
+              "price": "5570",
+              "priceCurrency": "CLP"
+            },
+            {
+              "@type": "Offer",
+              "name": "Sesión particular",
+              "description": "Sesión de 45 minutos por videollamada, sin previsión.",
+              "price": "15000",
+              "priceCurrency": "CLP"
+            }
+          ]
         },
         {
-          "@type": "EducationalOccupationalCredential",
-          "credentialCategory": "Registro Nacional de Prestadores Individuales",
-          "name": "RNPI 876085",
-          "recognizedBy": {
-            "@type": "Organization",
-            "name": "Superintendencia de Salud de Chile"
-          }
+          "@type": "WebSite",
+          "@id": "https://psicologojuanfernandez.cl/#website",
+          "url": "https://psicologojuanfernandez.cl/",
+          "name": "Juan Fernández, Psicólogo Clínico",
+          "inLanguage": "es-CL",
+          "publisher": { "@id": "https://psicologojuanfernandez.cl/#prestador" }
         }
       ]
     }
     </script>
 
-    <!-- JSON-LD #2: WebSite -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "@id": "https://psicologojuanfernandez.cl/#website",
-      "url": "https://psicologojuanfernandez.cl/",
-      "name": "Juan Fernández, Psicólogo Clínico",
-      "inLanguage": "es-CL",
-      "publisher": { "@id": "https://psicologojuanfernandez.cl/#prestador" }
-    }
-    </script>
-
-    <!-- JSON-LD #3: FAQPage -->
+    <!-- JSON-LD #2: FAQPage -->
     <!-- MANTENIMIENTO: si editas faqData.js, actualizar también este JSON-LD -->
     <script type="application/ld+json">
     {
