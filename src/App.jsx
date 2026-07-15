@@ -75,11 +75,22 @@ function LazySection({ id, scrollMarginTop = '80px', minHeight, children }) {
     return () => obs.disconnect()
   }, [])
 
+  // C31: content-visibility auto exime a las secciones bajo el pliegue del
+  // layout y del raster del primer frame. Sin esto, el primer paint rasteriza
+  // la pagina completa (10+ alturas de viewport) y en render por software
+  // (celulares de gama baja y los runners de PageSpeed) eso costaba segundos
+  // de pantalla en blanco. contain-intrinsic-size reserva el alto estimado ya
+  // calibrado en minHeight, el mismo que limitaba el CLS del montaje diferido.
   return (
     <div
       ref={ref}
       id={id}
-      style={{ scrollMarginTop, minHeight: visible ? undefined : minHeight }}
+      style={{
+        scrollMarginTop,
+        minHeight: visible ? undefined : minHeight,
+        contentVisibility: 'auto',
+        containIntrinsicSize: minHeight ? `auto ${minHeight}px` : 'auto 800px',
+      }}
     >
       {visible ? <Suspense fallback={null}>{children}</Suspense> : null}
     </div>

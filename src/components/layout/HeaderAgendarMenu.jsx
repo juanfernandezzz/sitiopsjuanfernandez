@@ -116,7 +116,7 @@ export default function HeaderAgendarMenu() {
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-full font-body font-semibold text-sm text-cream bg-terracotta-deep border-b-2 border-[#7C4129] shadow-[0_6px_20px_-8px_rgba(164,88,59,0.55)] px-5 py-3 transition-all duration-200 ease-out will-change-transform hover:bg-[#8E4B33] hover:-translate-y-[1px] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/60 select-none"
+        className="inline-flex items-center gap-1.5 rounded-full font-body font-semibold text-sm text-cream bg-terracotta-deep border-b-2 border-[#7C4129] shadow-[0_6px_20px_-8px_rgba(164,88,59,0.55)] px-5 py-3 transition-all duration-200 ease-out hover:bg-[#8E4B33] hover:-translate-y-[1px] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/60 select-none"
       >
         Agendar
         <svg

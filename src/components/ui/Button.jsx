@@ -68,7 +68,7 @@ const Button = forwardRef(function Button(
     'font-body font-medium',
     'rounded-full',
     'transition-all duration-200 ease-out',
-    'will-change-transform hover:-translate-y-[1px] active:translate-y-0',
+    'hover:-translate-y-[1px] active:translate-y-0',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream',
     'disabled:opacity-50 disabled:pointer-events-none',
     'select-none',
