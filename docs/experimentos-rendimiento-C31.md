@@ -1,7 +1,7 @@
 # Registro de experimentos de rendimiento (ciclo C31)
 
 Objetivo del ciclo: PageSpeed Insights móvil **85 o más** en `https://psicologojuanfernandez.cl/`.
-Estado al cierre de la corrida nocturna del 15 de julio de 2026: **66 a 71** (la varianza propia de
+Estado tras el fix pack 5 (15 de julio de 2026): **63 a 71** (la varianza propia de
 PSI es de unos ±3 puntos). Todo lo demás está al máximo posible; el único bloqueo es el LCP.
 
 Este documento existe para que **ningún ciclo futuro repita los descartes de abajo**. Es el mismo
@@ -49,8 +49,9 @@ de PageSpeed.
 | 6 | Los `blur-3xl` del hero son caros de rasterizar | Reemplazados por gradientes radiales equivalentes | **Hold igual** |
 | 7 | Las animaciones de entrada retienen el paint | Deshabilitadas por completo vía CSS inyectado | Paint observado 2769 → 2804 ms: **ningún efecto** |
 | 8 | Rasterizar la página entera (10+ viewports) en el primer frame | `content-visibility: auto` + `contain-intrinsic-size` en las 6 secciones bajo el pliegue | **Hold igual** |
-| 9 | Las `@font-face` retienen el primer paint aunque tengan swap | Las 3 caras diferidas a un CSS externo cargado tras el primer frame | **Hold igual** |
+| 9 | Las `@font-face` retienen el primer paint aunque tengan swap | Las 3 caras diferidas a un CSS externo cargado tras el primer frame | **NO CONCLUYENTE: se midió solo en local (con GPU), nunca contra PSI.** Repetir antes de descartar (ver sección 7) |
 | 10 | Las fuentes pesan de más | Subseteadas a cobertura latina con fontTools | Ahorro marginal (ya venían subseteadas); **hold igual** |
+| 11 | **Rasterizado procedural por software.** El runner de PSI corre sin GPU; los `feTurbulence` del grano se rasterizan por software en cada pintado. Moverlos a máscara (`656ad60`) les quitó la candidatura a LCP pero no el costo | Fix pack 5: tesela PNG pre-rasterizada de 8,8 KB en vez del filtro SVG. Verificado: cero `feTurbulence` en el DOM servido | **Hold igual: paint observado 2377 ms, 5 fotogramas vacíos, retraso de render 1917 ms.** La familia del raster procedural queda descartada |
 
 ## 3. Bisección local del HTML (servido desde `dist`)
 
@@ -69,6 +70,46 @@ Los efectos **no son aditivos**, lo que sugiere una causa común aguas arriba en
 independientes. Ojo con este método: el Chrome local rasteriza **con GPU**, así que un costo de
 rasterizado por software (el del runner de PSI) **no aparece aquí**. Esa ceguera del instrumento es
 justamente lo que motivó el fix pack 5.
+
+## 3 bis. Bisección de página en el propio PageSpeed (el hallazgo más informativo)
+
+Medir `respira.html` en PSI y compararla con la portada resultó mucho más revelador que toda la
+bisección local, porque compara dos páginas **reales servidas por el mismo runner**.
+
+| | Portada | `respira.html` |
+|---|---|---|
+| Paint observado | 2377 ms | **2304 ms** |
+| Fotogramas vacíos al inicio | 5 | 6 |
+| LCP de laboratorio | 6,7 s | 5,9 s |
+| Puntaje | 63 | 70 |
+| Peso del HTML | 94.925 bytes | **24.923 bytes** |
+| Header fijo | sí | **no** |
+| Foto del hero | sí | **no** |
+| Grano | sí | **no** |
+| Secciones lazy y halos | sí | **no** |
+
+`respira.html` es una cuarta parte del HTML, sin header fijo, sin foto, sin grano, sin secciones bajo
+el pliegue... **y tiene el mismo hold de ~2,3 s**.
+
+**Esto descarta con evidencia dura, y sin necesidad de tocar el diseño:**
+
+- **El header fijo.** Era la única pista abierta que exigía una decisión de diseño de Juan (el CTA
+  "Agendar" siempre visible). Ya no hace falta tocarlo: no es la causa. Los ~650 ms que le atribuía
+  la bisección local eran un artefacto del entorno con GPU.
+- La foto del hero, el grano, los halos, el tamaño del DOM y las secciones bajo el pliegue.
+
+**Lo que las dos páginas comparten, y por lo tanto es donde queda acorralada la causa:**
+
+1. El CSS común `/assets/index-*.css`, con las tres `@font-face`.
+2. Las webfonts (Fraunces, Karla, EB Garamond), todas con `font-display: swap`.
+3. El inyector que difiere el bundle hasta después del primer frame (`scripts/prerender.mjs`).
+4. La estructura de prerender más hidratación, y el hosting de Netlify.
+
+La pista más fuerte es el par CSS + webfonts, y encaja con la bisección local: un body mínimo con el
+head intacto pero **texto en Georgia** pinta en 113 ms, y forzar Georgia en el hero completo bajaba
+el paint de ~1900 a 1281 ms. El experimento 9 (diferir las `@font-face`) se midió solo en local, con
+GPU, así que **conviene repetirlo contra PSI antes de darlo por descartado**: es la prueba pendiente
+más barata y de mayor valor.
 
 ## 4. Datos de campo (CrUX), que son los que Google usa para rankear
 
@@ -104,11 +145,21 @@ aparece como "No superada" por el LCP.
 - El rastreo de consola y de red de la extensión **arranca recién al invocarlo**: hay que recargar
   *después* de activarlo, o se lee un vacío falso.
 
-## 7. Pistas abiertas
+## 7. Pistas abiertas (actualizado tras el fix pack 5)
 
-1. **Rasterizado por software (fix pack 5, en prueba).** El runner de PSI corre sin GPU. Los
-   `feTurbulence` del grano se rasterizaban por software en cada pintado; moverlos a máscara (commit
-   `656ad60`) les quitó la candidatura a LCP pero **no el costo**. El fix pack 5 los reemplaza por
-   una tesela PNG pre-rasterizada. Si el hold cede, el residuo a mirar son los `mix-blend-mode`.
-2. **El header fijo.** La bisección local le atribuye unos 650 ms. Tocarlo afecta la UX del CTA
-   "Agendar" siempre visible: **es una decisión de diseño de Juan**, no técnica.
+1. **CSS común más webfonts.** Es lo que queda en pie tras la bisección de página: lo único
+   compartido por la portada y `respira.html`, que exhiben el mismo hold pese a no compartir casi
+   nada más. Prueba pendiente más barata: repetir el experimento 9 (diferir las tres `@font-face` a
+   un CSS externo cargado tras el primer frame) **midiendo contra PSI**, no en local. Ojo con la
+   hipótesis nula: `font-display: swap` debería pintar con la fuente de reserva de inmediato, así
+   que si las fuentes retienen el paint, algo rompe ese contrato y vale la pena entender qué.
+2. **Los `mix-blend-mode`.** Quedan dos usos (`multiply` en el grano del fondo, `overlay` en el de la
+   foto), pero `respira.html` **no los tiene** y aun así muestra el hold: baja prioridad.
+3. **El runner de PSI en sí.** Vale considerar que el hold sea un piso del entorno (arranque en frío
+   del renderizador sin GPU) y no algo del sitio. A favor: el campo real (CrUX) mide 3,4 s, muy por
+   debajo del laboratorio, y ningún cambio en cinco deploys lo movió un milímetro. Antes de gastar
+   otro ciclo persiguiéndolo, conviene comparar el mismo perfil de filmstrip contra un sitio de
+   referencia liviano y conocido.
+
+**Descartado y cerrado:** el header fijo. La bisección de página lo prueba (ver sección 3 bis). No
+hace falta tocar el diseño del CTA.
