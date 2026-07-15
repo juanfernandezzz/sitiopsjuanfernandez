@@ -115,6 +115,34 @@ for (const pagina of PAGINAS) {
   html = html.replace(marcador, `<div id="${pagina.raizDom}">${contenido}</div>`)
   html = html.replace('</head>', `${RESPALDO_NOSCRIPT}</head>`)
 
+  // C31 fix pack 6: se inlinan las hojas de estilo. El unico recurso que
+  // bloqueaba el primer pintado era el <link rel="stylesheet"> del CSS del
+  // sitio (26 KB): en el simulador de PageSpeed, sin importar su peso, agrega
+  // una ida y vuelta de red completa antes de que el navegador pueda pintar el
+  // HTML ya prerenderizado, y ese es el retraso de render que infla el LCP. Al
+  // incrustar el CSS en el <head>, llega con el propio documento: cero requests
+  // que bloqueen, el navegador pinta apenas parsea el HTML. Las caras de fuente
+  // siguen cargando por @font-face con swap (no bloquean). Compensacion: el CSS
+  // deja de cachearse por separado entre paginas; a 6 KB gzip y con visitantes
+  // que aterrizan en una pagina, el intercambio favorece el primer pintado.
+  html = html.replace(
+    /[ \t]*<link rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>\r?\n?/g,
+    (coincidencia, href) => {
+      const rutaCss = path.join(DIST, href.replace(/^\//, ''))
+      let css
+      try {
+        css = fs.readFileSync(rutaCss, 'utf8')
+      } catch {
+        console.error(`[prerender] ${pagina.archivo}: no se pudo leer el CSS ${href}`)
+        errores += 1
+        return coincidencia
+      }
+      // El cierre </style> dentro del CSS es imposible en CSS valido, pero se
+      // neutraliza por prudencia para no romper el parseo del HTML.
+      return `<style>${css.replace(/<\/style>/gi, '<\\/style>')}</style>`
+    }
+  )
+
   // C31: el bundle completo (descarga Y ejecucion) se difiere hasta despues
   // del primer frame pintado. Con la etiqueta <script type="module"> y los
   // <link rel="modulepreload"> normales, todo el JS baja y se evalua antes de
