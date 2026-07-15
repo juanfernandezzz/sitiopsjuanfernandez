@@ -50,7 +50,9 @@ const VARS_RITMO = {
 
 export default function RespiraVisor() {
   const [running, setRunning] = useState(false);
-  const [k] = useState(generarCaleidoscopio);
+  // C31 fix pack 3: semilla fija para que servidor y cliente dibujen el mismo
+  // caleidoscopio y la hidratacion conserve el HTML prerenderizado.
+  const [k] = useState(() => generarCaleidoscopio(45));
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
 
   const idCeldaA = `celdaA-${uid}`;

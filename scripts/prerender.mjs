@@ -92,6 +92,18 @@ for (const pagina of PAGINAS) {
 
   const contenido = await render(pagina.clave)
 
+  // Guardia de determinismo (C31 fix pack 3): el mismo render dos veces debe
+  // dar bytes identicos. Si difiere, hay azar en el arbol y la hidratacion de
+  // React descartaria el HTML en el navegador; mejor que falle el build aqui.
+  const contenidoBis = await render(pagina.clave)
+  if (contenido !== contenidoBis) {
+    console.error(
+      `[prerender] ${pagina.archivo}: render NO determinista (dos pasadas difieren); hay azar en el arbol de React`
+    )
+    errores += 1
+    continue
+  }
+
   if (contenido.length < MINIMO_CARACTERES) {
     console.error(
       `[prerender] ${pagina.archivo}: render sospechosamente corto (${contenido.length} caracteres)`

@@ -78,9 +78,28 @@ export const RESPIRA_TEXTO = {
   puenteCta: 'Agendar una sesión',
 };
 
-const alea = (min, max) => min + Math.random() * (max - min);
+// C31 fix pack 3: azar con semilla opcional. En la web, el servidor (prerender)
+// y el cliente (hidratacion) deben producir EXACTAMENTE el mismo arte: si las
+// cantidades o coordenadas difieren, React detecta el desajuste (#418), descarta
+// el HTML prerenderizado y lo rearma en el cliente. Con semilla numerica la
+// secuencia es reproducible; sin semilla (como la usa la app) se conserva el
+// azar de siempre.
+const crearRnd = (semilla) => {
+  let a = semilla >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+let rnd = Math.random;
+
+const alea = (min, max) => min + rnd() * (max - min);
 const r1 = (n) => Math.round(n * 10) / 10;
-const elegir = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const elegir = (arr) => arr[Math.floor(rnd() * arr.length)];
 
 // Paleta de marca con techo de opacidad por color (seguridad visual).
 const PALETA = [
@@ -115,7 +134,8 @@ function hoja() {
   return { d, ext: Math.hypot(sesgo, largo) };
 }
 
-export function generarCaleidoscopio() {
+export function generarCaleidoscopio(semilla) {
+  rnd = typeof semilla === 'number' ? crearRnd(semilla) : Math.random;
   const hojas = Array.from({ length: elegir([2, 3]) }, () => {
     const c = elegir(PALETA);
     const h = hoja();
