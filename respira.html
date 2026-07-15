@@ -14,13 +14,22 @@
 
     <!-- Google tag (gtag.js): pagina publica indexable, lleva la etiqueta de
          medicion (GA4 + conversiones de Google Ads), igual que el inicio. -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RWPN108JJE"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-RWPN108JJE');
       gtag('config', 'AW-18178105505');
+      // C31: gtag se carga tras window.load para no ocupar el hilo principal
+      // antes del primer paint; la cola dataLayer conserva lo registrado.
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RWPN108JJE';
+          document.head.appendChild(s);
+        }, 0);
+      });
     </script>
 
     <!-- SEO (indexable: es una página de valor, no legal) -->

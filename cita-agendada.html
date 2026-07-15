@@ -8,13 +8,22 @@
     <!-- Google tag (gtag.js): mide la conversion de reserva por carga de pagina
          y el evento GA4 'cita_agendada'. Esta pagina es de las publicas que
          llevan la etiqueta; las paginas legales y clinicas no la llevan. -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RWPN108JJE"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-RWPN108JJE');
       gtag('config', 'AW-18178105505');
+      // C31: gtag se carga tras window.load; la cola dataLayer conserva la
+      // conversion de reserva registrada antes de que cargue el script.
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RWPN108JJE';
+          document.head.appendChild(s);
+        }, 0);
+      });
     </script>
 
     <!-- Favicons -->

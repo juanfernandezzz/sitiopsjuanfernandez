@@ -6,6 +6,10 @@ import './index.css'
 // C31: si el build prerenderizo la pagina (SSG), la raiz llega con HTML y
 // React hidrata sobre ese DOM en vez de montarlo desde cero. En desarrollo
 // la raiz llega vacia y se monta como antes.
+//
+// El "pintar primero, hidratar despues" NO vive aca: scripts/prerender.mjs
+// difiere la inyeccion del bundle completo hasta despues del primer frame.
+// Cuando este codigo corre, el paint inicial ya ocurrio; hidratar de inmediato.
 const raiz = document.getElementById('root')
 const elemento = (
   <React.StrictMode>

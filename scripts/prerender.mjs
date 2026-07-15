@@ -115,6 +115,29 @@ for (const pagina of PAGINAS) {
   html = html.replace(marcador, `<div id="${pagina.raizDom}">${contenido}</div>`)
   html = html.replace('</head>', `${RESPALDO_NOSCRIPT}</head>`)
 
+  // C31: el bundle completo (descarga Y ejecucion) se difiere hasta despues
+  // del primer frame pintado. Con la etiqueta <script type="module"> y los
+  // <link rel="modulepreload"> normales, todo el JS baja y se evalua antes de
+  // la primera oportunidad de paint del HTML ya prerenderizado, y PageSpeed
+  // imputa esa cadena completa (red mas CPU) como retraso de render del LCP.
+  // Tras el paint, el modulo inyectado trae sus dependencias por si mismo. El
+  // costo real es que la pagina se vuelve interactiva una fraccion despues;
+  // el contenido ya era visible y legible desde el primer frame.
+  // Tres vias de arranque, gana la primera: doble rAF (pestana visible, tras
+  // el primer paint), window.load mas un respiro (pestanas en segundo plano,
+  // donde rAF no dispara), y un temporizador de seguridad absoluto.
+  html = html.replace(/[ \t]*<link rel="modulepreload"[^>]*>\r?\n?/g, '')
+  html = html.replace(
+    /<script type="module" crossorigin src="([^"]+)"><\/script>/g,
+    (_coincidencia, src) =>
+      '<script>(function(){var hecho=false;function arrancar(){if(hecho)return;hecho=true;' +
+      'var s=document.createElement("script");s.type="module";s.crossOrigin="";' +
+      `s.src="${src}";document.head.appendChild(s)}` +
+      'requestAnimationFrame(function(){requestAnimationFrame(function(){setTimeout(arrancar,0)})});' +
+      'window.addEventListener("load",function(){setTimeout(arrancar,150)});' +
+      'setTimeout(arrancar,2500)})()</script>'
+  )
+
   for (const texto of pagina.textosRequeridos) {
     if (!html.includes(texto)) {
       console.error(`[prerender] ${pagina.archivo}: falta el texto canonico "${texto}"`)

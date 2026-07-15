@@ -73,24 +73,43 @@ export default function Hero() {
       className="relative bg-cream text-ink overflow-hidden"
       aria-label="Presentación"
     >
-      {/* Textura de grano sutil */}
+      {/* Textura de grano sutil. C31: el ruido va como mask-image sobre un color
+          plano (mismo pixel resultante que la version background-image con
+          feColorMatrix), porque un background-image que cubre la seccion entera
+          es candidato a LCP y el simulador de PageSpeed le imputaba segundos de
+          retraso de render. Las mascaras no son contenido elegible para LCP. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-multiply"
         style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.23  0 0 0 0 0.30  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          backgroundColor: 'rgb(41, 59, 77)',
+          WebkitMaskImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
+          maskImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
         }}
       />
 
-      {/* Acentos geométricos discretos */}
+      {/* Acentos geométricos discretos. C31: gradiente radial en vez de circulo
+          con blur-3xl; el desenfoque de 64px sobre cajas de 400px es muy caro de
+          rasterizar en el primer frame (render por software en moviles de gama
+          baja y en los runners de PageSpeed) y retrasaba el primer paint. El
+          gradiente produce el mismo halo suave con rasterizado barato. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-sage-light/20 blur-3xl"
+        className="pointer-events-none absolute -top-24 -right-24 w-[420px] h-[420px]"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(168,181,160,0.20) 0%, rgba(168,181,160,0.17) 45%, rgba(168,181,160,0.07) 75%, transparent 100%)',
+        }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-32 left-[-80px] w-[360px] h-[360px] rounded-full bg-terracota/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 left-[-80px] w-[360px] h-[360px]"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(201,123,94,0.10) 0%, rgba(201,123,94,0.085) 45%, rgba(201,123,94,0.035) 75%, transparent 100%)',
+        }}
       />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-8 lg:pt-14 pb-12 lg:pb-16">
@@ -202,7 +221,10 @@ export default function Hero() {
           {/* Columna foto: borde fino sage definido (sin marco de relleno offwhite,
               que se leía como marco pálido de bajo contraste). Mobile más grande
               para reforzar la señal de competencia del headshot sin que domine el CTA. */}
-          <div className="anim-fade lg:col-span-2" style={delay(200)}>
+          {/* C31: la foto es el candidato LCP legitimo; sin animacion de entrada
+              para que su primer paint contable no espere una opacidad en 0. El
+              texto conserva su entrada escalonada. */}
+          <div className="lg:col-span-2">
             <div className="mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:max-w-none">
               <div
                 className="relative w-full overflow-hidden rounded-2xl ring-1 ring-sage/30 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
