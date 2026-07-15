@@ -73,20 +73,20 @@ export default function Hero() {
       className="relative bg-cream text-ink overflow-hidden"
       aria-label="Presentación"
     >
-      {/* Textura de grano sutil. C31: el ruido va como mask-image sobre un color
-          plano (mismo pixel resultante que la version background-image con
-          feColorMatrix), porque un background-image que cubre la seccion entera
-          es candidato a LCP y el simulador de PageSpeed le imputaba segundos de
-          retraso de render. Las mascaras no son contenido elegible para LCP. */}
+      {/* Textura de grano sutil. C31 fix pack 5: tesela PNG pre-rasterizada en
+          vez de feTurbulence. El filtro SVG se rasteriza por software en
+          entornos sin GPU (el runner de PageSpeed y los moviles de gama baja)
+          y retiene el primer pintado; el PNG ya viene rasterizado. Sigue como
+          mascara sobre color plano: las mascaras no son candidatas a LCP.
+          Opacidad recalibrada (0.05 a 0.03) porque la tesela trae el alfa a
+          rango completo, sin el 0.6 que traia el rect del SVG. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-multiply"
+        className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-multiply"
         style={{
           backgroundColor: 'rgb(41, 59, 77)',
-          WebkitMaskImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
-          maskImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>\")",
+          WebkitMaskImage: "url('/textures/grano-128.png')",
+          maskImage: "url('/textures/grano-128.png')",
         }}
       />
 
@@ -251,8 +251,7 @@ export default function Hero() {
                     aria-hidden="true"
                     className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay"
                     style={{
-                      backgroundImage:
-                        "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                      backgroundImage: "url('/textures/grano-128.png')",
                     }}
                   />
                 </div>
