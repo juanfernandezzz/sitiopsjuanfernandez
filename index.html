@@ -28,6 +28,34 @@
       });
     </script>
 
+    <!-- Umami (C37): medicion sin cookies, complementaria a la etiqueta de
+         Google. Carga tras window.load, igual que gtag, para no ocupar el
+         hilo principal antes del primer paint. El identificador del sitio lo
+         inyecta el ciclo de aplicacion; si esta vacio, el script no se carga
+         y el sitio funciona igual. -->
+    <script>
+      window.UMAMI_WEBSITE_ID = '7c99c23d-9dce-4756-a3fb-7fe4df9b88e4';
+      window.umamiCola = window.umamiCola || [];
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          if (!window.UMAMI_WEBSITE_ID) return;
+          var u = document.createElement('script');
+          u.defer = true;
+          u.src = 'https://cloud.umami.is/script.js';
+          u.setAttribute('data-website-id', window.UMAMI_WEBSITE_ID);
+          u.onload = function () {
+            try {
+              if (window.umami && typeof window.umami.track === 'function') {
+                window.umamiCola.forEach(function (ev) { window.umami.track(ev); });
+                window.umamiCola.length = 0;
+              }
+            } catch (e) {}
+          };
+          document.head.appendChild(u);
+        }, 0);
+      });
+    </script>
+
     <!-- Favicons (set completo: SVG vectorial + PNGs para cada contexto) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />

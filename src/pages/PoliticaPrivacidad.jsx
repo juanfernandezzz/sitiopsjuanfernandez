@@ -6,11 +6,17 @@ import { LEGAL, CONTACTO, PRESTADOR, URLS_EXTERNAS } from '../lib/contacto';
  * El texto es cita textual del bloque canonico definido en C9.
  * No parafrasear sin permiso explicito de Juan.
  *
- * Enmienda C27 (medicion de Google Ads): al instalar la etiqueta de Google en
- * las paginas publicas, dos bloques se actualizaron para reflejar la realidad y
- * cumplir la transparencia de la Ley 21.719: la nota de la seccion 2 (antes
- * afirmaba que no se usa Google Analytics) y la seccion 9 (cookies y rastreo).
- * Cambio pendiente de validacion de wording por Juan.
+ * Enmienda C27 (medicion de Google Ads): la nota de la seccion 2 y la
+ * seccion 9 se actualizaron al instalar la etiqueta de Google.
+ *
+ * Enmienda C37 (auditoria contra el texto oficial de la Ley 21.719, Diario
+ * Oficial 13-dic-2024): version explicita (art. 14 ter a), universo de
+ * titulares y base de licitud de la medicion (14 ter d, arts. 12 y 13),
+ * derecho de bloqueo (arts. 4 y 8 ter), plazos y gratuidad (arts. 10 y 11),
+ * via de reclamo ante la Agencia (14 ter g, art. 41), transferencias
+ * internacionales en los terminos del art. 27, declaracion de no
+ * perfilamiento (14 ter l) y alta de Umami como encargado de medicion.
+ * Wording aprobado por Juan en C37.
  */
 
 const STYLES = {
@@ -87,7 +93,8 @@ export default function PoliticaPrivacidad() {
         Política de Privacidad
       </h1>
       <p style={STYLES.fecha}>
-        Última actualización: {LEGAL.ultimaActualizacionPolitica}
+        Última actualización: {LEGAL.ultimaActualizacionPolitica} (versión{' '}
+        {LEGAL.versionPolitica})
       </p>
 
       <p style={STYLES.intro}>
@@ -129,6 +136,11 @@ export default function PoliticaPrivacidad() {
       <h2 className="font-display" style={STYLES.h2}>
         2. Qué datos recopilo
       </h2>
+      <p style={STYLES.p}>
+        Mis bases de datos comprenden a pacientes adultos, a adultos
+        responsables de adolescentes en atención y a personas que visitan el
+        sitio o me escriben para orientarse antes de agendar.
+      </p>
       <p style={STYLES.subhead}>Datos que tú me entregas:</p>
       <ul style={STYLES.ul}>
         <li style={STYLES.li}>
@@ -164,6 +176,11 @@ export default function PoliticaPrivacidad() {
         política: esas quedan libres de medición publicitaria. Esta medición no
         recibe ningún dato clínico ni de salud, ni el motivo de tu consulta, ni
         el tipo de sesión que reservas.
+      </p>
+      <p style={STYLES.p}>
+        En esas mismas páginas públicas uso Umami, una herramienta de medición
+        complementaria que cuenta visitas y reservas de forma agregada, no usa
+        cookies y no almacena tu dirección IP.
       </p>
 
       {/* 3 */}
@@ -208,7 +225,16 @@ export default function PoliticaPrivacidad() {
           Ejecución del contrato de prestación de servicios profesionales que
           iniciamos al agendar.
         </li>
+        <li style={STYLES.li}>
+          Mi interés legítimo en medir el funcionamiento del sitio y el
+          resultado de la publicidad (cuántas personas visitan y cuántas
+          reservan), sin datos clínicos. Puedes oponerte a esta medición en
+          cualquier momento (ver sección 8).
+        </li>
       </ul>
+      <p style={STYLES.p}>
+        No tomo decisiones automatizadas ni elaboro perfiles con tus datos.
+      </p>
 
       {/* 5 */}
       <h2 className="font-display" style={STYLES.h2}>
@@ -258,13 +284,25 @@ export default function PoliticaPrivacidad() {
           llamadas a funciones serverless necesarias para el formulario de
           consentimiento. Logs anonimizados.
         </li>
+        <li style={STYLES.li}>
+          Google (medición): recibe identificadores técnicos de navegación en
+          las páginas públicas para contar visitas (Google Analytics 4) y
+          conversiones de Google Ads. Nunca recibe datos clínicos ni el motivo
+          de tu consulta.
+        </li>
+        <li style={STYLES.li}>
+          Umami (medición sin cookies): cuenta visitas y reservas de forma
+          agregada, sin cookies y sin almacenar tu dirección IP.
+        </li>
       </ul>
       <p style={STYLES.p}>
-        Algunos de estos proveedores procesan datos fuera de Chile (servidores
-        en Estados Unidos o Europa). He verificado que cada uno entrega
-        garantías razonables de seguridad y cumple estándares internacionales
-        aplicables (cifrado en tránsito, ISO 27001 o equivalente cuando
-        corresponde).
+        Estos proveedores procesan datos fuera de Chile (servidores en Estados
+        Unidos o Europa). Mientras la autoridad chilena no declare qué países
+        ofrecen niveles adecuados de protección, estas transferencias se
+        amparan en las garantías que reconoce el artículo 27 de la{' '}
+        {LEGAL.leyDatosFutura}: cláusulas contractuales de protección de datos
+        suscritas con cada proveedor y, cuando corresponde, la necesidad de
+        ejecutar el contrato de atención que iniciamos al agendar.
       </p>
 
       {/* 7 */}
@@ -303,6 +341,10 @@ export default function PoliticaPrivacidad() {
           mantenerlos (como la ficha clínica, que sí debo mantener 15 años).
         </li>
         <li style={STYLES.li}>Oponerte a usos específicos.</li>
+        <li style={STYLES.li}>
+          Solicitar el bloqueo temporal del tratamiento mientras se resuelve
+          una solicitud de rectificación, supresión u oposición.
+        </li>
         <li style={STYLES.li}>Portar tus datos hacia otro prestador.</li>
         <li style={STYLES.li}>
           Retirar tu consentimiento en cualquier momento (lo que no afecta lo
@@ -315,7 +357,17 @@ export default function PoliticaPrivacidad() {
           {CONTACTO.email}
         </a>{' '}
         con tu nombre completo, RUT y el derecho específico que quieres
-        ejercer. Respondo dentro de los plazos legales aplicables.
+        ejercer. Acusaré recibo y responderé dentro de 30 días corridos,
+        prorrogables por una sola vez hasta por otros 30 cuando la solicitud
+        lo requiera. Ejercer los derechos de rectificación, supresión y
+        oposición es siempre gratuito; el acceso y la portabilidad son
+        gratuitos al menos una vez por trimestre.
+      </p>
+      <p style={STYLES.p}>
+        Si rechazo tu solicitud o no respondo a tiempo, puedes reclamar ante
+        la {LEGAL.autoridadDatos}, la autoridad que crea la{' '}
+        {LEGAL.leyDatosFutura}, dentro de los 30 días hábiles siguientes. Es
+        un derecho tuyo y mi deber informártelo.
       </p>
 
       {/* 9 */}
@@ -342,8 +394,15 @@ export default function PoliticaPrivacidad() {
         >
           tools.google.com/dlpage/gaoptout
         </a>
-        . El tratamiento de estos datos se rige por la {LEGAL.leyDatosVigente} y,
-        desde el {LEGAL.vigenciaPlena21719}, por la {LEGAL.leyDatosFutura}.
+        . Esta medición se basa en mi interés legítimo (sección 4) y puedes
+        oponerte a ella en cualquier momento escribiéndome, además de
+        bloquearla desde tu navegador. El tratamiento de estos datos se rige
+        por la {LEGAL.leyDatosVigente} y, desde el {LEGAL.vigenciaPlena21719},
+        por la {LEGAL.leyDatosFutura}.
+      </p>
+      <p style={STYLES.p}>
+        Umami, la herramienta de medición complementaria, no instala cookies
+        ni guarda identificadores personales.
       </p>
 
       {/* 10 */}

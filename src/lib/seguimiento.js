@@ -133,4 +133,16 @@ export function dispararEventoCita() {
   } catch {
     /* sin gtag cargado: la conversion por URL ya quedo cubierta */
   }
+  // C37: mismo evento hacia Umami (medicion sin cookies). Si su script aun
+  // no carga (llega tras window.load), el evento queda en la cola que el
+  // loader del <head> vacia al terminar de cargar.
+  try {
+    if (window.umami && typeof window.umami.track === 'function') {
+      window.umami.track('cita_agendada');
+    } else if (Array.isArray(window.umamiCola)) {
+      window.umamiCola.push('cita_agendada');
+    }
+  } catch {
+    /* sin Umami disponible: la medicion de Google ya cubrio la conversion */
+  }
 }
