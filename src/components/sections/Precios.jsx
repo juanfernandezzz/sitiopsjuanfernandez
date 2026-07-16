@@ -82,10 +82,10 @@ export default function Precios() {
             className="font-display text-4xl md:text-5xl text-ink mb-5"
             style={{ fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
           >
-            Precios y formas de pago
+            ¿Cuánto cuesta la terapia online?
           </h2>
           <p className="font-body text-lg text-ink/75 leading-relaxed">
-            Misma duración y dedicación, independiente del modo de pago.
+            {`Con bono Fonasa Modalidad Libre Elección pagas un copago de ${PRECIOS.fonasaCopago.display}. La sesión particular cuesta ${PRECIOS.particular.display}. Misma dedicación, independiente del modo de pago.`}
           </p>
         </motion.div>
 
@@ -268,7 +268,7 @@ export default function Precios() {
                 </span>
               </p>
               <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                Sin previsión requerida. Comprobante para reembolso de Isapre cuando aplique.
+                Si tienes Isapre, otra previsión de salud o ninguna. Incluye boleta de honorarios para solicitar reembolso en tu Isapre o seguro complementario, según la cobertura de tu plan.
               </p>
               <div className="mt-auto flex flex-col gap-4">
                 <Button
@@ -336,6 +336,49 @@ export default function Precios() {
             </motion.article>
           </div>
         </div>
+
+        {/* C36 (BLUEPRINT Fase 3): tabla resumen extraíble. Estructura semántica
+            real (table/caption/th scope) para crawlers y respuesta rápida; los
+            cards de arriba conservan el trabajo de conversión con sus CTAs. */}
+        <motion.div variants={item} className="mt-12 lg:mt-16 overflow-x-auto">
+          <table className="w-full font-body text-[15px] text-ink/85" style={{ borderCollapse: 'collapse', minWidth: 480 }}>
+            <caption className="text-left font-body text-[13px] uppercase tracking-[0.18em] text-sage pb-4">
+              Resumen de valores
+            </caption>
+            <thead>
+              <tr className="border-b border-sage/25 text-left">
+                <th scope="col" className="py-3 pr-4 font-semibold text-ink">Sesión</th>
+                <th scope="col" className="py-3 pr-4 font-semibold text-ink">Código Fonasa MLE</th>
+                <th scope="col" className="py-3 font-semibold text-ink">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-sage/15">
+                <th scope="row" className="py-3 pr-4 font-normal text-left">Primera sesión con bono Fonasa</th>
+                <td className="py-3 pr-4">09 08 101</td>
+                <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
+              </tr>
+              <tr className="border-b border-sage/15">
+                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión de avance con bono Fonasa</th>
+                <td className="py-3 pr-4">09 08 102</td>
+                <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
+              </tr>
+              <tr className="border-b border-sage/15">
+                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión de pareja con bono Fonasa</th>
+                <td className="py-3 pr-4">09 08 103</td>
+                <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
+              </tr>
+              <tr className="border-b border-sage/15">
+                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión particular</th>
+                <td className="py-3 pr-4">No aplica</td>
+                <td className="py-3">{PRECIOS.particular.display}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p className="font-body text-[13.5px] text-ink/60 mt-3 leading-relaxed">
+            Copago con bono Fonasa en Modalidad Libre Elección, tramos B, C y D. Valores en pesos chilenos.
+          </p>
+        </motion.div>
       </motion.div>
     </section>
   );

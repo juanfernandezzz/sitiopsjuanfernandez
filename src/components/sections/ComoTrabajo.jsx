@@ -231,7 +231,7 @@ export default function ComoTrabajo() {
               letterSpacing: '-0.01em',
             }}
           >
-            Y conectarte es simple
+            ¿Cómo te conectas a la sesión online?
           </motion.h3>
 
           <motion.ol

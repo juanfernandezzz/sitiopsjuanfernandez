@@ -16,7 +16,7 @@
  */
 export const SOBRE_MI = {
   eyebrow: 'Sobre mí',
-  titulo: 'Quién te acompaña en cada sesión.',
+  titulo: '¿Quién te acompaña en cada sesión?',
   bio: 'La vida moderna nos mantiene siempre en movimiento, pero mereces un espacio seguro y profesional centrado en ti. Soy Juan Fernández, psicólogo clínico, y te acompaño a lidiar con aquello que te frena, dando un nuevo significado a tus experiencias. Toma el primer paso hacia tu bienestar desde la comodidad de tu hogar.',
   enfoque: {
     titulo: 'El enfoque',

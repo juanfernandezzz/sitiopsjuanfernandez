@@ -69,11 +69,16 @@ export function OpcionesAgendar({ onPick, autoFocusFirst = false }) {
               : 'rgba(63,91,74,0.18)';
           }}
         >
-          <span className="font-body font-semibold text-ink block" style={{ fontSize: 15 }}>
-            {op.titulo}
+          <span className="flex items-baseline justify-between gap-3">
+            <span className="font-body font-semibold text-ink" style={{ fontSize: 15 }}>
+              {op.titulo}
+            </span>
+            <span className="font-body font-semibold text-sage flex-shrink-0" style={{ fontSize: 14 }}>
+              {op.precio}
+            </span>
           </span>
           <span className="font-body text-ink/70 block" style={{ fontSize: 13.5, marginTop: 2 }}>
-            {op.detalleModal}
+            {op.detalle}
           </span>
         </button>
       ))}

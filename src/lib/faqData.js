@@ -14,7 +14,7 @@ import { PRECIOS } from './precios';
 export const FAQ_ITEMS = [
   {
     q: '¿Cómo saber si la terapia es para mí?',
-    a: 'Si llevas más de un par de semanas con algo que te incomoda: ansiedad, tristeza, una decisión difícil, una sensación que no logras nombrar. Vale la pena conversarlo. La primera sesión es para conocernos y entender juntos qué te trae. Si después no quieres continuar, no hay compromiso.',
+    a: 'Si llevas más de un par de semanas con algo que te incomoda (ansiedad, tristeza, una decisión difícil, una sensación que no logras nombrar), vale la pena conversarlo. La primera sesión es para conocernos y entender juntos qué te trae. Si después no quieres continuar, no hay compromiso.',
   },
   {
     q: '¿La terapia online funciona igual que la presencial?',
@@ -36,12 +36,16 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una sesión?',
-    a: `Hay dos modalidades: sesión particular por ${PRECIOS.particular.display}, o sesión con bono Fonasa por ${PRECIOS.fonasaCopago.display} (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión.`,
+    a: `Hay dos modalidades: sesión particular por ${PRECIOS.particular.display}, o sesión con bono Fonasa Modalidad Libre Elección por ${PRECIOS.fonasaCopago.display} (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión.`,
   },
   {
     q: '¿Cómo compro un bono Fonasa?',
     a: 'Puedes comprarlo online desde Mi Fonasa con tu ClaveÚnica, o presencial en sucursales Fonasa, Caja Los Andes, Caja Los Héroes, ChileAtiende y Servipag. Lo importante: compra el bono ANTES de la sesión y envíame el folio por WhatsApp para validarlo.',
     cta: { label: 'Ver guía paso a paso →', action: 'openFonasaModal' },
+  },
+  {
+    q: '¿Qué pasa si tengo Isapre o un seguro complementario?',
+    a: `Puedes atenderte en modalidad particular por ${PRECIOS.particular.display}: recibes una boleta de honorarios por la atención psicológica, que te sirve para solicitar reembolso en tu Isapre o seguro complementario, según la cobertura de tu plan. El bono Fonasa es solo para afiliados de Fonasa y no incluye boleta: son vías separadas. Si no conoces tu cobertura, confírmala con tu Isapre o aseguradora antes de agendar.`,
   },
   {
     q: '¿Qué pasa en la primera sesión?',

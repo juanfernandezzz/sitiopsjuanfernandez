@@ -34,7 +34,7 @@ export default function Agendar() {
           <TarjetaSesion
             titulo={s.titulo}
             precio={s.precio}
-            detalle={s.detalleApp}
+            detalle={s.detalle}
             destacada={s.destacada}
             cta={s.cta}
             onPress={() => abrirAgenda(CAL_EVENTS[s.key])}

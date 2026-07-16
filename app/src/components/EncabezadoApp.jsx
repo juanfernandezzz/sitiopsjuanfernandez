@@ -130,7 +130,7 @@ function HojaAgendar({ abierta, alCerrar }) {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.opcionTitulo}>{s.titulo}</Text>
                   <Text style={styles.opcionPrecio}>{s.precio}</Text>
-                  <Text style={styles.opcionDetalle}>{s.detalleApp}</Text>
+                  <Text style={styles.opcionDetalle}>{s.detalle}</Text>
                 </View>
                 <Feather name="chevron-right" size={20} color={COLORS.inkFaint} />
               </Pressable>
