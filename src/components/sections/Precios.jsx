@@ -268,7 +268,7 @@ export default function Precios() {
                 </span>
               </p>
               <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                Si tienes Isapre, otra previsión de salud o ninguna. Incluye boleta de honorarios para solicitar reembolso en tu Isapre o seguro complementario, según la cobertura de tu plan.
+                Si tienes otra previsión de salud o ninguna. Incluye boleta de honorarios para solicitar reembolso en tu Isapre o seguro complementario, en los casos que aplique.
               </p>
               <div className="mt-auto flex flex-col gap-4">
                 <Button
