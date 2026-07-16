@@ -1,4 +1,11 @@
-import { PRESTADOR, CONTACTO, REDES, LEGAL, FONASA_CODIGOS } from '../../lib/contacto';
+import {
+  PRESTADOR,
+  CONTACTO,
+  REDES,
+  LEGAL,
+  FONASA_CODIGOS,
+  URLS_EXTERNAS,
+} from '../../lib/contacto';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -133,9 +140,18 @@ function ColumnaIdentidad() {
 }
 
 function ColumnaCredenciales() {
+  // C38: la credencial RNPI enlaza al portal publico del registro
+  // (rnpi.superdesalud.gob.cl) para que cualquier persona verifique la
+  // inscripcion con el RUT o el nombre. El portal no tiene permalink por
+  // prestador, por eso se enlaza la busqueda y no una ficha.
   const items = [
     `Psicólogo, ${PRESTADOR.universidad}`,
-    `Registro en la Superintendencia de Salud N° ${PRESTADOR.rnpi}`,
+    {
+      texto: `Registro en la Superintendencia de Salud N° ${PRESTADOR.rnpi}`,
+      href: URLS_EXTERNAS.rnpiRegistro,
+      ariaLabel:
+        'Verificar registro N° 876085 en el Registro Nacional de Prestadores Individuales de la Superintendencia de Salud (se abre en una pestaña nueva)',
+    },
     'Prestador inscrito en Fonasa (Modalidad Libre Elección)',
     'Plataforma certificada por Fonasa: Doxy.me',
   ];
@@ -153,11 +169,29 @@ function ColumnaCredenciales() {
           lineHeight: 1.7,
         }}
       >
-        {items.map((item) => (
-          <li key={item} style={{ marginBottom: 4 }}>
-            {item}
-          </li>
-        ))}
+        {items.map((item) =>
+          typeof item === 'string' ? (
+            <li key={item} style={{ marginBottom: 4 }}>
+              {item}
+            </li>
+          ) : (
+            <li key={item.texto} style={{ marginBottom: 4 }}>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={item.ariaLabel}
+                style={{
+                  color: 'rgba(246, 241, 232, 0.8)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 3,
+                }}
+              >
+                {item.texto}
+              </a>
+            </li>
+          )
+        )}
         <li style={{ marginTop: 8 }}>
           Códigos Fonasa:
           <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0' }}>

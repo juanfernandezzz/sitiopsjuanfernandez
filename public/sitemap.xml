@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!-- C38: solo paginas indexables (robots index,follow) y en su URL canonica
+     exacta (.html donde el canonical lo declara asi; las rutas sin extension
+     hacen 301 en netlify.toml y un sitemap no debe listar redirecciones).
+     Fuera: cita-agendada, consentimiento y asentimientoinformado (noindex). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://psicologojuanfernandez.cl/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-CL" href="https://psicologojuanfernandez.cl/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://psicologojuanfernandez.cl/" />
+    <lastmod>2026-07-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://psicologojuanfernandez.cl/respira</loc>
+    <loc>https://psicologojuanfernandez.cl/respira.html</loc>
+    <xhtml:link rel="alternate" hreflang="es-CL" href="https://psicologojuanfernandez.cl/respira.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://psicologojuanfernandez.cl/respira.html" />
     <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://psicologojuanfernandez.cl/politica-privacidad</loc>
-    <lastmod>2026-05-27</lastmod>
+    <loc>https://psicologojuanfernandez.cl/politica-privacidad.html</loc>
+    <xhtml:link rel="alternate" hreflang="es-CL" href="https://psicologojuanfernandez.cl/politica-privacidad.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://psicologojuanfernandez.cl/politica-privacidad.html" />
+    <lastmod>2026-07-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://psicologojuanfernandez.cl/consentimiento</loc>
-    <lastmod>2026-05-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
 </urlset>

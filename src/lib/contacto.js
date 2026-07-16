@@ -65,6 +65,9 @@ export const LEGAL = {
 
 export const URLS_EXTERNAS = {
   superintendenciaSalud: 'https://www.superdesalud.gob.cl/',
+  // Portal publico de busqueda del RNPI (sin permalink por prestador: se
+  // consulta por RUT o nombre). URL verificada con respuesta 200 en C38.
+  rnpiRegistro: 'https://rnpi.superdesalud.gob.cl/',
   fonasa: 'https://www.fonasa.cl/',
   miFonasa: 'https://mi.fonasa.gob.cl/',
 };

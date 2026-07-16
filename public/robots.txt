@@ -1,3 +1,45 @@
+# robots.txt de psicologojuanfernandez.cl (C38, Fase 5 del BLUEPRINT)
+#
+# Los crawlers de IA no ejecutan JavaScript: leen este archivo y el HTML
+# crudo prerenderizado. Cada proveedor usa varios agentes con proposito
+# distinto (entrenamiento, indexacion de busqueda y consultas de usuario)
+# y cada agente exige su propio grupo: permitir uno no permite los otros.
+# Tokens verificados contra la documentacion oficial de cada proveedor
+# (OpenAI platform.openai.com/docs/bots, Anthropic support.anthropic.com,
+# Perplexity docs.perplexity.ai, Google developers.google.com).
+
+# OpenAI: entrenamiento, indice de busqueda de ChatGPT y consultas de usuario
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic: entrenamiento, indice de busqueda de Claude y consultas de usuario
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Perplexity: indice de citacion y consultas de usuario
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google: token de control para Gemini (grounding y entrenamiento)
+User-agent: Google-Extended
+Allow: /
+
+# Resto de agentes
 User-agent: *
 Allow: /
 

@@ -26,6 +26,14 @@
   to     = "/cita-agendada.html"
   status = 301
 
+# C38: sin este redirect, /asentimientoinformado sin extension caia en el
+# catch-all y servia el index con status 200 (URL confusa para quien recibe
+# el enlace por WhatsApp y para cualquier crawler que la descubra).
+[[redirects]]
+  from   = "/asentimientoinformado"
+  to     = "/asentimientoinformado.html"
+  status = 301
+
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

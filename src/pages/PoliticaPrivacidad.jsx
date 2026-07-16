@@ -119,15 +119,15 @@ export default function PoliticaPrivacidad() {
           {CONTACTO.email}
         </a>
         . Inscrito en el Registro Nacional de Prestadores Individuales (RNPI)
-        bajo el N° {PRESTADOR.rnpi}, verificable en el sitio de la
-        Superintendencia de Salud (
+        bajo el N° {PRESTADOR.rnpi}, verificable en el portal público del
+        registro de la Superintendencia de Salud (
         <a
-          href={URLS_EXTERNAS.superintendenciaSalud}
+          href={URLS_EXTERNAS.rnpiRegistro}
           target="_blank"
           rel="noopener noreferrer"
           style={linkStyle}
         >
-          superdesalud.gob.cl
+          rnpi.superdesalud.gob.cl
         </a>
         ).
       </p>
