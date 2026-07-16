@@ -48,7 +48,7 @@ En schema.org los precios se escriben como enteros sin separador de miles: "5570
 
 1. **Los crawlers de IA no ejecutan JavaScript.** GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot y afines leen solo el HTML crudo. Un sitio React con renderizado en cliente les entrega un cascarón vacío. Gemini es la excepción (usa la infraestructura de render de Googlebot). Confianza alta. Consecuencia: el prerendering es prerrequisito de todo lo demás.
 2. **El tráfico referido por asistentes de IA convierte mejor que el orgánico clásico** en verticales de consideración (estudios de Semrush, Seer Interactive y Ahrefs, 2025), con contraevidencia en e-commerce. Salud mental encaja en el perfil de alto valor por visita. Confianza moderada (sesgo de muestra hacia SaaS).
-3. **No existe el tipo schema.org/Psychologist.** La estructura correcta es MedicalBusiness enlazado por @graph a Person y HealthcareService, con VirtualLocation y areaServed Chile para señalar servicio 100% online. Confianza alta.
+3. **No existe el tipo schema.org/Psychologist.** La estructura correcta es MedicalBusiness enlazado por @graph a Person y Service, con VirtualLocation y areaServed Chile para señalar servicio 100% online. Confianza alta.
 4. **El rich result de FAQ está muerto en Google, pero el markup FAQPage sigue siendo válido** y es parseado por Bingbot (fuente de ChatGPT Search y Copilot) y PerplexityBot. El trabajo pesado lo hace el par pregunta-respuesta visible en HTML. Confianza alta.
 5. **llms.txt no tiene adopción funcional** por ningún proveedor mayor. Costo casi nulo, impacto no esperable. Confianza alta.
 6. **Core Web Vitals impacta más en conversión que en ranking.** Casos documentados de mejoras de conversión de un dígito alto a dos dígitos tras optimizar LCP e INP. Lighthouse actual ~62, objetivo ≥85. Confianza moderada-alta.
@@ -98,7 +98,7 @@ En schema.org los precios se escriben como enteros sin separador de miles: "5570
 
 **Objetivo:** grafo JSON-LD válido que declare la entidad profesional y el servicio.
 
-**Estructura:** @graph con MedicalBusiness (location: VirtualLocation con URL de teleconsulta; areaServed: Chile), Person (hasCredential: título UVM y registro; identifier: PropertyValue con propertyID RNPI y value 876085; sameAs a perfiles verificables), HealthcareService (availableChannel con serviceUrl de Cal.com; availableLanguage español). Offers con priceCurrency CLP y valores enteros "5570" y "15000". Sin aggregateRating, sin review.
+**Estructura:** @graph con MedicalBusiness (location: VirtualLocation con URL de teleconsulta; areaServed: Chile), Person (hasCredential: título UVM y registro; identifier: PropertyValue con propertyID RNPI y value 876085; sameAs a perfiles verificables), Service (availableChannel con serviceUrl de Cal.com; availableLanguage español). Corrección C35: HealthcareService tampoco existe en schema.org (es un recurso FHIR de HL7, no un tipo del vocabulario); el tipo válido para el nodo de servicio es Service, verificado en validator.schema.org. Offers con priceCurrency CLP y valores enteros "5570" y "15000". Sin aggregateRating, sin review.
 
 **Verificación autónoma:** Rich Results Test y validator.schema.org sin errores ni advertencias críticas; greps en cero.
 
