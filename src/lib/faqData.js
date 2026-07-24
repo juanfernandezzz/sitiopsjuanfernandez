@@ -1,5 +1,10 @@
 /**
- * Single source de verdad para las 10 Q&A del FAQ.
+ * Single source de verdad para las 12 Q&A del FAQ.
+ *
+ * C39: el encabezado decía 10 desde antes de que C36 ampliara el set a 12.
+ * El conteo real es 12 y debe coincidir exactamente con el FAQPage de
+ * index.html: si cambia una pregunta aquí, el JSON-LD se actualiza en el
+ * MISMO commit.
  *
  * Consumido por:
  *   - src/components/sections/FAQ.jsx (UI)

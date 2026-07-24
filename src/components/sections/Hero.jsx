@@ -112,12 +112,17 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-8 lg:pt-14 pb-12 lg:pb-16">
-        <div className="flex flex-col-reverse gap-8 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center">
+      {/* C39: el espaciado vertical se comprime SOLO bajo sm (640px). Motivo:
+          en movil el orden visual es flex-col-reverse (foto arriba), y la suma
+          de foto + separaciones empujaba el copago Fonasa unos 950px hacia
+          abajo, muy por debajo del pliegue de cualquier telefono. Desde sm
+          hacia arriba los valores originales quedan intactos. */}
+      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-6 sm:pt-8 lg:pt-14 pb-12 lg:pb-16">
+        <div className="flex flex-col-reverse gap-6 sm:gap-8 lg:gap-12 lg:grid lg:grid-cols-5 lg:items-center">
           {/* Columna texto */}
           <div className="lg:col-span-3">
             <span
-              className="anim-rise inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
+              className="anim-rise inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-4 sm:mb-5"
               style={delay(50)}
             >
               <span className="w-6 h-px bg-sage" aria-hidden="true" />
@@ -155,15 +160,28 @@ export default function Hero() {
             </h1>
 
             <p
-              className="anim-rise mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
+              className="anim-rise mt-5 sm:mt-6 font-body text-[18px] lg:text-[20px] leading-[1.6] text-ink/80 max-w-[40ch]"
               style={delay(210)}
             >
               {HERO.sub}
             </p>
 
-            <div
-              className="anim-rise mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+            {/* C39: el copago Fonasa sube por encima de los botones. Antes
+                vivia debajo de ellos y en movil caia fuera del pliegue, que es
+                justo el dato que prometen los anuncios de Google Ads. Va en su
+                propio parrafo y sin interpolaciones, asi el HTML crudo entrega
+                un unico nodo de texto en vez de uno partido por separadores de
+                comentario (leccion C36). */}
+            <p
+              className="anim-rise mt-4 sm:mt-5 font-body text-[15px] lg:text-[16px] text-ink/80"
               style={delay(290)}
+            >
+              {HERO.microcopia}
+            </p>
+
+            <div
+              className="anim-rise mt-4 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+              style={delay(370)}
             >
               <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
                 {HERO.ctaPrimario}
@@ -180,12 +198,13 @@ export default function Hero() {
               </Button>
             </div>
 
-            {/* Microcopy: aclara restricción y ofrece ruta alternativa sin abandonar el fold. */}
+            {/* Ruta alternativa. Se queda DESPUES del CTA principal a
+                proposito: un enlace secundario sobre el boton competiria con
+                la accion primaria. */}
             <p
               className="anim-rise mt-3 font-body text-[15px] text-ink/75"
-              style={delay(370)}
+              style={delay(450)}
             >
-              {HERO.microcopia}{' '}
               <button
                 type="button"
                 data-cal-link={PARTICULAR_CAL_LINK}
@@ -204,8 +223,8 @@ export default function Hero() {
             </p>
 
             <ul
-              className="anim-rise mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
-              style={delay(450)}
+              className="anim-rise mt-6 sm:mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"
+              style={delay(530)}
             >
               {HERO.chips.map((chip, i) => (
                 <React.Fragment key={chip}>
@@ -229,10 +248,14 @@ export default function Hero() {
               <div
                 className="relative w-full overflow-hidden rounded-2xl ring-1 ring-sage/30 shadow-[0_36px_70px_-28px_rgba(63,91,74,0.45),0_20px_44px_-26px_rgba(201,123,94,0.3)]"
               >
-                <div
-                  className="relative w-full overflow-hidden rounded-2xl bg-sage-light/15"
-                  style={{ aspectRatio: '4 / 5' }}
-                >
+                {/* C39: bajo sm la foto se recorta a banda 3/2 con el encuadre
+                    desplazado hacia arriba (object-position 50% 20%). El rostro
+                    conserva exactamente el mismo tamano en pixeles porque el
+                    ancho no cambia; lo que se recorta es el aire sobre la
+                    cabeza y las piernas. Ahorra 163px de alto sobre el pliegue
+                    movil. Desde sm vuelve al retrato 4/5 original. La caja
+                    mantiene aspect-ratio declarado, asi que el CLS sigue en 0. */}
+                <div className="relative w-full overflow-hidden rounded-2xl bg-sage-light/15 aspect-[3/2] sm:aspect-[4/5]">
                   <picture>
                     <source srcSet="/juan-720.webp" type="image/webp" />
                     <img
@@ -243,7 +266,7 @@ export default function Hero() {
                       loading="eager"
                       fetchpriority="high"
                       decoding="async"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-[50%_20%] sm:object-center"
                     />
                   </picture>
 
