@@ -2,8 +2,16 @@ import { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
+import { SESIONES } from '../../lib/sesiones';
 import { useUI } from '../../lib/uiContext';
 import Button from '../ui/Button';
+import VeloSinCupos from '../ui/EtiquetaSinCupos';
+
+// La disponibilidad se lee de la fuente unica (lib/sesiones.js), no se repite
+// aqui: al quitar la bandera alla, esta card vuelve sola a su estado normal.
+const PAREJA_SIN_CUPOS = SESIONES.some(
+  (s) => s.key === 'parejaFonasa' && s.sinCupos
+);
 
 const WEBPAY_PAGO_URL = 'https://www.webpay.cl/form-pay/388212';
 
@@ -215,9 +223,11 @@ export default function Precios() {
             {/* Terapia de pareja (Fonasa) */}
             <motion.article
               variants={item}
-              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
+              className="relative bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
               style={SECONDARY_CARD_SHADOW}
             >
+              {PAREJA_SIN_CUPOS && <VeloSinCupos />}
+
               <h3 className="font-display text-lg text-ink mb-2">
                 Terapia de pareja con bono Fonasa
               </h3>
@@ -234,16 +244,27 @@ export default function Precios() {
               </p>
               <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
                 Código 09 08 103. Sesión de 45 minutos con ambos miembros presentes.
+                {PAREJA_SIN_CUPOS && (
+                  <>
+                    {' '}
+                    Por ahora tengo la agenda de pareja cerrada. Las sesiones
+                    individuales siguen disponibles.
+                  </>
+                )}
               </p>
               <div className="mt-auto">
-                <Button
-                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.parejaFonasa}`}
-                  variant="primary"
-                  size="md"
-                  className="w-full sm:w-auto"
-                >
-                  Agendar sesión de pareja
-                </Button>
+                {/* Sin cupos: el boton desaparece del DOM, no queda un CTA
+                    detras del velo que alguien pueda alcanzar con el teclado. */}
+                {!PAREJA_SIN_CUPOS && (
+                  <Button
+                    calLink={`${CAL_USERNAME}/${CAL_EVENTS.parejaFonasa}`}
+                    variant="primary"
+                    size="md"
+                    className="w-full sm:w-auto"
+                  >
+                    Agendar sesión de pareja
+                  </Button>
+                )}
               </div>
             </motion.article>
 
@@ -364,7 +385,14 @@ export default function Precios() {
                 <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
               </tr>
               <tr className="border-b border-sage/15">
-                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión de pareja con bono Fonasa</th>
+                <th scope="row" className="py-3 pr-4 font-normal text-left">
+                  Sesión de pareja con bono Fonasa
+                  {PAREJA_SIN_CUPOS && (
+                    <span className="block text-[13px] text-sage/85 mt-0.5">
+                      Sin cupos por ahora
+                    </span>
+                  )}
+                </th>
                 <td className="py-3 pr-4">09 08 103</td>
                 <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
               </tr>

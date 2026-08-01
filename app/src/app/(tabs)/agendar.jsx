@@ -37,6 +37,7 @@ export default function Agendar() {
             detalle={s.detalle}
             destacada={s.destacada}
             cta={s.cta}
+            sinCupos={s.sinCupos}
             onPress={() => abrirAgenda(CAL_EVENTS[s.key])}
           />
         </Aparece>

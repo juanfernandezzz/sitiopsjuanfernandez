@@ -7,8 +7,18 @@
  * precio NO vive en el texto: cada superficie renderiza `precio` como dato
  * estructurado junto al titulo, asi el monto sale siempre de PRECIOS y el copy
  * no puede derivar entre superficies.
+ *
+ * C40: bandera `sinCupos`. Una sesion con sinCupos: true sigue existiendo en el
+ * sitio (no se borra: la gente la busca) pero no toma reservas. Cada superficie
+ * la marca con la etiqueta y desactiva su enlace a Cal.com. Para reabrirla basta
+ * con quitar la bandera aqui: no hay que tocar ningun componente.
  */
 import { PRECIOS } from './precios';
+
+// Texto unico de la etiqueta. Vive aqui para que las cuatro superficies de
+// agendamiento (Precios, menu del header, modal de tipo de sesion, seccion
+// Agendar) y la app digan exactamente lo mismo.
+export const AVISO_SIN_CUPOS = 'Sin cupos por ahora';
 
 export const SESIONES = [
   {
@@ -32,6 +42,7 @@ export const SESIONES = [
     precio: PRECIOS.fonasaCopago.display,
     detalle: 'Con ambos miembros presentes.',
     cta: 'Agendar sesión de pareja',
+    sinCupos: true,
   },
   {
     key: 'particular15000',

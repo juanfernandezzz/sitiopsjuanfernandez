@@ -2,8 +2,14 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
+import { SESIONES } from '../../lib/sesiones';
 import { recordarSlug } from '../../lib/seguimiento';
 import { useUI } from '../../lib/uiContext';
+import VeloSinCupos from '../ui/EtiquetaSinCupos';
+
+// Sesiones que existen pero no toman reservas. La bandera vive en
+// lib/sesiones.js: aqui solo se consulta.
+const SIN_CUPOS = new Set(SESIONES.filter((s) => s.sinCupos).map((s) => s.key));
 
 // Cal embed se carga lazy para no inflar el bundle inicial.
 const Cal = lazy(() =>
@@ -75,7 +81,7 @@ export default function Agendar() {
   // Sincroniza tab activo con pendingAgendarTab (seteado desde el modal Fonasa).
   useEffect(() => {
     if (!pendingAgendarTab) return;
-    if (CAL_EVENTS[pendingAgendarTab]) {
+    if (CAL_EVENTS[pendingAgendarTab] && !SIN_CUPOS.has(pendingAgendarTab)) {
       setSelectedKey(pendingAgendarTab);
     }
     if (typeof window !== 'undefined') {
@@ -221,17 +227,24 @@ export default function Agendar() {
           }}
         >
           {TABS.map((tab) => {
-            const active = tab.key === selectedKey;
+            const sinCupos = SIN_CUPOS.has(tab.key);
+            const active = !sinCupos && tab.key === selectedKey;
             return (
               <button
                 key={tab.key}
                 role="tab"
                 aria-selected={active}
-                onClick={() => {
-                  setSelectedKey(tab.key);
-                  setShowChooseWarning(false);
-                }}
-                className="font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                disabled={sinCupos}
+                aria-disabled={sinCupos || undefined}
+                onClick={
+                  sinCupos
+                    ? undefined
+                    : () => {
+                        setSelectedKey(tab.key);
+                        setShowChooseWarning(false);
+                      }
+                }
+                className="relative font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 style={{
                   backgroundColor: active ? '#A4583B' : 'transparent',
                   color: active ? '#F6F1E8' : 'rgba(42,59,76,0.7)',
@@ -240,7 +253,7 @@ export default function Agendar() {
                   fontSize: 14,
                   fontWeight: 600,
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: sinCupos ? 'default' : 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
@@ -250,13 +263,14 @@ export default function Agendar() {
                   height: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.style.color = '#3F5B4A';
+                  if (!active && !sinCupos) e.currentTarget.style.color = '#3F5B4A';
                 }}
                 onMouseLeave={(e) => {
-                  if (!active)
+                  if (!active && !sinCupos)
                     e.currentTarget.style.color = 'rgba(42,59,76,0.7)';
                 }}
               >
+                {sinCupos && <VeloSinCupos radio="rounded-[10px]" />}
                 <span style={{ whiteSpace: 'normal' }}>{tab.label}</span>
                 <span
                   style={{

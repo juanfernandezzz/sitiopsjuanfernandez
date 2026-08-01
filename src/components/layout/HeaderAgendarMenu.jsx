@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
 import { SESIONES } from '../../lib/sesiones';
+import VeloSinCupos from '../ui/EtiquetaSinCupos';
 
 /**
  * Menú "Agendar" del header (C26): reemplaza al modal centrado por un
@@ -51,24 +52,35 @@ export function OpcionesAgendar({ onPick, autoFocusFirst = false }) {
           ref={i === 0 ? firstRef : null}
           type="button"
           role="menuitem"
-          data-cal-link={`${CAL_USERNAME}/${CAL_EVENTS[op.key]}`}
-          data-cal-namespace={CAL_NAMESPACE}
-          data-cal-config='{"layout":"month_view","theme":"light"}'
-          onClick={() => handle(op.key)}
-          className="group text-left rounded-xl p-3.5 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+          // Una sesion sin cupos no lleva atributos data-cal-*: el listener
+          // delegado de Cal.com no tiene nada que abrir.
+          {...(op.sinCupos
+            ? {}
+            : {
+                'data-cal-link': `${CAL_USERNAME}/${CAL_EVENTS[op.key]}`,
+                'data-cal-namespace': CAL_NAMESPACE,
+                'data-cal-config': '{"layout":"month_view","theme":"light"}',
+              })}
+          disabled={op.sinCupos}
+          aria-disabled={op.sinCupos || undefined}
+          onClick={op.sinCupos ? undefined : () => handle(op.key)}
+          className="group relative text-left rounded-xl p-3.5 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:cursor-default"
           style={{
             background: '#FFFDF8',
             border: op.destacada ? '1.5px solid #C97B5E' : '1px solid rgba(63,91,74,0.18)',
           }}
           onMouseEnter={(e) => {
+            if (op.sinCupos) return;
             e.currentTarget.style.borderColor = '#C97B5E';
           }}
           onMouseLeave={(e) => {
+            if (op.sinCupos) return;
             e.currentTarget.style.borderColor = op.destacada
               ? '#C97B5E'
               : 'rgba(63,91,74,0.18)';
           }}
         >
+          {op.sinCupos && <VeloSinCupos radio="rounded-xl" />}
           <span className="flex items-baseline justify-between gap-3">
             <span className="font-body font-semibold text-ink" style={{ fontSize: 15 }}>
               {op.titulo}

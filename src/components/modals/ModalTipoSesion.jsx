@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
 import { SESIONES } from '../../lib/sesiones';
+import VeloSinCupos from '../ui/EtiquetaSinCupos';
 
 /**
  * Modal que pregunta el tipo de usuario/pago ANTES de abrir Cal.com, para que el
@@ -107,11 +108,19 @@ export default function ModalTipoSesion({ open, onClose }) {
                   key={op.key}
                   ref={i === 0 ? firstBtnRef : null}
                   type="button"
-                  data-cal-link={`${CAL_USERNAME}/${CAL_EVENTS[op.key]}`}
-                  data-cal-namespace={CAL_NAMESPACE}
-                  data-cal-config='{"layout":"month_view","theme":"light"}'
-                  onClick={() => handlePick(op.key)}
-                  className="group text-left rounded-xl p-4 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                  // Sin cupos: no inyectamos data-cal-* para que el listener
+                  // delegado de Cal.com no tenga nada que abrir.
+                  {...(op.sinCupos
+                    ? {}
+                    : {
+                        'data-cal-link': `${CAL_USERNAME}/${CAL_EVENTS[op.key]}`,
+                        'data-cal-namespace': CAL_NAMESPACE,
+                        'data-cal-config': '{"layout":"month_view","theme":"light"}',
+                      })}
+                  disabled={op.sinCupos}
+                  aria-disabled={op.sinCupos || undefined}
+                  onClick={op.sinCupos ? undefined : () => handlePick(op.key)}
+                  className="group relative text-left rounded-xl p-4 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:cursor-default"
                   style={{
                     background: '#FFFDF8',
                     border: op.destacada
@@ -119,16 +128,19 @@ export default function ModalTipoSesion({ open, onClose }) {
                       : '1px solid rgba(63,91,74,0.18)',
                   }}
                   onMouseEnter={(e) => {
+                    if (op.sinCupos) return;
                     e.currentTarget.style.borderColor = '#C97B5E';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
+                    if (op.sinCupos) return;
                     e.currentTarget.style.borderColor = op.destacada
                       ? '#C97B5E'
                       : 'rgba(63,91,74,0.18)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
+                  {op.sinCupos && <VeloSinCupos radio="rounded-xl" />}
                   <span className="flex items-baseline justify-between gap-3">
                     <span className="font-body font-semibold text-ink" style={{ fontSize: 16 }}>
                       {op.titulo}
