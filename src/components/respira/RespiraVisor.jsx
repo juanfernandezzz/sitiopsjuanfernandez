@@ -1,6 +1,11 @@
 import React, { useId, useState } from 'react';
 import Button from '../ui/Button';
-import { generarCaleidoscopio, RESPIRA_RITMO } from '../../lib/respiraNucleo';
+import {
+  generarCaleidoscopio,
+  RESPIRA_PATRONES,
+  RESPIRA_RITMO,
+  patronSiguiente,
+} from '../../lib/respiraNucleo';
 import '../../respira.css';
 
 /**
@@ -26,34 +31,59 @@ import '../../respira.css';
  *    extenso bese exactamente el radio objetivo a inhalación completa; un
  *    clipPath en r=206 hace imposible pintar fuera del disco.
  *
- * Lo que la aleatoriedad no toca: el ritmo (ciclo fijo de 11 s; la escala de
+ * Lo que la aleatoriedad no toca: el ritmo (el del patrón activo; la escala de
  * respiración sigue siendo la señal dominante: las derivas son un orden de
  * magnitud más lentas), la calma (paleta de marca, opacidades techo, cero
  * animación de color u opacidad en las formas) y la accesibilidad (arranca en
  * pausa, pausar congela todo con animation-play-state, y con
  * prefers-reduced-motion la figura queda fija e igual única por visita).
  * Cero JavaScript por frame: todo es CSS sobre grupos SVG.
+ *
+ * C41: dos patrones intercambiables (respiración coherente y 4-7-8) desde el
+ * mismo visor. Cambia el reparto del tiempo, no la figura: el patrón activo
+ * inyecta su duración de ciclo por variable CSS y, en el caso del 4-7-8, la
+ * clase .patron-478 cambia el nombre de las animaciones de respiración y de
+ * palabras (respira.css). Los rotores, la tijera y el pulso son ajenos al
+ * patrón, así que al alternar la figura no da ningún salto.
  */
 
-// Variables CSS del ritmo, derivadas del núcleo compartido. respira.css trae
-// estos mismos valores como fallback: si algo fallara al inyectarlas, el
+// Variables CSS del ritmo, derivadas del patrón activo. respira.css trae los
+// valores del patrón base como fallback: si algo fallara al inyectarlas, el
 // ejercicio no cambia.
-const VARS_RITMO = {
-  '--respira-ciclo': `${RESPIRA_RITMO.cicloS}s`,
-  '--respira-bezier': `cubic-bezier(${RESPIRA_RITMO.bezier.join(', ')})`,
-  '--respira-esc-ex': RESPIRA_RITMO.escalaExhalado,
-  '--respira-esc-in': RESPIRA_RITMO.escalaInhalado,
-  '--respira-esc-reposo': RESPIRA_RITMO.escalaReposo,
-  '--respira-pulso-min': RESPIRA_RITMO.pulsoMin,
-  '--respira-pulso-max': RESPIRA_RITMO.pulsoMax,
+// Clase CSS de cada palabra guía. Las animaciones de opacidad viven en
+// respira.css, una por fase y por patrón.
+const CLASE_CUE = {
+  inhalar: 'cue-inhala',
+  sostener: 'cue-sosten',
+  exhalar: 'cue-exhala',
 };
+
+const varsRitmo = (p) => ({
+  '--respira-ciclo': `${p.cicloS}s`,
+  '--respira-bezier': `cubic-bezier(${p.bezier.join(', ')})`,
+  '--respira-esc-ex': p.escalaExhalado,
+  '--respira-esc-in': p.escalaInhalado,
+  '--respira-esc-reposo': p.escalaReposo,
+  '--respira-pulso-min': p.pulsoMin,
+  '--respira-pulso-max': p.pulsoMax,
+});
 
 export default function RespiraVisor() {
   const [running, setRunning] = useState(false);
+  const [patronId, setPatronId] = useState(RESPIRA_RITMO.id);
+  const patron = RESPIRA_PATRONES.find((p) => p.id === patronId) || RESPIRA_RITMO;
   // C31 fix pack 3: semilla fija para que servidor y cliente dibujen el mismo
   // caleidoscopio y la hidratacion conserve el HTML prerenderizado.
   const [k] = useState(() => generarCaleidoscopio(45));
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+
+  // Alternar de patrón deja el ejercicio en pausa a propósito: el conteo
+  // cambia y conviene leer la instrucción nueva antes de seguir, en vez de
+  // quedar a media inhalación con otro ritmo encima.
+  const cambiarPatron = () => {
+    setRunning(false);
+    setPatronId(patronSiguiente(patronId).id);
+  };
 
   const idCeldaA = `celdaA-${uid}`;
   const idCeldaB = `celdaB-${uid}`;
@@ -73,7 +103,12 @@ export default function RespiraVisor() {
     ));
 
   return (
-    <div className={`respira-visor ${running ? 'is-running' : ''}`} style={VARS_RITMO}>
+    <div
+      className={`respira-visor ${running ? 'is-running' : ''} ${
+        patron.id === 'cuatro78' ? 'patron-478' : ''
+      }`}
+      style={varsRitmo(patron)}
+    >
       <div className="respira-stage" aria-hidden="true">
         <svg
           viewBox="0 0 420 420"
@@ -185,11 +220,14 @@ export default function RespiraVisor() {
           </g>
         </svg>
 
-        {/* Palabras guía (el lector de pantalla recibe el estado por la
-            región aria-live de abajo, no por esto). */}
+        {/* Palabras guía del patrón activo (el lector de pantalla recibe el
+            estado por la región aria-live de abajo, no por esto). */}
         <p className="respira-cues font-display" aria-hidden="true">
-          <span className="cue cue-inhala">Inhala</span>
-          <span className="cue cue-exhala">Exhala</span>
+          {patron.fases.map((f) => (
+            <span key={f.clave} className={`cue ${CLASE_CUE[f.clave]}`}>
+              {f.cue}
+            </span>
+          ))}
           <span className="cue cue-reposo">Comienza cuando quieras</span>
         </p>
       </div>
@@ -205,20 +243,33 @@ export default function RespiraVisor() {
           {running ? 'Pausar' : 'Iniciar'}
         </Button>
         <p aria-live="polite" className="sr-only">
-          {running
-            ? 'Ejercicio en marcha: inhala durante 5,5 segundos y exhala durante 5,5 segundos.'
-            : 'Ejercicio en pausa.'}
+          {running ? patron.estadoVivo : `Ejercicio en pausa. Ritmo actual: ${patron.nombre}.`}
         </p>
-        <p className="font-body text-ink/75" style={{ fontSize: 15 }}>
-          Practica entre 3 y 5 minutos, o el tiempo que te acomode.
+        <p
+          className="font-body text-ink/80"
+          style={{ fontSize: 15, lineHeight: 1.6, maxWidth: '52ch', textAlign: 'center' }}
+        >
+          {patron.instruccion}
+        </p>
+        <p className="font-body text-ink/75" style={{ fontSize: 15, textAlign: 'center' }}>
+          {patron.duracion}
         </p>
         <p
           className="respira-nota-rm font-body text-ink/75"
           style={{ fontSize: 14, maxWidth: '52ch', textAlign: 'center' }}
         >
-          Tu dispositivo indica que prefieres menos movimiento: la figura queda
-          fija y el ritmo lo marcan las palabras Inhala y Exhala.
+          {patron.notaReducida}
         </p>
+
+        {/* Cambio de ritmo: el mismo botón lleva al otro patrón y de vuelta. */}
+        <Button
+          size="md"
+          variant="ghost"
+          onClick={cambiarPatron}
+          className="mt-1 text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4"
+        >
+          {patron.ctaCambio}
+        </Button>
       </div>
     </div>
   );

@@ -1,11 +1,23 @@
 /*
- * Respira conmigo (C24 fixpack 2; C25: ritmo desde el núcleo compartido).
+ * Respira conmigo (C24 fixpack 2; C25: ritmo desde el núcleo compartido;
+ * C41: dos patrones intercambiables).
  * Los números del ritmo viven en src/lib/respiraNucleo.js; el componente los
  * inyecta como variables CSS y este archivo los consume con fallback idéntico.
  * Respiración pausada + morfosis geométrica.
  *
- * Ritmo: ciclo de 11 s = 5,5 s de inhalación + 5,5 s de exhalación (~6
- * respiraciones por minuto). La escala de respiración es la señal dominante.
+ * Ritmos:
+ *  - Respiración coherente (por omisión): ciclo de 11 s = 5,5 s de inhalación
+ *    + 5,5 s de exhalación (~6 respiraciones por minuto).
+ *  - Respiración 4-7-8: ciclo de 19 s = 4 s de inhalación + 7 s de sostén + 8 s
+ *    de exhalación. La clase .patron-478 en el visor cambia el nombre de las
+ *    animaciones; la duración sigue llegando por --respira-ciclo.
+ * En ambos, la escala de respiración es la señal dominante.
+ *
+ * Porcentajes de los keyframes del 4-7-8 (CSS no admite variables dentro de un
+ * @keyframes, así que van fijos y derivados a mano del núcleo):
+ *    4/19 = 21,053 %   (fin de la inhalación)
+ *   11/19 = 57,895 %   (fin del sostén)
+ * Si cambian los segundos en respiraNucleo.js, hay que recalcularlos aquí.
  *
  * Morfosis: tres capas giran a periodos inconmensurables (variables CSS
  * sorteadas por el componente), las alas oscilan en tijera y los acentos
@@ -103,15 +115,41 @@
   animation: respira-cue-out var(--respira-ciclo, 11s) linear infinite;
   animation-play-state: paused;
 }
+/* La palabra del sostén solo existe en el patrón que la usa. */
+.cue-sosten {
+  display: none;
+  animation: respira-cue-478-sosten var(--respira-ciclo, 19s) linear infinite;
+  animation-play-state: paused;
+}
 .is-running .cue-inhala,
-.is-running .cue-exhala {
+.is-running .cue-exhala,
+.is-running .cue-sosten {
   animation-play-state: running;
 }
 
 /* En pausa, las palabras del ciclo se ocultan y aparece la invitación. */
 .respira-visor:not(.is-running) .cue-inhala,
-.respira-visor:not(.is-running) .cue-exhala {
+.respira-visor:not(.is-running) .cue-exhala,
+.respira-visor:not(.is-running) .cue-sosten {
   visibility: hidden;
+}
+
+/*
+ * Patrón 4-7-8: mismo motor, otro reparto del tiempo. Cambiar el nombre de la
+ * animación (y no solo su duración) hace que al alternar de patrón el ciclo
+ * arranque limpio desde el comienzo, sin saltos a mitad de una curva.
+ */
+.patron-478 .respira-breath {
+  animation-name: respira-ciclo-478;
+}
+.patron-478 .cue-inhala {
+  animation-name: respira-cue-478-inhala;
+}
+.patron-478 .cue-exhala {
+  animation-name: respira-cue-478-exhala;
+}
+.patron-478 .cue-sosten {
+  display: block;
 }
 .cue-reposo {
   visibility: hidden;
@@ -130,6 +168,18 @@
 @keyframes respira-ciclo {
   0% { transform: scale(var(--respira-esc-ex, 0.68)); }
   50% { transform: scale(var(--respira-esc-in, 1)); }
+  100% { transform: scale(var(--respira-esc-ex, 0.68)); }
+}
+
+/*
+ * 4-7-8: sube en 4 s, se queda quieta expandida 7 s y baja en 8 s. El tramo de
+ * sostén repite la escala inhalada, así que la figura queda literalmente
+ * detenida mientras dura la apnea.
+ */
+@keyframes respira-ciclo-478 {
+  0% { transform: scale(var(--respira-esc-ex, 0.68)); }
+  21.053% { transform: scale(var(--respira-esc-in, 1)); }
+  57.895% { transform: scale(var(--respira-esc-in, 1)); }
   100% { transform: scale(var(--respira-esc-ex, 0.68)); }
 }
 
@@ -161,6 +211,28 @@
 @keyframes respira-cue-out {
   0%, 45% { opacity: 0; }
   50%, 95% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/*
+ * Palabras del 4-7-8. Cada relevo se funde durante el 5 % del ciclo y termina
+ * justo en el cambio de fase, igual que la ventana 45-50 % del patrón base.
+ */
+@keyframes respira-cue-478-inhala {
+  0%, 16.053% { opacity: 1; }
+  21.053%, 95% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes respira-cue-478-sosten {
+  0%, 16.053% { opacity: 0; }
+  21.053%, 52.895% { opacity: 1; }
+  57.895%, 100% { opacity: 0; }
+}
+
+@keyframes respira-cue-478-exhala {
+  0%, 52.895% { opacity: 0; }
+  57.895%, 95% { opacity: 1; }
   100% { opacity: 0; }
 }
 

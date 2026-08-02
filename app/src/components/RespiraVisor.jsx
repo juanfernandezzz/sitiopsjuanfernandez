@@ -3,6 +3,7 @@ import {
   Animated,
   View,
   Text,
+  Pressable,
   StyleSheet,
   Easing,
   AccessibilityInfo,
@@ -22,7 +23,12 @@ import Svg, {
   Stop,
   ClipPath,
 } from 'react-native-svg';
-import { generarCaleidoscopio, RESPIRA_RITMO } from '@contenido/respiraNucleo';
+import {
+  generarCaleidoscopio,
+  RESPIRA_PATRONES,
+  RESPIRA_RITMO,
+  patronSiguiente,
+} from '@contenido/respiraNucleo';
 import { COLORS, FONTS } from '../theme/tokens';
 import Boton from './Boton';
 
@@ -34,18 +40,24 @@ import Boton from './Boton';
  * cada install y cada OTA). Aqui no vive ningun numero del ejercicio: si el
  * nucleo cambia en el sitio, el siguiente push lo trae a la app.
  *
+ * C41: dos patrones intercambiables (respiracion coherente y 4-7-8), los
+ * mismos del sitio y con el mismo boton para alternar. El motor de la
+ * respiracion pasa de dos mitades fijas a una secuencia de fases declarada por
+ * el patron, asi que un patron nuevo en el nucleo no necesita codigo nuevo
+ * aqui: la fase "sostener" simplemente mantiene la escala y espera.
+ *
  * Equivalencias con el driver CSS del sitio (respira.css):
- *  - Respiracion: escala exhalado-inhalado con la misma bezier, por mitades
- *    de ciclo (en CSS la curva aplica por tramo de keyframe; aqui, por timing
- *    de cada mitad). Senal dominante.
+ *  - Respiracion: escala exhalado-inhalado con la misma bezier, fase por fase
+ *    (en CSS la curva aplica por tramo de keyframe; aqui, por timing de cada
+ *    fase). Senal dominante.
  *  - Rotores: giro lineal infinito por capa, con duracion, sentido y fase
  *    sorteados por el nucleo (fase = animation-delay negativo del CSS).
  *  - Tijera de alas: base y espejo oscilan +-tdeg en sentidos opuestos,
  *    ease-in-out alternate.
  *  - Pulso radial: escala pulsoMin-pulsoMax, ease-in-out alternate.
- *  - Cues: Inhala visible la primera mitad, Exhala la segunda; el crossfade
- *    dura el 5% del ciclo y TERMINA en el cambio de mitad, igual que la
- *    ventana 45-50% del CSS (se agenda antes del borde de cada mitad).
+ *  - Cues: la palabra de la fase en curso; el crossfade dura el 5% del ciclo y
+ *    TERMINA en el cambio de fase, igual que la ventana 45-50% del CSS (se
+ *    agenda antes del borde de cada fase).
  *  - Pausa: congela todo donde esta; reanudar continua del mismo punto
  *    (paridad con animation-play-state). Detalle honesto: al reanudar a mitad
  *    de un tramo, la curva del resto del tramo se re-easea sobre el tiempo
@@ -64,11 +76,40 @@ import Boton from './Boton';
  * la region viva. La pantalla no se apaga mientras el ejercicio corre.
  */
 
-const MEDIO_MS = (RESPIRA_RITMO.cicloS * 1000) / 2;
-const FADE_CUE_MS = Math.round(RESPIRA_RITMO.cicloS * 1000 * 0.05);
 const EASE_RESPIRO = Easing.bezier(...RESPIRA_RITMO.bezier);
 // Equivalente exacto del keyword ease-in-out de CSS.
 const EASE_INOUT = Easing.bezier(0.42, 0, 0.58, 1);
+
+// Claves de fase que existen en el nucleo. La app monta una palabra por clave
+// (aunque el patron activo no la use) para que el crossfade sea siempre el
+// mismo codigo.
+const CLAVES_CUE = ['inhalar', 'sostener', 'exhalar'];
+
+/**
+ * Traduce las fases del patron a tramos de animacion. El valor animado va de 0
+ * (exhalado) a 1 (inhalado); inhalar sube, exhalar baja y sostener se queda
+ * donde estaba, que es lo que hace que la figura se detenga durante la apnea.
+ */
+function crearSecuencia(patron) {
+  let actual = 0;
+  const tramos = patron.fases.map((f) => {
+    const desde = actual;
+    const hasta = f.clave === 'inhalar' ? 1 : f.clave === 'exhalar' ? 0 : actual;
+    actual = hasta;
+    return { clave: f.clave, cue: f.cue, durMs: f.s * 1000, desde, hasta };
+  });
+  return {
+    id: patron.id,
+    tramos,
+    fadeMs: Math.round(patron.cicloS * 1000 * 0.05),
+    i: 0,
+    tau: 0,
+    tauInicio: 0,
+    t0: 0,
+    timer: null,
+    val: new Animated.Value(tramos[0].desde),
+  };
+}
 
 // Inversa numerica de una curva de easing monotona en [0,1] (biseccion).
 // Se usa al pausar: convierte el valor congelado en fraccion de tiempo del
@@ -127,10 +168,14 @@ export default function RespiraVisor() {
   const [k] = useState(generarCaleidoscopio);
   const [corriendo, setCorriendo] = useState(false);
   const [reduce, setReduce] = useState(false);
-  const [textoReducido, setTextoReducido] = useState('inhala');
+  const [patronId, setPatronId] = useState(RESPIRA_RITMO.id);
+  const patron = RESPIRA_PATRONES.find((p) => p.id === patronId) || RESPIRA_RITMO;
+  const [textoReducido, setTextoReducido] = useState(patron.fases[0].cue);
 
-  // Canales de animacion. tau = fraccion de tiempo consumida del tramo en
-  // curso; val = Animated.Value 0..1 cuyo easing vive en el timing.
+  // Canales de animacion ajenos al patron (giros, tijera, pulso): siguen igual
+  // al alternar de ritmo, asi la figura no da ningun salto. tau = fraccion de
+  // tiempo consumida del tramo en curso; val = Animated.Value 0..1 cuyo easing
+  // vive en el timing.
   const motor = useRef(null);
   if (motor.current === null) {
     const tij0 = estadoAlternante(k.faseT, k.durT);
@@ -142,14 +187,6 @@ export default function RespiraVisor() {
     };
     motor.current = {
       canales: {
-        respiro: {
-          tipo: 'alternante',
-          val: new Animated.Value(0),
-          durMs: MEDIO_MS,
-          easing: EASE_RESPIRO,
-          tau: 0,
-          adelante: true,
-        },
         rotA: {
           tipo: 'lineal',
           val: new Animated.Value(fraccionDeFase(k.faseA, k.durA)),
@@ -188,12 +225,22 @@ export default function RespiraVisor() {
           adelante: pul0.adelante,
         },
       },
-      opInhala: new Animated.Value(0),
-      opExhala: new Animated.Value(0),
+      // Una opacidad por clave de fase; el patron activo usa las que declara.
+      opCue: CLAVES_CUE.reduce((acc, clave) => {
+        acc[clave] = new Animated.Value(0);
+        return acc;
+      }, {}),
       timersCue: [],
     };
   }
-  const { canales, opInhala, opExhala } = motor.current;
+  const { canales, opCue } = motor.current;
+
+  // Secuencia de respiracion del patron activo. Si el patron cambia, se
+  // rearma entera (el ejercicio queda en pausa al alternar, ver cambiarPatron).
+  const seq = useRef(null);
+  if (seq.current === null || seq.current.id !== patron.id) {
+    seq.current = crearSecuencia(patron);
+  }
 
   useEffect(() => {
     let vivo = true;
@@ -246,38 +293,66 @@ export default function RespiraVisor() {
     motor.current.timersCue = [];
   };
 
-  const cruzarCues = (haciaInhala, durMs) => {
-    Animated.parallel([
-      Animated.timing(opInhala, {
-        toValue: haciaInhala ? 1 : 0,
-        duration: durMs,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opExhala, {
-        toValue: haciaInhala ? 0 : 1,
-        duration: durMs,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  const cruzarCues = (claveDestino, durMs) => {
+    Animated.parallel(
+      CLAVES_CUE.map((clave) =>
+        Animated.timing(opCue[clave], {
+          toValue: clave === claveDestino ? 1 : 0,
+          duration: durMs,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      )
+    ).start();
   };
 
-  // El crossfade dura el 5% del ciclo y termina justo en el cambio de mitad,
-  // como la ventana 45-50% del CSS: se agenda restante - FADE_CUE_MS despues
-  // de arrancar cada mitad.
-  const programarCue = (c, restanteMs) => {
-    const dur = Math.min(FADE_CUE_MS, restanteMs);
+  // El crossfade dura el 5% del ciclo y termina justo en el cambio de fase,
+  // como la ventana 45-50% del CSS: se agenda restante - fadeMs despues de
+  // arrancar cada fase.
+  const programarCue = (s, claveDestino, restanteMs) => {
+    const dur = Math.min(s.fadeMs, restanteMs);
     const t = setTimeout(() => {
-      cruzarCues(!c.adelante, dur);
+      cruzarCues(claveDestino, dur);
     }, Math.max(0, restanteMs - dur));
     motor.current.timersCue.push(t);
   };
 
-  const pasoAlternante = (c, conCues) => {
+  // Motor de la respiracion: recorre las fases del patron en circulo. La fase
+  // de sostenido no anima nada (desde === hasta), solo espera; por eso el
+  // avance se agenda con un temporizador en vez de con el fin de una curva.
+  const pasoSecuencia = (s) => {
+    const tramo = s.tramos[s.i];
+    const siguiente = s.tramos[(s.i + 1) % s.tramos.length];
+    const restante = Math.max(16, (1 - s.tau) * tramo.durMs);
+    programarCue(s, siguiente.clave, restante);
+    s.tauInicio = s.tau;
+    s.t0 = Date.now();
+
+    const avanzar = () => {
+      s.i = (s.i + 1) % s.tramos.length;
+      s.tau = 0;
+      pasoSecuencia(s);
+    };
+
+    if (tramo.desde === tramo.hasta) {
+      s.val.setValue(tramo.hasta);
+      s.timer = setTimeout(avanzar, restante);
+      return;
+    }
+    Animated.timing(s.val, {
+      toValue: tramo.hasta,
+      duration: restante,
+      easing: EASE_RESPIRO,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) avanzar();
+    });
+  };
+
+  // Tijera y pulso: vaiven continuo, sin cues y sin relacion con el patron.
+  const pasoAlternante = (c) => {
     const objetivo = c.adelante ? 1 : 0;
     const restante = Math.max(16, (1 - c.tau) * c.durMs);
-    if (conCues) programarCue(c, restante);
     const anim = Animated.timing(c.val, {
       toValue: objetivo,
       duration: restante,
@@ -288,7 +363,7 @@ export default function RespiraVisor() {
       if (!finished) return;
       c.tau = 0;
       c.adelante = !c.adelante;
-      pasoAlternante(c, conCues);
+      pasoAlternante(c);
     });
   };
 
@@ -308,19 +383,31 @@ export default function RespiraVisor() {
     });
   };
 
-  const arrancar = () => {
-    opInhala.setValue(canales.respiro.adelante ? 1 : 0);
-    opExhala.setValue(canales.respiro.adelante ? 0 : 1);
-    pasoAlternante(canales.respiro, true);
+  const arrancar = (s) => {
+    CLAVES_CUE.forEach((clave) => {
+      opCue[clave].setValue(clave === s.tramos[s.i].clave ? 1 : 0);
+    });
+    pasoSecuencia(s);
     pasoLineal(canales.rotA);
     pasoLineal(canales.rotB);
     pasoLineal(canales.rotC);
-    pasoAlternante(canales.tij, false);
-    pasoAlternante(canales.pul, false);
+    pasoAlternante(canales.tij);
+    pasoAlternante(canales.pul);
   };
 
-  const congelar = () => {
+  const congelar = (s) => {
     limpiarTimers();
+    // La respiracion guarda su avance por reloj: es exacto tambien en la fase
+    // de sostenido, donde el valor animado no se mueve y no habria nada que
+    // invertir.
+    if (s.timer) {
+      clearTimeout(s.timer);
+      s.timer = null;
+    }
+    s.val.stopAnimation();
+    const avance = (Date.now() - s.t0) / s.tramos[s.i].durMs;
+    s.tau = Math.min(Math.max(s.tauInicio + avance, 0), 1);
+
     Object.values(canales).forEach((c) => {
       c.val.stopAnimation((v) => {
         if (c.tipo === 'lineal') {
@@ -333,34 +420,52 @@ export default function RespiraVisor() {
         c.tau = invertirEasing(c.easing, progreso);
       });
     });
-    opInhala.stopAnimation();
-    opExhala.stopAnimation();
-    opInhala.setValue(0);
-    opExhala.setValue(0);
+    CLAVES_CUE.forEach((clave) => {
+      opCue[clave].stopAnimation();
+      opCue[clave].setValue(0);
+    });
   };
 
   useEffect(() => {
     if (reduce || !corriendo) return undefined;
-    arrancar();
-    return () => congelar();
+    // La secuencia se captura al arrancar: si el patron cambia, la cadena
+    // recursiva que quede viva opera sobre el objeto viejo y muere al pararlo.
+    const s = seq.current;
+    arrancar(s);
+    return () => congelar(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [corriendo, reduce]);
+  }, [corriendo, reduce, patronId]);
 
   useEffect(() => {
-    // Reduce-motion: figura fija; el ritmo lo marcan solo las palabras.
+    // Reduce-motion: figura fija; el ritmo lo marcan solo las palabras, una
+    // por fase y durante lo que dura esa fase.
     if (!reduce || !corriendo) return undefined;
-    setTextoReducido('inhala');
-    const id = setInterval(() => {
-      setTextoReducido((t) => (t === 'inhala' ? 'exhala' : 'inhala'));
-    }, MEDIO_MS);
-    return () => clearInterval(id);
-  }, [reduce, corriendo]);
+    let i = 0;
+    let timer = null;
+    setTextoReducido(patron.fases[0].cue);
+    const paso = () => {
+      timer = setTimeout(() => {
+        i = (i + 1) % patron.fases.length;
+        setTextoReducido(patron.fases[i].cue);
+        paso();
+      }, patron.fases[i].s * 1000);
+    };
+    paso();
+    return () => clearTimeout(timer);
+  }, [reduce, corriendo, patron]);
+
+  // Alternar de patron deja el ejercicio en pausa a proposito: el conteo
+  // cambia y conviene leer la instruccion nueva antes de seguir.
+  const cambiarPatron = () => {
+    setCorriendo(false);
+    setPatronId(patronSiguiente(patronId).id);
+  };
 
   // ---- Transformaciones (mapeo lineal; el easing ya viajo en el timing) ----
 
-  const escala = canales.respiro.val.interpolate({
+  const escala = seq.current.val.interpolate({
     inputRange: [0, 1],
-    outputRange: [RESPIRA_RITMO.escalaExhalado, RESPIRA_RITMO.escalaInhalado],
+    outputRange: [patron.escalaExhalado, patron.escalaInhalado],
   });
   const angulo = (c, dir) =>
     c.val.interpolate({
@@ -380,7 +485,7 @@ export default function RespiraVisor() {
   });
   const escalaPulso = canales.pul.val.interpolate({
     inputRange: [0, 1],
-    outputRange: [RESPIRA_RITMO.pulsoMin, RESPIRA_RITMO.pulsoMax],
+    outputRange: [patron.pulsoMin, patron.pulsoMax],
   });
 
   // En reduce-motion el sitio apaga las animaciones de figura: queda la
@@ -416,7 +521,7 @@ export default function RespiraVisor() {
           style={[
             capa,
             reduce
-              ? { transform: [{ scale: RESPIRA_RITMO.escalaReposo }] }
+              ? { transform: [{ scale: patron.escalaReposo }] }
               : { transform: [{ scale: escala }] },
           ]}
         >
@@ -538,23 +643,23 @@ export default function RespiraVisor() {
           </Svg>
         </Animated.View>
 
-        {/* Palabras guia centradas sobre la figura */}
+        {/* Palabras guia centradas sobre la figura (una por fase del patron) */}
         <View style={[capa, styles.centro]} pointerEvents="none">
           {reduce ? (
             corriendo ? (
-              <Text style={styles.cue}>{textoReducido === 'inhala' ? 'Inhala' : 'Exhala'}</Text>
+              <Text style={styles.cue}>{textoReducido}</Text>
             ) : (
               <Text style={styles.cue}>Comienza cuando quieras</Text>
             )
           ) : corriendo ? (
-            <>
-              <Animated.Text style={[styles.cue, styles.cueAbs, { opacity: opInhala }]}>
-                Inhala
+            patron.fases.map((f) => (
+              <Animated.Text
+                key={f.clave}
+                style={[styles.cue, styles.cueAbs, { opacity: opCue[f.clave] }]}
+              >
+                {f.cue}
               </Animated.Text>
-              <Animated.Text style={[styles.cue, styles.cueAbs, { opacity: opExhala }]}>
-                Exhala
-              </Animated.Text>
-            </>
+            ))
           ) : (
             <Text style={styles.cue}>Comienza cuando quieras</Text>
           )}
@@ -567,17 +672,18 @@ export default function RespiraVisor() {
           {corriendo ? 'Pausar' : 'Iniciar'}
         </Boton>
         <Text accessibilityLiveRegion="polite" style={styles.estadoOculto}>
-          {corriendo
-            ? 'Ejercicio en marcha: inhala durante 5,5 segundos y exhala durante 5,5 segundos.'
-            : 'Ejercicio en pausa.'}
+          {corriendo ? patron.estadoVivo : `Ejercicio en pausa. Ritmo actual: ${patron.nombre}.`}
         </Text>
-        <Text style={styles.ayuda}>Practica entre 3 y 5 minutos, o el tiempo que te acomode.</Text>
-        {reduce ? (
-          <Text style={styles.notaReduce}>
-            Tu dispositivo indica que prefieres menos movimiento: la figura queda fija y el ritmo lo
-            marcan las palabras Inhala y Exhala.
-          </Text>
-        ) : null}
+        <Text style={styles.instruccion}>{patron.instruccion}</Text>
+        <Text style={styles.ayuda}>{patron.duracion}</Text>
+        {reduce ? <Text style={styles.notaReduce}>{patron.notaReducida}</Text> : null}
+
+        {/* Cambio de ritmo: el mismo control lleva al otro patron y de vuelta.
+            Va como enlace y no como boton lleno para que no compita con
+            Iniciar, que es la accion principal. */}
+        <Pressable onPress={cambiarPatron} accessibilityRole="button" style={styles.cambio}>
+          <Text style={styles.cambioTexto}>{patron.ctaCambio}</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -604,12 +710,35 @@ const styles = StyleSheet.create({
     height: 1,
     opacity: 0,
   },
+  instruccion: {
+    fontFamily: FONTS.body,
+    fontSize: 15,
+    lineHeight: 23,
+    color: COLORS.inkSoft,
+    marginTop: 16,
+    maxWidth: 340,
+    textAlign: 'center',
+  },
   ayuda: {
     fontFamily: FONTS.body,
     fontSize: 15,
+    lineHeight: 23,
     color: COLORS.inkSoft,
-    marginTop: 14,
+    marginTop: 10,
+    maxWidth: 340,
     textAlign: 'center',
+  },
+  cambio: {
+    marginTop: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  cambioTexto: {
+    fontFamily: FONTS.bodyMed,
+    fontSize: 15,
+    color: COLORS.sage,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   notaReduce: {
     fontFamily: FONTS.body,
