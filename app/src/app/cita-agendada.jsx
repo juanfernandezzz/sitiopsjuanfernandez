@@ -86,7 +86,10 @@ export default function CitaAgendada() {
         </Tarjeta>
 
         {/* Paso 2: pago */}
-        <Tarjeta numero={2} titulo="Paga tu sesión antes de la hora">
+        {/* Titulo neutro respecto al momento del pago: el bono Fonasa se compra
+            antes y la sesion particular se paga despues. Cada bloque declara su
+            propio plazo. */}
+        <Tarjeta numero={2} titulo="Cómo se paga tu sesión">
           {ambos ? (
             <Text style={[styles.parrafo, { fontSize: 13.5, color: COLORS.inkSoft }]}>
               Sigue el bloque que corresponde a la sesión que reservaste.
@@ -156,18 +159,24 @@ function BloqueParticular({ data, conSeparador }) {
       <Text style={styles.bloqueTitulo}>{data.titulo}</Text>
       <Text style={styles.parrafo}>{data.intro}</Text>
 
-      <Text style={styles.opcion}>Opción 1: WebPay</Text>
-      <Boton onPress={() => abrirUrl(data.webpay.url)} style={{ marginTop: 6 }}>
+      {/* La transferencia va primero: es la via declarada por defecto. WebPay
+          queda como alternativa, no como opcion principal. */}
+      <View style={{ marginTop: 10 }}>
+        <FilaDato etiqueta="Banco" valor={t.banco} />
+        <FilaDato etiqueta="Tipo de cuenta" valor={t.tipoCuenta} />
+        <FilaDato etiqueta="N° de cuenta" valor={t.cuenta} />
+        <FilaDato etiqueta="Titular" valor={t.titular} />
+        <FilaDato etiqueta="RUT" valor={t.rut} />
+        <FilaDato etiqueta="Comprobante a" valor={t.correoComprobante} />
+      </View>
+      <Text style={[styles.parrafo, { marginTop: 12 }]}>{data.nota}</Text>
+
+      <Text style={[styles.parrafo, { marginTop: 14, fontSize: 13.5, color: COLORS.inkFaint }]}>
+        {data.notaWebpay}
+      </Text>
+      <Boton variant="secondary" onPress={() => abrirUrl(data.webpay.url)} style={{ marginTop: 8 }}>
         {data.webpay.texto}
       </Boton>
-
-      <Text style={[styles.opcion, { marginTop: 16 }]}>Opción 2: transferencia electrónica</Text>
-      <FilaDato etiqueta="Banco" valor={t.banco} />
-      <FilaDato etiqueta="N° de cuenta" valor={t.cuenta} />
-      <FilaDato etiqueta="Titular" valor={t.titular} />
-      <FilaDato etiqueta="RUT" valor={t.rut} />
-      <FilaDato etiqueta="Comprobante a" valor={t.correoComprobante} />
-      <Text style={[styles.parrafo, { marginTop: 12 }]}>{data.nota}</Text>
     </View>
   );
 }
@@ -249,7 +258,6 @@ const styles = StyleSheet.create({
   },
   pasoTexto: { flex: 1, fontFamily: FONTS.body, fontSize: 14.5, color: COLORS.inkSoft, lineHeight: 21 },
   separador: { marginTop: 18, paddingTop: 18, borderTopWidth: 1, borderTopColor: COLORS.line },
-  opcion: { fontFamily: FONTS.bodyBold, fontSize: 14.5, color: COLORS.ink, marginTop: 14 },
   filaDato: { flexDirection: 'row', gap: 10, paddingVertical: 2 },
   filaEtiqueta: { fontFamily: FONTS.body, fontSize: 14, color: COLORS.inkFaint, minWidth: 120 },
   filaValor: { flex: 1, fontFamily: FONTS.body, fontSize: 14, color: COLORS.ink },

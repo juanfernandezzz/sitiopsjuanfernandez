@@ -38,6 +38,7 @@ sitio-juan/
 │   ├── main.jsx / main-consentimiento.jsx / main-politica.jsx
 │   └── index.css
 ├── netlify/functions/       cal-webhook, enviar-consentimiento
+├── netlify/lib/             correoReserva (contenido del correo post reserva)
 ├── index.html / consentimiento.html / politica-privacidad.html
 ├── netlify.toml
 ├── tailwind.config.js / postcss.config.js / vite.config.js
@@ -98,10 +99,34 @@ Configurar workflows en cal.com con dos triggers:
 ### Política de reagendamiento
 Definir la política en cada event type (Booking Limits / Reschedule Policy). El copy del sitio en la sección Agendar dice "reagendamiento flexible según mi política" para no contradecir la config real.
 
-### Correo de consentimiento: una sola vez por persona
-El webhook `cal-webhook` envía el correo pidiendo el consentimiento **solo en el primer evento de cada persona**. Los siguientes (reagendamientos, controles nuevos, sesiones que agendas tú manualmente) no lo reenvían: se apoya en un registro persistente (Netlify Blobs, store `consentimiento-solicitado`) por email.
+### Correo automático post reserva (C42)
+El webhook `cal-webhook` envía un correo en **cada reserva nueva**, con el contenido que corresponde al tipo de sesión. El motivo es el bono: hay que comprarlo antes de cada sesión Fonasa, sin excepción, así que un control o una sesión de pareja también necesitan sus datos de prestador.
 
-Para pacientes que ya estaban en tratamiento cuando esto se desplegó, el registro arranca vacío, así que su próximo evento *nuevo* podría dispararles el correo una vez. Para evitarlo, agrega sus emails en la env var opcional de Netlify `CONSENTIMIENTO_YA_OBTENIDO` (separados por coma o salto de línea): esos correos nunca reciben la solicitud. No va en el repo por ser dato de pacientes.
+Ramas por slug de Cal.com (catálogo en `netlify/lib/correoReserva.js`):
+
+| Evento | Contenido de pago |
+|---|---|
+| `primera-sesion-bonofonasa` | bono Fonasa, código 0908101 |
+| `sesiones-de-avance-bonofonasa` | bono Fonasa, código 0908102 |
+| `psicoterapia-de-pareja-bonofonasa` | bono Fonasa, código 0908103 (trato en plural) |
+| `psicoterapia-individual-online-particular-15.000` | transferencia, se paga **después** de la sesión |
+| slug desconocido | sin bloque de pago (degradación segura) |
+
+Los datos del prestador que pide Mi Fonasa (nombre legal completo, RUT, región, comuna, código) van en una tabla dentro del correo. La atención es online: región y comuna se incluyen solo porque el formulario del bono las exige, y el correo lo aclara.
+
+Un reagendamiento **no** dispara correo: es la misma sesión movida de hora, el bono comprado sigue sirviendo y Cal.com ya avisa del cambio por su cuenta.
+
+**El consentimiento informado sigue siendo una sola vez por persona.** El registro persistente (Netlify Blobs, store `consentimiento-solicitado`, clave = email) ya no decide si se envía el correo, decide si el correo lleva ese paso. Para pacientes que ya estaban en tratamiento cuando esto se desplegó, el registro arranca vacío: agrega sus emails en la env var opcional de Netlify `CONSENTIMIENTO_YA_OBTENIDO` (separados por coma o salto de línea) y recibirán el correo sin el paso de consentimiento. No va en el repo por ser dato de pacientes.
+
+Para revisar el copy sin desplegar ni gastar envíos:
+
+```bash
+node scripts/previsualizar-correos.mjs
+```
+
+Genera en `dist-correos/` las ocho variantes (cuatro tipos de sesión, con y sin consentimiento) en HTML y texto plano, más un índice para abrirlas.
+
+**Sincronización:** los mismos datos de pago se muestran en `/cita-agendada` y en la app, con fuente en `src/lib/postReserva.js`. Si cambia un dato de pago hay que tocar los dos archivos: ese y `netlify/lib/correoReserva.js`.
 
 ## SEO y verificación de motores de búsqueda
 

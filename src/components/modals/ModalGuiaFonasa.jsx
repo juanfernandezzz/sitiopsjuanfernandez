@@ -54,12 +54,17 @@ const PASOS = [
   {
     titulo: 'Selecciona el prestador',
     desc:
-      'Elige la búsqueda por RUT del prestador e ingresa el mío (lo tienes en el bloque de datos arriba). Verás mi nombre y podrás seleccionarlo.',
+      `Elige la búsqueda por RUT del prestador e ingresa el mío (lo tienes en el bloque de datos arriba). Aparecerá mi nombre completo, ${PRESTADOR.nombreCompleto}, y podrás seleccionarlo.`,
+  },
+  {
+    titulo: 'Completa región y comuna si te las pide',
+    desc:
+      `Indica ${PRESTADOR.regionBono}, comuna ${PRESTADOR.comunaBono}. La atención es online por videollamada: esos datos son solo los que el sistema de Fonasa exige para emitir el bono, no cambian nada de tu sesión.`,
   },
   {
     titulo: 'Selecciona el código de prestación',
     desc:
-      `Elige uno de los códigos disponibles según el tipo de sesión: 09 08 101 o 09 08 102 para individual, 09 08 103 para pareja. El copago para tramos B, C y D es de ${PRECIOS.fonasaCopago.display}.`,
+      `Elige el código según el tipo de sesión: 09 08 101 para la primera sesión, 09 08 102 para control y avance, 09 08 103 para pareja. Si el sistema te pide escribirlo, va sin espacios (0908101, 0908102, 0908103). El copago para tramos B, C y D es de ${PRECIOS.fonasaCopago.display}.`,
   },
   {
     titulo: 'Paga el bono en línea',
@@ -363,8 +368,16 @@ export default function ModalGuiaFonasa() {
                     {RUT_PROFESIONAL}
                   </li>
                   <li>
-                    <strong style={{ fontWeight: 600 }}>Nombre:</strong> Juan
-                    Fernández
+                    <strong style={{ fontWeight: 600 }}>Nombre:</strong>{' '}
+                    {PRESTADOR.nombreCompleto}
+                  </li>
+                  <li>
+                    <strong style={{ fontWeight: 600 }}>Región:</strong>{' '}
+                    {PRESTADOR.regionBono}
+                  </li>
+                  <li>
+                    <strong style={{ fontWeight: 600 }}>Comuna:</strong>{' '}
+                    {PRESTADOR.comunaBono}
                   </li>
                   <li style={{ marginTop: 4 }}>
                     <strong style={{ fontWeight: 600 }}>
@@ -382,6 +395,21 @@ export default function ModalGuiaFonasa() {
                       <li>09 08 102 Telerehabilitación: Psicoterapia individual</li>
                       <li>09 08 103 Telerehabilitación: Sesión de psicoterapia de pareja (con ambos miembros)</li>
                     </ul>
+                  </li>
+                  {/* La atencion es online. Region y comuna van en el bloque
+                      porque el formulario del bono las pide, y sin esta linea
+                      la persona puede entender que la sesion es presencial en
+                      Valparaiso y abandonar. */}
+                  <li
+                    style={{
+                      marginTop: 8,
+                      fontSize: 13,
+                      color: 'rgba(42, 59, 76, 0.62)',
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    La atención es online por videollamada. La región y la comuna
+                    aparecen solo porque Fonasa las exige para emitir el bono.
                   </li>
                 </ul>
               </section>

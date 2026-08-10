@@ -1,36 +1,45 @@
 import { Resend } from 'resend';
 import { getStore } from '@netlify/blobs';
 import crypto from 'crypto';
+import { construirCorreo, formatearInicio, reservaDeSlug } from '../lib/correoReserva.js';
 
 /**
  * Webhook que Cal.com llama tras BOOKING_CREATED.
  *
- * Regla de negocio: el correo pidiendo el consentimiento se envía UNA sola vez por
- * persona, en su primer evento. Nunca en los siguientes, sea un reagendamiento, un
- * control nuevo o una sesión que el propio Juan agenda manualmente a un paciente ya
- * en tratamiento. El consentimiento se firma una vez y sigue vigente.
+ * REGLA DE NEGOCIO (cambiada en C42)
+ *   Antes: un solo correo por persona, en su primer evento y nunca mas.
+ *   Ahora: un correo en CADA reserva nueva, con el contenido que corresponde al
+ *   tipo de sesion reservada. El motivo es el bono: hay que comprarlo antes de
+ *   cada sesion Fonasa, sin excepcion, asi que un control o una sesion de pareja
+ *   tambien necesitan sus instrucciones y sus datos de prestador.
+ *
+ *   Lo que sigue siendo una sola vez por persona es el CONSENTIMIENTO INFORMADO:
+ *   se firma una vez y sigue vigente. El registro de Netlify Blobs ya no decide
+ *   si se envia el correo, decide si el correo lleva el bloque de consentimiento.
  *
  * Flujo:
  *   1. Valida la firma HMAC-SHA-256 del payload con CAL_WEBHOOK_SECRET.
- *   2. Descarta reagendamientos por las marcas del payload (early-out barato, ver nota).
- *   3. Consulta el registro persistente (Netlify Blobs) por email: si a esa persona ya
- *      se le pidió el consentimiento antes, no reenvía.
- *   4. Envía el correo con link pre-rellenado y, si el envío fue exitoso, deja al email
- *      registrado para no volver a molestarlo en futuros eventos.
+ *   2. Descarta reagendamientos por las marcas del payload.
+ *   3. Consulta el registro persistente por email: si a esa persona ya se le
+ *      pidio el consentimiento antes, el correo sale sin ese paso.
+ *   4. Arma el correo segun el slug del evento (netlify/lib/correoReserva.js) y
+ *      lo envia. Si incluia consentimiento y el envio fue exitoso, deja al email
+ *      registrado para no volver a pedirselo.
  *
  * NOTA sobre reagendamientos:
- *   Al reagendar una sesión, Cal.com crea un booking nuevo (uid nuevo) y dispara
- *   BOOKING_CREATED igual que una reserva nueva. La diferencia es que el payload de un
- *   reagendamiento trae rescheduleUid (uid del booking original) y campos hermanos
- *   (rescheduleId, rescheduleStartTime), que una reserva genuinamente nueva no tiene.
- *   El registro por email (paso 3) ya cubriría este caso, pero el early-out evita el
- *   trabajo y sigue funcionando aunque el almacén esté temporalmente caído.
+ *   Al reagendar, Cal.com crea un booking nuevo (uid nuevo) y dispara
+ *   BOOKING_CREATED igual que una reserva nueva. La diferencia es que el payload
+ *   trae rescheduleUid (uid del booking original) y campos hermanos. No se envia
+ *   correo: no es una sesion adicional, es la misma movida de hora, y el bono
+ *   comprado sigue sirviendo (vence a los 30 dias, no en la fecha original).
+ *   La confirmacion del cambio de hora la manda Cal.com por su cuenta.
  *
  * Registro (Netlify Blobs):
- *   Store 'consentimiento-solicitado', clave = email en minúsculas. Si el almacén no
- *   está disponible se degrada de forma segura ENVIANDO igual (el consentimiento es un
- *   requisito legal: preferimos un correo repetido a que un paciente nuevo se quede sin
- *   pedírselo). El único riesgo residual es un correo extra en esa rara ventana.
+ *   Store 'consentimiento-solicitado', clave = email en minusculas. Si el almacen
+ *   no esta disponible se degrada de forma segura PIDIENDO el consentimiento (es
+ *   un requisito legal: preferimos pedirlo dos veces a que un paciente nuevo se
+ *   quede sin firmarlo). El unico riesgo residual es un paso repetido en esa rara
+ *   ventana.
  *
  * Variables de entorno requeridas:
  *   - CAL_WEBHOOK_SECRET   (string aleatorio, mismo configurado en Cal.com)
@@ -40,29 +49,29 @@ import crypto from 'crypto';
  *   - SITIO_URL            (default: https://psicologojuanfernandez.cl)
  *
  * Variable de entorno opcional:
- *   - CONSENTIMIENTO_YA_OBTENIDO  Lista de emails (separados por coma o salto de línea)
- *       de pacientes que ya firmaron el consentimiento antes de existir el registro.
- *       Nunca reciben el correo. Útil para no molestar a pacientes en tratamiento al
- *       momento de desplegar esto. Se deja fuera del repo por ser dato de pacientes.
+ *   - CONSENTIMIENTO_YA_OBTENIDO  Lista de emails (separados por coma o salto de
+ *       linea) de pacientes que ya firmaron antes de existir el registro. Reciben
+ *       el correo igual, pero sin el paso de consentimiento. Se deja fuera del
+ *       repo por ser dato de pacientes.
  *
- * Retorna 200 incluso ante errores no críticos para evitar reintentos de Cal.com
- * que solo generarían ruido sin resolver el problema raíz.
+ * Retorna 200 incluso ante errores no criticos para evitar reintentos de Cal.com
+ * que solo generarian ruido sin resolver el problema raiz.
  */
 
-// Fábrica del almacén, aislada para poder inyectar un doble en las pruebas.
+// Fabrica del almacen, aislada para poder inyectar un doble en las pruebas.
 let _crearRegistro = () => getStore('consentimiento-solicitado');
 
-/** Solo para tests: sustituye la fábrica del registro por un doble en memoria. */
+/** Solo para tests: sustituye la fabrica del registro por un doble en memoria. */
 export function _setRegistroFactory(fn) {
   _crearRegistro = fn;
 }
 
-// Devuelve el store o null si Blobs no está disponible (degradación segura: enviar).
+// Devuelve el store o null si Blobs no esta disponible (degradacion segura).
 function obtenerRegistro() {
   try {
     return _crearRegistro();
   } catch (err) {
-    console.warn('Netlify Blobs no disponible, se enviará sin registrar:', err?.message);
+    console.warn('Netlify Blobs no disponible, se pedira el consentimiento igual:', err?.message);
     return null;
   }
 }
@@ -91,7 +100,7 @@ export const handler = async (event) => {
     .update(rawBody)
     .digest('hex');
 
-  // Comparación timing-safe
+  // Comparacion timing-safe
   let validSignature = false;
   try {
     validSignature =
@@ -122,8 +131,7 @@ export const handler = async (event) => {
 
   const booking = payload.payload || {};
 
-  // Reagendamiento: si el payload trae marcas de reschedule, el paciente ya firmó
-  // el consentimiento al reservar la primera vez. No reenviamos el correo.
+  // Reagendamiento: misma sesion movida de hora, no una sesion adicional.
   const esReagendamiento = Boolean(
     booking.rescheduleUid ||
       booking.rescheduleId ||
@@ -132,7 +140,7 @@ export const handler = async (event) => {
   );
   if (esReagendamiento) {
     console.log(
-      'Reagendamiento detectado (rescheduleUid=%s); no se reenvía consentimiento',
+      'Reagendamiento detectado (rescheduleUid=%s); no se envia correo',
       booking.rescheduleUid || booking.rescheduleId || booking.fromReschedule || 'true'
     );
     return { statusCode: 200, body: 'Reschedule ignored' };
@@ -145,36 +153,51 @@ export const handler = async (event) => {
     return { statusCode: 200, body: 'No attendee data' };
   }
 
-  // Registro por persona: si a este email ya se le pidió el consentimiento en un
-  // evento anterior, no reenviamos. Clave normalizada a minúsculas.
+  // --- Decision: este correo lleva el paso de consentimiento? ---------------
+  // Clave normalizada a minusculas.
   const emailKey = attendee.email.trim().toLowerCase();
+  let pedirConsentimiento = true;
 
-  // Lista opcional de emails que YA tienen el consentimiento firmado desde antes de
-  // existir este registro (típicamente pacientes en tratamiento al desplegar esto).
-  // Se configura en la env var CONSENTIMIENTO_YA_OBTENIDO de Netlify, separada por
-  // comas o saltos de línea. Va fuera del repo a propósito: son datos de pacientes.
+  // Lista opcional de emails que YA tienen el consentimiento firmado desde antes
+  // de existir este registro (tipicamente pacientes en tratamiento al desplegar
+  // esto). Se configura en la env var CONSENTIMIENTO_YA_OBTENIDO de Netlify.
   const emailsPrevios = (process.env.CONSENTIMIENTO_YA_OBTENIDO || '')
     .split(/[,\n]/)
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
   if (emailsPrevios.includes(emailKey)) {
-    console.log('Email %s marcado con consentimiento previo (env); no se envía', emailKey);
-    return { statusCode: 200, body: 'Consent on file (preseed)' };
+    console.log('Email %s marcado con consentimiento previo (env)', emailKey);
+    pedirConsentimiento = false;
   }
 
   const registro = obtenerRegistro();
-  if (registro) {
+  if (pedirConsentimiento && registro) {
     try {
       const yaSolicitado = await registro.get(emailKey);
       if (yaSolicitado) {
-        console.log('Consentimiento ya solicitado antes a %s; no se reenvía', emailKey);
-        return { statusCode: 200, body: 'Consent already requested' };
+        console.log('Consentimiento ya solicitado antes a %s; se omite el paso', emailKey);
+        pedirConsentimiento = false;
       }
     } catch (err) {
-      // Lectura fallida: degradación segura, seguimos y enviamos.
-      console.warn('No se pudo leer el registro (se enviará igual):', err?.message);
+      // Lectura fallida: degradacion segura, se pide igual.
+      console.warn('No se pudo leer el registro (se pedira igual):', err?.message);
     }
   }
+
+  const eventSlug = booking.eventType?.slug || '';
+  const eventTitle = booking.eventType?.title || '';
+  const ficha = reservaDeSlug(eventSlug);
+
+  // Trazabilidad en los logs de Netlify: con esto se ve de un vistazo por que un
+  // correo salio con un contenido y no con otro. Va antes de cualquier corte por
+  // configuracion faltante, para que quede registro incluso si no se envio nada.
+  console.log(
+    'Reserva %s (slug=%s, tipo=%s, consentimiento=%s)',
+    booking.uid || 'sin-uid',
+    eventSlug || 'sin-slug',
+    ficha.tipo || 'desconocido',
+    pedirConsentimiento ? 'si' : 'no'
+  );
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -189,217 +212,30 @@ export const handler = async (event) => {
   const REPLY_TO = process.env.EMAIL_REPLY_TO || 'juanfernandezpsicologo@gmail.com';
   const SITIO_URL = process.env.SITIO_URL || 'https://psicologojuanfernandez.cl';
 
-  const primerNombre = attendee.name.split(' ')[0];
-  const linkConsentimiento =
-    `${SITIO_URL}/consentimiento.html` +
-    `?nombre=${encodeURIComponent(attendee.name)}` +
-    `&email=${encodeURIComponent(attendee.email)}`;
+  const linkConsentimiento = pedirConsentimiento
+    ? `${SITIO_URL}/consentimiento.html` +
+      `?nombre=${encodeURIComponent(attendee.name)}` +
+      `&email=${encodeURIComponent(attendee.email)}`
+    : null;
 
-  const eventTitle = booking.eventType?.title || 'sesión';
-  const eventSlug = booking.eventType?.slug || '';
-  const startTime = booking.startTime
-    ? new Date(booking.startTime).toLocaleString('es-CL', {
-        dateStyle: 'long',
-        timeStyle: 'short',
-        timeZone: 'America/Santiago',
-      })
-    : '';
+  const inicioTexto = formatearInicio(booking.startTime);
 
-  // --- Datos del prestador (públicos, hardcodeados server-side a propósito).
-  // El webhook corre server-side y no lee las VITE_ vars del cliente. ---
-  const RUT_PRESTADOR = '17.520.730-9';
-  const WHATSAPP = '+56 9 7339 4530';
-  const MI_FONASA_URL = 'https://mi.fonasa.gob.cl/';
-  const WEBPAY_URL = 'https://www.webpay.cl/form-pay/388212';
-  const TRANSFER_EMAIL = 'juanfernandezpsicologo@gmail.com';
-
-  // Mapeo slug del evento Cal -> código Fonasa con su string literal del portal
-  // (idéntico a lo que el usuario ve en Mi Fonasa, para que seleccione el código
-  // correcto). Verificado contra src/lib/cal.js. Si el slug no calza, pagoLineas
-  // queda vacío y el email sale sin bloque de pago (degradación segura).
-  const FONASA_POR_SLUG = {
-    'primera-sesion-bonofonasa':
-      "09 08 101 Telerehabilitación: Psicólogo clínico (sesiones 45')",
-    'sesiones-de-avance-bonofonasa':
-      '09 08 102 Telerehabilitación: Psicoterapia individual',
-    'psicoterapia-de-pareja-bonofonasa':
-      '09 08 103 Telerehabilitación: Sesión de psicoterapia de pareja (con ambos miembros)',
-  };
-  const ES_PARTICULAR =
-    eventSlug === 'psicoterapia-individual-online-particular-15.000';
-
-  let pagoLineas = [];
-  if (FONASA_POR_SLUG[eventSlug]) {
-    pagoLineas = [
-      'PAGO DE TU SESIÓN (BONO FONASA)',
-      'Antes de la sesión necesitas comprar el bono Fonasa:',
-      `1. Entra a Mi Fonasa: ${MI_FONASA_URL}`,
-      `2. Busca el prestador por RUT: ${RUT_PRESTADOR} (Juan Fernández).`,
-      `3. Selecciona el código: ${FONASA_POR_SLUG[eventSlug]}`,
-      '4. Paga el bono (copago $5.570 para tramos B, C y D) y recibirás un folio.',
-      `5. Envíame el folio por WhatsApp (${WHATSAPP}) antes de la sesión. Sin el folio no puedo registrar la prestación en Fonasa.`,
-    ];
-  } else if (ES_PARTICULAR) {
-    pagoLineas = [
-      'PAGO DE TU SESIÓN (PARTICULAR, $15.000)',
-      'Puedes pagar de dos formas antes de la sesión:',
-      `Opción 1, WebPay: ${WEBPAY_URL}`,
-      'Opción 2, transferencia electrónica:',
-      '  Banco: BancoEstado (CuentaRUT)',
-      '  N° de cuenta: 17520730',
-      '  Titular: Juan Fernández',
-      `  RUT: ${RUT_PRESTADOR}`,
-      `  Correo para el comprobante: ${TRANSFER_EMAIL}`,
-      `Envíame el comprobante a ese correo o por WhatsApp (${WHATSAPP}).`,
-    ];
-  }
-
-  // Bloque de pago con líneas en blanco a los lados (vacío si el slug no calza).
-  const bloquePago = pagoLineas.length ? ['', ...pagoLineas, ''] : [];
-
-  // --- Versión HTML del correo -------------------------------------------
-  // Tabla con estilos inline (lo único confiable en clientes de email). Paleta
-  // de marca: sage en cabecera/pie, cream de fondo, terracotta en botones, ink
-  // en texto. Sin dependencias nuevas, sin imágenes externas, ancho 600px.
-  const C = {
-    sage: '#3F5B4A',
-    sageDark: '#2F4538',
-    cream: '#F6F1E8',
-    offwhite: '#FFFDF8',
-    terracotta: '#C97B5E',
-    ink: '#2A3B4C',
-    sageLight: '#A8B5A0',
-  };
-
-  const esc = (s) =>
-    String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-
-  const btn = (href, label, bg) =>
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0;">
-      <tr><td align="center" bgcolor="${bg}" style="border-radius:8px;">
-        <a href="${href}" target="_blank" style="display:inline-block;padding:13px 26px;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:bold;color:#FFFDF8;text-decoration:none;border-radius:8px;">${label}</a>
-      </td></tr>
-    </table>`;
-
-  // Bloque de pago en HTML, ramificado igual que el texto plano.
-  let pagoHtml = '';
-  if (FONASA_POR_SLUG[eventSlug]) {
-    pagoHtml = `
-      <tr><td style="padding:8px 32px 0;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.offwhite};border:1px solid #E7DFD0;border-radius:10px;">
-          <tr><td style="padding:20px 22px;">
-            <p style="margin:0 0 10px;font-family:Georgia,serif;font-size:17px;color:${C.sageDark};font-weight:bold;">Pago de tu sesión (bono Fonasa)</p>
-            <p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">Antes de la sesión necesitas comprar el bono Fonasa:</p>
-            <ol style="margin:0 0 14px;padding-left:20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:${C.ink};">
-              <li>Entra a Mi Fonasa con tu ClaveÚnica.</li>
-              <li>Busca el prestador por RUT: <strong>${RUT_PRESTADOR}</strong> (Juan Fernández).</li>
-              <li>Selecciona el código: <strong>${esc(FONASA_POR_SLUG[eventSlug])}</strong></li>
-              <li>Paga el bono (copago $5.570 para tramos B, C y D) y recibirás un folio.</li>
-              <li>Envíame el folio por WhatsApp (${WHATSAPP}) antes de la sesión. Sin el folio no puedo registrar la prestación en Fonasa.</li>
-            </ol>
-            ${btn(MI_FONASA_URL, 'Ir a Mi Fonasa', C.sage)}
-          </td></tr>
-        </table>
-      </td></tr>`;
-  } else if (ES_PARTICULAR) {
-    pagoHtml = `
-      <tr><td style="padding:8px 32px 0;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.offwhite};border:1px solid #E7DFD0;border-radius:10px;">
-          <tr><td style="padding:20px 22px;">
-            <p style="margin:0 0 10px;font-family:Georgia,serif;font-size:17px;color:${C.sageDark};font-weight:bold;">Pago de tu sesión (particular, $15.000)</p>
-            <p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">Puedes pagar de dos formas antes de la sesión:</p>
-            <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:${C.ink};"><strong>Opción 1, WebPay:</strong></p>
-            ${btn(WEBPAY_URL, 'Pagar con WebPay', C.terracotta)}
-            <p style="margin:14px 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:${C.ink};"><strong>Opción 2, transferencia electrónica:</strong></p>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">
-              <tr><td style="padding:2px 0;width:42%;color:#6A7480;">Banco</td><td style="padding:2px 0;">BancoEstado (CuentaRUT)</td></tr>
-              <tr><td style="padding:2px 0;color:#6A7480;">N° de cuenta</td><td style="padding:2px 0;">17520730</td></tr>
-              <tr><td style="padding:2px 0;color:#6A7480;">Titular</td><td style="padding:2px 0;">Juan Fernández</td></tr>
-              <tr><td style="padding:2px 0;color:#6A7480;">RUT</td><td style="padding:2px 0;">${RUT_PRESTADOR}</td></tr>
-              <tr><td style="padding:2px 0;color:#6A7480;">Comprobante a</td><td style="padding:2px 0;">${TRANSFER_EMAIL}</td></tr>
-            </table>
-            <p style="margin:12px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">Envíame el comprobante a ese correo o por WhatsApp (${WHATSAPP}).</p>
-          </td></tr>
-        </table>
-      </td></tr>`;
-  }
-
-  const htmlBody = `<!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background-color:${C.cream};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.cream};">
-    <tr><td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background-color:${C.cream};border-radius:14px;overflow:hidden;">
-        <tr><td style="background-color:${C.sage};padding:26px 32px;">
-          <p style="margin:0;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:${C.cream};">Juan Fernández</p>
-          <p style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.08em;color:${C.sageLight};text-transform:uppercase;">Psicólogo Clínico</p>
-        </td></tr>
-
-        <tr><td style="padding:28px 32px 0;">
-          <p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:${C.ink};">Hola ${esc(primerNombre)},</p>
-          <p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:${C.ink};">Confirmé tu reserva de <strong>${esc(eventTitle)}</strong>${startTime ? ` para el <strong>${esc(startTime)}</strong>` : ''}.</p>
-        </td></tr>
-
-        <tr><td style="padding:6px 32px 0;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${C.offwhite};border:1px solid #E7DFD0;border-radius:10px;">
-            <tr><td style="padding:20px 22px;">
-              <p style="margin:0 0 10px;font-family:Georgia,serif;font-size:17px;color:${C.sageDark};font-weight:bold;">Antes de la sesión: consentimiento informado</p>
-              <p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">Es un requisito legal (Ley 21.541 de Telemedicina) y toma unos 4 minutos. Recibirás una copia firmada en tu email y la podrás descargar en PDF.</p>
-              ${btn(linkConsentimiento, 'Completar consentimiento', C.terracotta)}
-            </td></tr>
-          </table>
-        </td></tr>
-
-        ${pagoHtml}
-
-        <tr><td style="padding:22px 32px 4px;">
-          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:${C.ink};">Si tienes cualquier duda escríbeme por WhatsApp al ${WHATSAPP} o responde a este email. Nos vemos pronto.</p>
-        </td></tr>
-
-        <tr><td style="padding:18px 32px 28px;">
-          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:${C.ink};">Juan Fernández</p>
-          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#6A7480;">Psicólogo Clínico</p>
-        </td></tr>
-
-        <tr><td style="background-color:${C.sageDark};padding:16px 32px;">
-          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:rgba(246,241,232,0.7);">psicologojuanfernandez.cl · Atención online por videollamada certificada por Fonasa.</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
+  const { asunto, html, texto } = construirCorreo({
+    nombre: attendee.name,
+    slug: eventSlug,
+    tituloEvento: eventTitle,
+    inicioTexto,
+    linkConsentimiento,
+  });
 
   try {
     const result = await resend.emails.send({
       from: FROM,
       to: [attendee.email],
       reply_to: REPLY_TO,
-      subject: 'Antes de tu sesión: consentimiento informado y pago',
-      html: htmlBody,
-      text: [
-        `Hola ${primerNombre},`,
-        ``,
-        `Confirmé tu reserva de "${eventTitle}"${startTime ? ` para el ${startTime}` : ''}.`,
-        ``,
-        `Antes de la sesión necesito que completes el consentimiento informado. Es un requisito legal (Ley 21.541 de Telemedicina) y toma unos 4 minutos.`,
-        ``,
-        `Completa aquí:`,
-        `${linkConsentimiento}`,
-        ``,
-        `Llegará una copia firmada a tu email y la podrás descargar en PDF.`,
-        ...bloquePago,
-        `Si tienes cualquier duda escríbeme por WhatsApp al ${WHATSAPP} o responde a este email.`,
-        ``,
-        `Nos vemos pronto.`,
-        ``,
-        `Juan Fernández`,
-        `Psicólogo Clínico`,
-        `psicologojuanfernandez.cl`,
-      ].join('\n'),
+      subject: asunto,
+      html,
+      text: texto,
     });
 
     if (result.error) {
@@ -408,16 +244,17 @@ export const handler = async (event) => {
       return { statusCode: 200, body: 'Email send failed but webhook acknowledged' };
     }
 
-    // Envío exitoso: dejamos constancia para no volver a pedirle el consentimiento
-    // a esta persona. Best-effort: si el registro falla, ya se envió, así que solo
-    // logueamos (a lo sumo se arriesga un correo repetido en un evento futuro).
-    if (registro) {
+    // Envio exitoso. Solo si el correo llevaba el consentimiento dejamos
+    // constancia, para no volver a pedirselo a esta persona. Best-effort: si el
+    // registro falla ya se envio, asi que solo logueamos (a lo sumo se arriesga
+    // un paso repetido en una reserva futura).
+    if (pedirConsentimiento && registro) {
       try {
         await registro.set(
           emailKey,
           JSON.stringify({
             solicitadoEn: new Date().toISOString(),
-            evento: eventTitle,
+            evento: eventTitle || eventSlug,
             uid: booking.uid || null,
           })
         );
