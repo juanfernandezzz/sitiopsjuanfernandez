@@ -85,7 +85,7 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C47';
+export const REVISION = 'C48';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -536,8 +536,6 @@ export function construirCorreo({
       `5. Selecciona el código de prestación ${ficha.codigo}. En el listado aparece como: ${ficha.codigoPortal}`,
       `6. Paga el copago de ${PRECIOS.fonasaCopago} y descarga el bono.`,
       `7. Envíame el bono o una foto de este por WhatsApp al ${CONTACTO.whatsappDisplay}.`,
-      '',
-      `Mi Fonasa: ${CONTACTO.miFonasaUrl}`,
       '',
       'IMPORTANTE: necesito el bono antes de la sesión, sin excepción. Sin el folio del bono no puedo registrar la prestación en Fonasa. El bono vence a los 30 días de emitido, y no se usará si la sesión no se puede llevar a cabo, quedando usable para un reagendamiento.'
     );
