@@ -38,7 +38,6 @@ sitio-juan/
 │   ├── main.jsx / main-consentimiento.jsx / main-politica.jsx
 │   └── index.css
 ├── netlify/functions/       cal-webhook, enviar-consentimiento
-├── netlify/lib/             correoReserva (contenido del correo post reserva)
 ├── index.html / consentimiento.html / politica-privacidad.html
 ├── netlify.toml
 ├── tailwind.config.js / postcss.config.js / vite.config.js
@@ -102,7 +101,17 @@ Definir la política en cada event type (Booking Limits / Reschedule Policy). El
 ### Correo automático post reserva (C42)
 El webhook `cal-webhook` envía un correo en **cada reserva nueva**, con el contenido que corresponde al tipo de sesión. El motivo es el bono: hay que comprarlo antes de cada sesión Fonasa, sin excepción, así que un control o una sesión de pareja también necesitan sus datos de prestador.
 
-Ramas por slug de Cal.com (catálogo en `netlify/lib/correoReserva.js`):
+Todo el correo vive dentro de `netlify/functions/cal-webhook.js`, en un solo archivo. En C42 el contenido estaba en `netlify/lib/`, fuera de la carpeta de funciones, y el correo siguió saliendo con el formato viejo pese a que el sitio sí se actualizó: ese import cruzado no llegó a la función desplegada. Un archivo autocontenido elimina esa clase de falla.
+
+**Comprobar qué versión está viva**, sin entrar a Netlify y sin mandarle un correo de prueba a nadie:
+
+```bash
+curl https://psicologojuanfernandez.cl/.netlify/functions/cal-webhook
+```
+
+Devuelve `{"funcion":"cal-webhook","revision":"C44","slugs":[...]}`. Si la revisión no es la esperada, el deploy no actualizó la función. **Subir `REVISION` en cada cambio del correo.**
+
+Ramas por slug de Cal.com (catálogo `CATALOGO` en el mismo archivo):
 
 | Evento | Contenido de pago |
 |---|---|
@@ -125,8 +134,6 @@ node scripts/previsualizar-correos.mjs
 ```
 
 Genera en `dist-correos/` las ocho variantes (cuatro tipos de sesión, con y sin consentimiento) en HTML y texto plano, más un índice para abrirlas.
-
-**El correo es autocontenido.** `netlify/lib/correoReserva.js` no importa nada de `src/lib`: tiene su propia copia de los datos del prestador y de pago. Cambiar el correo no toca el sitio ni la app.
 
 **Divergencia conocida, pendiente de decisión.** La página `/cita-agendada` y la pantalla equivalente de la app siguen con el encuadre anterior (`src/lib/postReserva.js`): titular "Juan Fernández" en vez del nombre legal completo, sin región ni comuna, sin el tipo de cuenta, WebPay como opción 1, y el particular presentado como pago **previo** a la sesión. El correo dice lo nuevo; esas dos superficies dicen lo viejo. Alinearlas es un cambio de copy del sitio, decisión aparte de este ciclo.
 

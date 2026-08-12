@@ -12,7 +12,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { CATALOGO, construirCorreo, formatearInicio } from '../netlify/lib/correoReserva.js';
+import { CATALOGO, construirCorreo, formatearInicio } from '../netlify/functions/cal-webhook.js';
 
 const SALIDA = 'dist-correos';
 
