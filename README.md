@@ -126,7 +126,9 @@ node scripts/previsualizar-correos.mjs
 
 Genera en `dist-correos/` las ocho variantes (cuatro tipos de sesión, con y sin consentimiento) en HTML y texto plano, más un índice para abrirlas.
 
-**Sincronización:** los mismos datos de pago se muestran en `/cita-agendada` y en la app, con fuente en `src/lib/postReserva.js`. Si cambia un dato de pago hay que tocar los dos archivos: ese y `netlify/lib/correoReserva.js`.
+**El correo es autocontenido.** `netlify/lib/correoReserva.js` no importa nada de `src/lib`: tiene su propia copia de los datos del prestador y de pago. Cambiar el correo no toca el sitio ni la app.
+
+**Divergencia conocida, pendiente de decisión.** La página `/cita-agendada` y la pantalla equivalente de la app siguen con el encuadre anterior (`src/lib/postReserva.js`): titular "Juan Fernández" en vez del nombre legal completo, sin región ni comuna, sin el tipo de cuenta, WebPay como opción 1, y el particular presentado como pago **previo** a la sesión. El correo dice lo nuevo; esas dos superficies dicen lo viejo. Alinearlas es un cambio de copy del sitio, decisión aparte de este ciclo.
 
 ## SEO y verificación de motores de búsqueda
 
