@@ -85,7 +85,7 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C46';
+export const REVISION = 'C47';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -479,12 +479,12 @@ export function construirCorreo({
 
     const pasos = [
       `Entra a Mi Fonasa (<strong>${esc(CONTACTO.miFonasaUrl)}</strong>) con tu ClaveÚnica.`,
-      'Abre la compra de bono en línea.',
+      'Abre la compra de bono en línea y elige la opción <strong>Bono Web</strong>, no Prebono Web.',
       `Busca al prestador por RUT: <strong>${esc(PRESTADOR.rut)}</strong>.`,
       `Si el sistema pide ubicación, indica <strong>${esc(PRESTADOR.region)}</strong>, comuna <strong>${esc(PRESTADOR.comuna)}</strong>.`,
       `Selecciona el código de prestación <strong>${esc(ficha.codigo)}</strong>. En el listado aparece como: ${esc(ficha.codigoPortal)}`,
-      `Paga el copago de <strong>${PRECIOS.fonasaCopago}</strong> y descarga el bono con su folio.`,
-      `Envíame el folio por WhatsApp al <strong>${esc(CONTACTO.whatsappDisplay)}</strong>.`,
+      `Paga el copago de <strong>${PRECIOS.fonasaCopago}</strong> y descarga el bono.`,
+      `Envíame el bono o una foto de este por WhatsApp al <strong>${esc(CONTACTO.whatsappDisplay)}</strong>.`,
     ];
 
     // Titulo en singular incluso en la sesion de pareja: el bono lo emite quien
@@ -492,7 +492,7 @@ export function construirCorreo({
     // para lo que si es de los dos (la reserva, la hora, la videollamada).
     pagoHtml = tarjeta(
       nPago,
-      'Compra el bono Fonasa y envíame el folio',
+      'Compra el bono Fonasa y envíamelo',
       [
         avisarCambioCodigo
           ? aviso(
@@ -508,14 +508,14 @@ export function construirCorreo({
         listaPasos(pasos),
         boton(CONTACTO.miFonasaUrl, 'Ir a Mi Fonasa', C.sage),
         aviso(
-          `<strong>Necesito el folio antes de la sesión, sin excepción.</strong> Sin el folio no puedo registrar la prestación en Fonasa. El bono vence a los 30 días de emitido, así que conviene comprarlo cerca de la fecha de la sesión.`
+          `<strong>Necesito el bono antes de la sesión, sin excepción.</strong> Sin el folio del bono no puedo registrar la prestación en Fonasa. El bono vence a los 30 días de emitido, y no se usará si la sesión no se puede llevar a cabo, quedando usable para un reagendamiento.`
         ),
       ].join('')
     );
 
     pagoTexto.push(
       '',
-      `PASO ${nPago}. COMPRA EL BONO FONASA Y ENVÍAME EL FOLIO`,
+      `PASO ${nPago}. COMPRA EL BONO FONASA Y ENVÍAMELO`,
       ...(avisarCambioCodigo
         ? [
             '',
@@ -530,16 +530,16 @@ export function construirCorreo({
       'La atención es online por videollamada. La región y la comuna aparecen solo porque Fonasa las exige para emitir el bono, no cambian nada de la sesión.',
       '',
       `1. Entra a Mi Fonasa (${CONTACTO.miFonasaUrl}) con tu ClaveÚnica.`,
-      '2. Abre la compra de bono en línea.',
+      '2. Abre la compra de bono en línea y elige la opción Bono Web, no Prebono Web.',
       `3. Busca al prestador por RUT: ${PRESTADOR.rut}.`,
       `4. Si el sistema pide ubicación, indica ${PRESTADOR.region}, comuna ${PRESTADOR.comuna}.`,
       `5. Selecciona el código de prestación ${ficha.codigo}. En el listado aparece como: ${ficha.codigoPortal}`,
-      `6. Paga el copago de ${PRECIOS.fonasaCopago} y descarga el bono con su folio.`,
-      `7. Envíame el folio por WhatsApp al ${CONTACTO.whatsappDisplay}.`,
+      `6. Paga el copago de ${PRECIOS.fonasaCopago} y descarga el bono.`,
+      `7. Envíame el bono o una foto de este por WhatsApp al ${CONTACTO.whatsappDisplay}.`,
       '',
       `Mi Fonasa: ${CONTACTO.miFonasaUrl}`,
       '',
-      'IMPORTANTE: necesito el folio antes de la sesión, sin excepción. Sin el folio no puedo registrar la prestación en Fonasa. El bono vence a los 30 días de emitido, así que conviene comprarlo cerca de la fecha de la sesión.'
+      'IMPORTANTE: necesito el bono antes de la sesión, sin excepción. Sin el folio del bono no puedo registrar la prestación en Fonasa. El bono vence a los 30 días de emitido, y no se usará si la sesión no se puede llevar a cabo, quedando usable para un reagendamiento.'
     );
   } else if (ficha.tipo === 'particular') {
     const filas = [
@@ -585,7 +585,10 @@ export function construirCorreo({
 
   // ---------------- Cierre ----------------
 
-  const llegadaTexto = `El día de ${plural ? 'su' : 'tu'} hora ${plural ? 'entran' : 'entras'} a la videollamada desde el navegador, sin descargar nada. La consulta usa Doxy.me, plataforma certificada por Fonasa.`;
+  // "Te mando el link" y no "aqui esta el link": el link va en el mismo parrafo
+  // (boton Sala de espera), pero la frase describe la mecanica real, no que la
+  // persona ya deba tenerlo guardado desde antes.
+  const llegadaTexto = `El día de ${plural ? 'su' : 'tu'} hora ${plural ? 'les mando' : 'te mando'} el link para conectarnos por videollamada, y ${plural ? 'entran' : 'entras'} desde el navegador, sin descargar nada. La consulta usa Doxy.me, plataforma certificada por Fonasa.`;
   const dudasTexto = `Si ${plural ? 'tienen' : 'tienes'} cualquier duda, ${plural ? 'escríbanme' : 'escríbeme'} por WhatsApp al ${CONTACTO.whatsappDisplay} o ${plural ? 'respondan' : 'responde'} a este correo. Nos vemos pronto.`;
 
   const cierreHtml = `

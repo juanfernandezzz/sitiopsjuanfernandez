@@ -109,7 +109,7 @@ Todo el correo vive dentro de `netlify/functions/cal-webhook.js`, en un solo arc
 curl https://psicologojuanfernandez.cl/.netlify/functions/cal-webhook
 ```
 
-Devuelve `{"funcion":"cal-webhook","revision":"C46","slugs":[...]}`. Si la revisión no es la esperada, el deploy no actualizó la función. **Subir `REVISION` en cada cambio del correo.**
+Devuelve `{"funcion":"cal-webhook","revision":"C47","slugs":[...]}`. Si la revisión no es la esperada, el deploy no actualizó la función. **Subir `REVISION` en cada cambio del correo.**
 
 Ramas por slug de Cal.com (catálogo `CATALOGO` en el mismo archivo):
 
