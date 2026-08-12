@@ -109,23 +109,38 @@ Todo el correo vive dentro de `netlify/functions/cal-webhook.js`, en un solo arc
 curl https://psicologojuanfernandez.cl/.netlify/functions/cal-webhook
 ```
 
-Devuelve `{"funcion":"cal-webhook","revision":"C44","slugs":[...]}`. Si la revisión no es la esperada, el deploy no actualizó la función. **Subir `REVISION` en cada cambio del correo.**
+Devuelve `{"funcion":"cal-webhook","revision":"C46","slugs":[...]}`. Si la revisión no es la esperada, el deploy no actualizó la función. **Subir `REVISION` en cada cambio del correo.**
 
 Ramas por slug de Cal.com (catálogo `CATALOGO` en el mismo archivo):
 
-| Evento | Contenido de pago |
-|---|---|
-| `primera-sesion-bonofonasa` | bono Fonasa, código 0908101 |
-| `sesiones-de-avance-bonofonasa` | bono Fonasa, código 0908102 |
-| `psicoterapia-de-pareja-bonofonasa` | bono Fonasa, código 0908103 (trato en plural) |
-| `psicoterapia-individual-online-particular-15.000` | transferencia, se paga **después** de la sesión |
-| slug desconocido | sin bloque de pago (degradación segura) |
+| Evento | Contenido de pago | Consentimiento |
+|---|---|---|
+| `primera-sesion-bonofonasa` | bono Fonasa, código 0908101 | **siempre** |
+| `sesiones-de-avance-bonofonasa` | bono Fonasa, código 0908102 | **nunca** |
+| `psicoterapia-de-pareja-bonofonasa` | bono Fonasa, código 0908103 (trato en plural) | según registro |
+| `psicoterapia-individual-online-particular-15.000` | transferencia, se paga **después** de la sesión | según registro |
+| slug desconocido | sin bloque de pago (degradación segura) | según registro |
 
-Los datos del prestador que pide Mi Fonasa (nombre legal completo, RUT, región, comuna, código) van en una tabla dentro del correo. La atención es online: región y comuna se incluyen solo porque el formulario del bono las exige, y el correo lo aclara.
+Los datos del prestador que pide Mi Fonasa (dónde comprarlo, nombre legal completo, RUT, región, comuna, código, copago) van en una tabla dentro del correo. La atención es online: región y comuna se incluyen solo porque el formulario del bono las exige, y el correo lo aclara. La URL del portal (`https://mi.fonasa.gob.cl`) va como texto visible además del botón, porque no es el mismo dominio que el sitio institucional `fonasa.cl` y ahí se pierde gente.
 
 Un reagendamiento **no** dispara correo: es la misma sesión movida de hora, el bono comprado sigue sirviendo y Cal.com ya avisa del cambio por su cuenta.
 
-**El consentimiento informado sigue siendo una sola vez por persona.** El registro persistente (Netlify Blobs, store `consentimiento-solicitado`, clave = email) ya no decide si se envía el correo, decide si el correo lleva ese paso. Para pacientes que ya estaban en tratamiento cuando esto se desplegó, el registro arranca vacío: agrega sus emails en la env var opcional de Netlify `CONSENTIMIENTO_YA_OBTENIDO` (separados por coma o salto de línea) y recibirán el correo sin el paso de consentimiento. No va en el repo por ser dato de pacientes.
+### Los tres estados de una reserva Fonasa
+
+1. **Primera sesión** → consentimiento + bono `0908101`. Lleva el consentimiento **siempre**, aunque el registro diga que ya se pidió: no se puede firmar antes de agendar, así que reservar una primera sesión implica necesitarlo. Este evento no tiene variante "sin consentimiento".
+2. **Primer control** de un correo que ya está en el registro → bono `0908102` con el aviso de que **el código cambió**. Comprar el bono con el código viejo deja la prestación sin poder registrarse, así que es el único aviso que se destaca. Llega **una sola vez** por correo electrónico.
+3. **Controles siguientes, y pareja** → bono, sin aviso.
+
+El control y avance **nunca** lleva el consentimiento: no se llega a un control sin haber pasado por la primera sesión, donde ya se pidió. Es un estado imposible y por eso no existe en el código.
+
+### Registros (Netlify Blobs)
+
+| Store | Clave | Responde | Si Blobs falla |
+|---|---|---|---|
+| `consentimiento-solicitado` | email en minúsculas | ¿ya se le pidió firmar? | se pide igual (requisito legal) |
+| `primer-control-avisado` | email en minúsculas | ¿ya se le avisó del cambio de código? | se avisa igual |
+
+Ninguno decide si se envía el correo, solo qué contenido lleva. Para pacientes que ya estaban en tratamiento cuando esto se desplegó, el registro arranca vacío: agrega sus emails en la env var opcional de Netlify `CONSENTIMIENTO_YA_OBTENIDO` (separados por coma o salto de línea) y recibirán el correo sin el paso de consentimiento. No va en el repo por ser dato de pacientes.
 
 Para revisar el copy sin desplegar ni gastar envíos:
 
@@ -133,7 +148,7 @@ Para revisar el copy sin desplegar ni gastar envíos:
 node scripts/previsualizar-correos.mjs
 ```
 
-Genera en `dist-correos/` las ocho variantes (cuatro tipos de sesión, con y sin consentimiento) en HTML y texto plano, más un índice para abrirlas.
+Genera en `dist-correos/` las siete variantes reales en HTML y texto plano, más un índice para abrirlas. Solo genera combinaciones posibles: la primera sesión no tiene "sin consentimiento" y el control no tiene "con consentimiento".
 
 **Alineación con el sitio y la app (C45).** La página `/cita-agendada` y la pantalla equivalente de la app dicen lo mismo que el correo: nombre legal completo como titular, región y comuna, tipo de cuenta explícito, transferencia como vía principal con WebPay como alternativa, y el particular como pago **posterior** a la sesión. La fuente es `src/lib/postReserva.js` (la app recibe una copia generada por `app/scripts/sync-contenido.mjs` en cada `npm install`).
 

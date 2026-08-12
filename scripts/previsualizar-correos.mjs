@@ -3,7 +3,7 @@
  *
  * Uso: node scripts/previsualizar-correos.mjs
  *
- * Renderiza a dist-correos/ las ocho variantes que puede tomar el correo (los
+ * Renderiza a dist-correos/ todas las variantes que puede tomar el correo (los
  * cuatro tipos de sesion, cada uno con y sin el paso de consentimiento) mas un
  * indice para abrirlas. Sirve para revisar el copy y el diseno sin desplegar ni
  * gastar envios de Resend, y para pillar de una un dato de pago mal escrito.
@@ -36,20 +36,37 @@ fs.mkdirSync(SALIDA, { recursive: true });
 
 const generadas = [];
 
+// Variantes por evento. La primera sesion no tiene "sin consentimiento": no se
+// puede firmar antes de agendar, asi que reservarla implica siempre necesitarlo.
+// El control y avance suma una tercera, el primer control de alguien que ya paso
+// por la primera sesion, que es la unica que avisa del cambio de codigo.
 for (const slug of Object.keys(CATALOGO)) {
-  for (const conConsentimiento of [true, false]) {
+  const ficha = CATALOGO[slug];
+  const variantes = [];
+  if (!ficha.consentimientoNunca) {
+    variantes.push({ id: 'con-consentimiento', consentimiento: true, primerControl: false });
+  }
+  if (!ficha.consentimientoSiempre) {
+    variantes.push({ id: 'sin-consentimiento', consentimiento: false, primerControl: false });
+  }
+  if (ficha.asuntoPrimerControl) {
+    variantes.push({ id: 'primer-control', consentimiento: false, primerControl: true });
+  }
+
+  for (const v of variantes) {
     const { asunto, html, texto } = construirCorreo({
       nombre: NOMBRE,
       slug,
       tituloEvento: TITULOS[slug],
       inicioTexto: INICIO,
-      linkConsentimiento: conConsentimiento ? LINK : null,
+      linkConsentimiento: v.consentimiento ? LINK : null,
+      primerControl: v.primerControl,
     });
 
-    const base = `${slug}--${conConsentimiento ? 'con' : 'sin'}-consentimiento`;
+    const base = `${slug}--${v.id}`;
     fs.writeFileSync(path.join(SALIDA, `${base}.html`), html, 'utf8');
     fs.writeFileSync(path.join(SALIDA, `${base}.txt`), `Asunto: ${asunto}\n\n${texto}`, 'utf8');
-    generadas.push({ base, asunto, slug, conConsentimiento });
+    generadas.push({ base, asunto, slug, variante: v.id });
   }
 }
 
@@ -73,7 +90,7 @@ const indice = `<!DOCTYPE html>
       .map(
         (g) => `<li>
       <span class="asunto">${g.asunto}</span>
-      <span class="meta">${g.slug} · ${g.conConsentimiento ? 'con consentimiento' : 'sin consentimiento'}</span><br>
+      <span class="meta">${g.slug} · ${g.variante}</span><br>
       <a href="./${g.base}.html">Ver HTML</a> · <a href="./${g.base}.txt">Ver texto plano</a>
     </li>`
       )

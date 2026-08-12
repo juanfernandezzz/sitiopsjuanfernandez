@@ -85,7 +85,7 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C44';
+export const REVISION = 'C46';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -110,7 +110,9 @@ export const CONTACTO = {
   whatsappUrl: 'https://wa.me/56973394530',
   email: 'juanfernandezpsicologo@gmail.com',
   doxyUrl: 'https://doxy.me/psicologojuanfernandez',
-  miFonasaUrl: 'https://mi.fonasa.gob.cl/',
+  // Sin barra final: esta URL se muestra como texto dentro del correo, no solo
+  // como destino del boton, y una barra suelta al final se lee como ruido.
+  miFonasaUrl: 'https://mi.fonasa.gob.cl',
   webpayUrl: 'https://www.webpay.cl/form-pay/388212',
 };
 
@@ -153,8 +155,14 @@ export const CATALOGO = {
     trato: 'tu',
     codigo: '0908101',
     codigoPortal: "09 08 101 Telerehabilitación: Psicólogo clínico (sesiones 45')",
+    // El consentimiento no se puede firmar antes de agendar, asi que reservar
+    // una primera sesion implica SIEMPRE necesitar los dos: firmar y comprar el
+    // bono. Por eso este evento no tiene variante "sin consentimiento": ambos
+    // asuntos son el mismo, y consentimientoSiempre fuerza el bloque aunque el
+    // registro diga que ya se pidio antes.
+    consentimientoSiempre: true,
     asuntoCon: 'Antes de tu primera sesión: consentimiento y bono Fonasa',
-    asuntoSin: 'Antes de tu primera sesión: cómo comprar tu bono Fonasa',
+    asuntoSin: 'Antes de tu primera sesión: consentimiento y bono Fonasa',
     nota: null,
   },
   'sesiones-de-avance-bonofonasa': {
@@ -163,8 +171,20 @@ export const CATALOGO = {
     trato: 'tu',
     codigo: '0908102',
     codigoPortal: '09 08 102 Telerehabilitación: Psicoterapia individual',
-    asuntoCon: 'Antes de tu sesión de avance: consentimiento y bono Fonasa',
+    // Un control nunca lleva el consentimiento. El consentimiento se pide una
+    // sola vez, cuando Cal dispara la primera cita, y no se puede llegar a un
+    // control sin haber pasado por esa primera sesion. Por eso este evento no
+    // tiene variante "con consentimiento": seria un estado imposible.
+    consentimientoNunca: true,
     asuntoSin: 'Antes de tu sesión de avance: cómo comprar tu bono Fonasa',
+    // Tercer estado, exclusivo de este evento: el PRIMER control de alguien que
+    // ya paso por la primera sesion. Es la unica vez que hay que avisar que el
+    // codigo de prestacion cambia (0908101 -> 0908102); comprar el bono con el
+    // codigo viejo deja la prestacion sin poder registrarse. Se manda una sola
+    // vez por correo electronico (store 'primer-control-avisado').
+    asuntoPrimerControl:
+      'Antes de tu sesión: cómo comprar tu bono Fonasa (después de la primera)',
+    codigoAnterior: '0908101',
     nota: null,
   },
   'psicoterapia-de-pareja-bonofonasa': {
@@ -338,6 +358,7 @@ export function construirCorreo({
   tituloEvento,
   inicioTexto = '',
   linkConsentimiento = null,
+  primerControl = false,
 }) {
   const ficha = reservaDeSlug(slug);
   const primerNombre = String(nombre || '').trim().split(/\s+/)[0] || 'hola';
@@ -355,13 +376,29 @@ export function construirCorreo({
   const nPago = ficha.tipo === 'fonasa' ? ++n : null;
   const totalPasos = n;
 
-  const asunto = conConsentimiento ? ficha.asuntoCon : ficha.asuntoSin;
+  // El aviso de cambio de codigo solo tiene sentido si la persona ya compro un
+  // bono con el codigo anterior, es decir si ya paso por la primera sesion. Si
+  // este correo ademas pide el consentimiento, es alguien que nunca reservo
+  // conmigo: no hay codigo viejo que corregir y el aviso confundiria.
+  const avisarCambioCodigo =
+    primerControl && !conConsentimiento && Boolean(ficha.codigoAnterior);
+
+  // El control y avance no declara asuntoCon a proposito (estado imposible: no
+  // se llega a un control sin haber firmado en la primera sesion). El respaldo a
+  // asuntoSin existe solo para que un evento futuro sin ese campo no salga con
+  // el asunto vacio.
+  const asunto = conConsentimiento
+    ? ficha.asuntoCon || ficha.asuntoSin
+    : avisarCambioCodigo && ficha.asuntoPrimerControl
+      ? ficha.asuntoPrimerControl
+      : ficha.asuntoSin;
 
   // Texto de vista previa (lo que se lee en la bandeja junto al asunto). Es el
   // segundo elemento mas leido despues del asunto y por defecto los clientes
   // rellenan con el primer texto del cuerpo, que aqui seria el saludo.
-  const preheader =
-    totalPasos === 2
+  const preheader = avisarCambioCodigo
+    ? 'Ojo: desde esta sesión el código del bono es otro.'
+    : totalPasos === 2
       ? 'Dos pasos breves y queda todo listo para la sesión.'
       : totalPasos === 1
         ? 'Un paso breve y queda todo listo para la sesión.'
@@ -426,7 +463,12 @@ export function construirCorreo({
   const pagoTexto = [];
 
   if (ficha.tipo === 'fonasa') {
+    // "Dónde comprarlo" va como primera fila y no solo en el boton: mucha gente
+    // busca el bono en fonasa.cl (el sitio institucional) y no en el portal de
+    // tramites, que es otro dominio. La URL explicita ahorra ese desvio, y en el
+    // texto plano es lo unico que queda si el cliente de correo no pinta botones.
     const filas = [
+      ['Dónde comprarlo', CONTACTO.miFonasaUrl],
       ['Nombre del prestador', PRESTADOR.nombreCompleto],
       ['RUT', PRESTADOR.rut],
       ['Región', PRESTADOR.region],
@@ -436,7 +478,7 @@ export function construirCorreo({
     ];
 
     const pasos = [
-      'Entra a Mi Fonasa con tu ClaveÚnica.',
+      `Entra a Mi Fonasa (<strong>${esc(CONTACTO.miFonasaUrl)}</strong>) con tu ClaveÚnica.`,
       'Abre la compra de bono en línea.',
       `Busca al prestador por RUT: <strong>${esc(PRESTADOR.rut)}</strong>.`,
       `Si el sistema pide ubicación, indica <strong>${esc(PRESTADOR.region)}</strong>, comuna <strong>${esc(PRESTADOR.comuna)}</strong>.`,
@@ -452,6 +494,11 @@ export function construirCorreo({
       nPago,
       'Compra el bono Fonasa y envíame el folio',
       [
+        avisarCambioCodigo
+          ? aviso(
+              `<strong>Ojo, el código cambió.</strong> Para tu primera sesión compraste el bono con el código ${esc(ficha.codigoAnterior)}. Desde el control y avance en adelante el código es <strong>${esc(ficha.codigo)}</strong>. Mismo prestador y mismo copago, solo cambia el código.`
+            )
+          : '',
         parrafo('Estos son los datos que te va a pedir el sistema de Fonasa:'),
         tablaDatos(filas),
         parrafo(
@@ -469,13 +516,20 @@ export function construirCorreo({
     pagoTexto.push(
       '',
       `PASO ${nPago}. COMPRA EL BONO FONASA Y ENVÍAME EL FOLIO`,
+      ...(avisarCambioCodigo
+        ? [
+            '',
+            `OJO, EL CÓDIGO CAMBIÓ: para tu primera sesión compraste el bono con el código ${ficha.codigoAnterior}. Desde el control y avance en adelante el código es ${ficha.codigo}. Mismo prestador y mismo copago, solo cambia el código.`,
+          ]
+        : []),
+      '',
       'Estos son los datos que te va a pedir el sistema de Fonasa:',
       '',
       ...filas.map(([etiqueta, valor]) => `  ${etiqueta}: ${valor}`),
       '',
       'La atención es online por videollamada. La región y la comuna aparecen solo porque Fonasa las exige para emitir el bono, no cambian nada de la sesión.',
       '',
-      '1. Entra a Mi Fonasa con tu ClaveÚnica.',
+      `1. Entra a Mi Fonasa (${CONTACTO.miFonasaUrl}) con tu ClaveÚnica.`,
       '2. Abre la compra de bono en línea.',
       `3. Busca al prestador por RUT: ${PRESTADOR.rut}.`,
       `4. Si el sistema pide ubicación, indica ${PRESTADOR.region}, comuna ${PRESTADOR.comuna}.`,
@@ -633,6 +687,21 @@ export function construirCorreo({
  *   quede sin firmarlo). El unico riesgo residual es un paso repetido en esa rara
  *   ventana.
  *
+ *   Store 'primer-control-avisado', clave = email en minusculas. Marca a quien ya
+ *   recibio el aviso de que el codigo de prestacion cambia (0908101 -> 0908102)
+ *   al pasar de la primera sesion al control y avance. Se manda una sola vez.
+ *   Sin almacen se degrada avisando de mas: comprar el bono con el codigo viejo
+ *   deja la prestacion sin poder registrarse, que es peor que un aviso repetido.
+ *
+ * Los tres estados posibles de una reserva Fonasa:
+ *   1. Primera sesion  -> consentimiento + bono 0908101. Siempre lleva el
+ *      consentimiento (no se puede firmar antes de agendar, asi que reservar una
+ *      primera sesion implica necesitarlo).
+ *   2. Primer control  -> bono 0908102 con el aviso de que el codigo cambio.
+ *   3. Control siguiente, o pareja -> bono, sin aviso.
+ *   El control y avance NUNCA lleva el consentimiento (estados 2 y 3): no se
+ *   llega a un control sin haber pasado por la primera sesion.
+ *
  * Variables de entorno requeridas:
  *   - CAL_WEBHOOK_SECRET   (string aleatorio, mismo configurado en Cal.com)
  *   - RESEND_API_KEY
@@ -650,12 +719,27 @@ export function construirCorreo({
  * que solo generarian ruido sin resolver el problema raiz.
  */
 
-// Fabrica del almacen, aislada para poder inyectar un doble en las pruebas.
+// Fabricas de los dos almacenes, aisladas para poder inyectar dobles en pruebas.
+//
+//   consentimiento-solicitado -> a este correo ya se le pidio firmar.
+//   primer-control-avisado    -> a este correo ya se le aviso que el codigo de
+//                                prestacion cambia al pasar a control y avance.
+//
+// Son dos stores y no dos claves del mismo porque las preguntas son distintas y
+// se degradan distinto: sin el primero preferimos pedir el consentimiento de mas
+// (requisito legal); sin el segundo preferimos avisar del cambio de codigo de
+// mas (comprar el bono con el codigo viejo deja la prestacion sin registrar).
 let _crearRegistro = () => getStore('consentimiento-solicitado');
+let _crearRegistroControl = () => getStore('primer-control-avisado');
 
 /** Solo para tests: sustituye la fabrica del registro por un doble en memoria. */
 export function _setRegistroFactory(fn) {
   _crearRegistro = fn;
+}
+
+/** Solo para tests: idem para el registro del aviso de primer control. */
+export function _setRegistroControlFactory(fn) {
+  _crearRegistroControl = fn;
 }
 
 // Devuelve el store o null si Blobs no esta disponible (degradacion segura).
@@ -664,6 +748,15 @@ function obtenerRegistro() {
     return _crearRegistro();
   } catch (err) {
     console.warn('Netlify Blobs no disponible, se pedira el consentimiento igual:', err?.message);
+    return null;
+  }
+}
+
+function obtenerRegistroControl() {
+  try {
+    return _crearRegistroControl();
+  } catch (err) {
+    console.warn('Netlify Blobs no disponible, se avisara el cambio de codigo igual:', err?.message);
     return null;
   }
 }
@@ -760,10 +853,13 @@ export const handler = async (event) => {
     return { statusCode: 200, body: 'No attendee data' };
   }
 
-  // --- Decision: este correo lleva el paso de consentimiento? ---------------
-  // Clave normalizada a minusculas.
+  // --- Este correo ya paso por aqui alguna vez? -----------------------------
+  // Clave normalizada a minusculas. `yaConocido` responde una sola pregunta: a
+  // este correo ya se le pidio el consentimiento en algun momento. Se calcula
+  // aparte de la decision de pintar el bloque porque las dos ramas de abajo la
+  // necesitan por separado: el aviso de cambio de codigo depende de que el
+  // correo YA ESTE en el registro, no de si este correo pide firmar o no.
   const emailKey = attendee.email.trim().toLowerCase();
-  let pedirConsentimiento = true;
 
   // Lista opcional de emails que YA tienen el consentimiento firmado desde antes
   // de existir este registro (tipicamente pacientes en tratamiento al desplegar
@@ -772,21 +868,21 @@ export const handler = async (event) => {
     .split(/[,\n]/)
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  if (emailsPrevios.includes(emailKey)) {
+
+  let yaConocido = emailsPrevios.includes(emailKey);
+  if (yaConocido) {
     console.log('Email %s marcado con consentimiento previo (env)', emailKey);
-    pedirConsentimiento = false;
   }
 
   const registro = obtenerRegistro();
-  if (pedirConsentimiento && registro) {
+  if (!yaConocido && registro) {
     try {
-      const yaSolicitado = await registro.get(emailKey);
-      if (yaSolicitado) {
-        console.log('Consentimiento ya solicitado antes a %s; se omite el paso', emailKey);
-        pedirConsentimiento = false;
+      if (await registro.get(emailKey)) {
+        console.log('Consentimiento ya solicitado antes a %s', emailKey);
+        yaConocido = true;
       }
     } catch (err) {
-      // Lectura fallida: degradacion segura, se pide igual.
+      // Lectura fallida: degradacion segura, se trata como desconocido y se pide.
       console.warn('No se pudo leer el registro (se pedira igual):', err?.message);
     }
   }
@@ -795,15 +891,58 @@ export const handler = async (event) => {
   const eventTitle = booking.eventType?.title || '';
   const ficha = reservaDeSlug(eventSlug);
 
+  // --- Decision: este correo lleva el paso de consentimiento? ---------------
+  let pedirConsentimiento = !yaConocido;
+
+  // La primera sesion siempre lo lleva, aunque el registro diga que ya se pidio:
+  // no se puede firmar antes de agendar, asi que reservar una primera sesion
+  // implica necesitarlo si o si. Gana sobre el registro, pero no sobre
+  // CONSENTIMIENTO_YA_OBTENIDO, que es una exclusion puesta a mano.
+  if (ficha.consentimientoSiempre && !emailsPrevios.includes(emailKey)) {
+    if (!pedirConsentimiento) {
+      console.log('Primera sesion: se vuelve a pedir el consentimiento a %s', emailKey);
+    }
+    pedirConsentimiento = true;
+  }
+
+  // El control y avance nunca lo lleva: no se llega a un control sin haber
+  // pasado por la primera sesion, donde ya se pidio.
+  if (ficha.consentimientoNunca) {
+    pedirConsentimiento = false;
+  }
+
+  // --- Decision: este correo avisa que el codigo de prestacion cambio? -------
+  // Solo en el primer control y avance de un correo que YA esta en el registro
+  // (es decir, que ya paso por su primera sesion y compro un bono con el codigo
+  // anterior), y una sola vez por correo electronico.
+  let primerControl = false;
+  const registroControl = ficha.asuntoPrimerControl ? obtenerRegistroControl() : null;
+  if (ficha.asuntoPrimerControl && yaConocido) {
+    primerControl = true;
+    if (registroControl) {
+      try {
+        const yaAvisado = await registroControl.get(emailKey);
+        if (yaAvisado) {
+          console.log('Cambio de codigo ya avisado a %s; se omite', emailKey);
+          primerControl = false;
+        }
+      } catch (err) {
+        // Lectura fallida: degradacion segura, se avisa igual.
+        console.warn('No se pudo leer el registro de control (se avisara igual):', err?.message);
+      }
+    }
+  }
+
   // Trazabilidad en los logs de Netlify: con esto se ve de un vistazo por que un
   // correo salio con un contenido y no con otro. Va antes de cualquier corte por
   // configuracion faltante, para que quede registro incluso si no se envio nada.
   console.log(
-    'Reserva %s (slug=%s, tipo=%s, consentimiento=%s)',
+    'Reserva %s (slug=%s, tipo=%s, consentimiento=%s, primerControl=%s)',
     booking.uid || 'sin-uid',
     eventSlug || 'sin-slug',
     ficha.tipo || 'desconocido',
-    pedirConsentimiento ? 'si' : 'no'
+    pedirConsentimiento ? 'si' : 'no',
+    primerControl ? 'si' : 'no'
   );
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -833,6 +972,7 @@ export const handler = async (event) => {
     tituloEvento: eventTitle,
     inicioTexto,
     linkConsentimiento,
+    primerControl,
   });
 
   try {
@@ -867,6 +1007,22 @@ export const handler = async (event) => {
         );
       } catch (err) {
         console.warn('Consentimiento enviado pero no se pudo registrar:', err?.message);
+      }
+    }
+
+    // Idem para el aviso de cambio de codigo: se marca solo si de verdad salio.
+    if (primerControl && registroControl) {
+      try {
+        await registroControl.set(
+          emailKey,
+          JSON.stringify({
+            avisadoEn: new Date().toISOString(),
+            codigo: ficha.codigo,
+            uid: booking.uid || null,
+          })
+        );
+      } catch (err) {
+        console.warn('Aviso de cambio de codigo enviado pero no registrado:', err?.message);
       }
     }
 

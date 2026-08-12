@@ -39,7 +39,7 @@ const PASOS = [
   {
     titulo: 'Entra a tu cuenta de Mi Fonasa',
     desc:
-      'Desde el sitio fonasa.cl, busca el acceso a Mi Fonasa. Vas a necesitar tu ClaveÚnica.',
+      'El portal para comprar el bono es https://mi.fonasa.gob.cl, que no es el mismo sitio institucional fonasa.cl. Vas a necesitar tu ClaveÚnica.',
   },
   {
     titulo: 'Inicia sesión con ClaveÚnica',
