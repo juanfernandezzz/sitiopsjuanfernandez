@@ -100,7 +100,10 @@ export default function CitaAgendadaApp() {
           </Tarjeta>
 
           {/* Paso 2: pago */}
-          <Tarjeta numero={2} titulo="Paga tu sesión antes de la hora">
+          {/* El titulo es neutro respecto al momento del pago: el bono Fonasa se
+              compra antes de la sesion y la sesion particular se paga despues,
+              asi que cada bloque declara su propio plazo. */}
+          <Tarjeta numero={2} titulo="Cómo se paga tu sesión">
             {ambos && (
               <p className="font-body text-ink/70" style={{ ...parrafo, fontSize: 14 }}>
                 Sigue el bloque que corresponde a la sesión que reservaste.
@@ -216,20 +219,24 @@ function BloqueParticular({ data, conSeparador }) {
       <p className="font-body text-ink" style={{ fontSize: 15, fontWeight: 600, margin: '4px 0 6px' }}>{data.titulo}</p>
       <p className="font-body text-ink/80" style={parrafo}>{data.intro}</p>
 
-      <p className="font-body text-ink" style={{ fontSize: 15, fontWeight: 600, margin: '14px 0 6px' }}>Opción 1: WebPay</p>
-      <Button as="a" href={data.webpay.url} variant="primary" size="md" target="_blank" rel="noopener noreferrer">
-        {data.webpay.texto}
-      </Button>
-
-      <p className="font-body text-ink" style={{ fontSize: 15, fontWeight: 600, margin: '16px 0 6px' }}>Opción 2: transferencia electrónica</p>
-      <dl className="font-body text-ink/80" style={{ fontSize: 15, lineHeight: 1.65, margin: 0 }}>
+      {/* La transferencia va primero: es la via declarada por defecto. WebPay
+          queda como alternativa, no como opcion principal. */}
+      <dl className="font-body text-ink/80" style={{ fontSize: 15, lineHeight: 1.65, margin: '10px 0 0' }}>
         <FilaDato etiqueta="Banco" valor={t.banco} />
+        <FilaDato etiqueta="Tipo de cuenta" valor={t.tipoCuenta} />
         <FilaDato etiqueta="N° de cuenta" valor={t.cuenta} />
         <FilaDato etiqueta="Titular" valor={t.titular} />
         <FilaDato etiqueta="RUT" valor={t.rut} />
         <FilaDato etiqueta="Comprobante a" valor={t.correoComprobante} />
       </dl>
       <p className="font-body text-ink/80" style={{ ...parrafo, marginTop: 12 }}>{data.nota}</p>
+
+      <p className="font-body text-ink/70" style={{ ...parrafo, fontSize: 14, marginTop: 14 }}>{data.notaWebpay}</p>
+      <div style={{ marginTop: 8 }}>
+        <Button as="a" href={data.webpay.url} variant="secondary" size="md" target="_blank" rel="noopener noreferrer">
+          {data.webpay.texto}
+        </Button>
+      </div>
     </div>
   );
 }

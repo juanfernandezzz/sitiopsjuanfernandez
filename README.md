@@ -135,7 +135,11 @@ node scripts/previsualizar-correos.mjs
 
 Genera en `dist-correos/` las ocho variantes (cuatro tipos de sesión, con y sin consentimiento) en HTML y texto plano, más un índice para abrirlas.
 
-**Divergencia conocida, pendiente de decisión.** La página `/cita-agendada` y la pantalla equivalente de la app siguen con el encuadre anterior (`src/lib/postReserva.js`): titular "Juan Fernández" en vez del nombre legal completo, sin región ni comuna, sin el tipo de cuenta, WebPay como opción 1, y el particular presentado como pago **previo** a la sesión. El correo dice lo nuevo; esas dos superficies dicen lo viejo. Alinearlas es un cambio de copy del sitio, decisión aparte de este ciclo.
+**Alineación con el sitio y la app (C45).** La página `/cita-agendada` y la pantalla equivalente de la app dicen lo mismo que el correo: nombre legal completo como titular, región y comuna, tipo de cuenta explícito, transferencia como vía principal con WebPay como alternativa, y el particular como pago **posterior** a la sesión. La fuente es `src/lib/postReserva.js` (la app recibe una copia generada por `app/scripts/sync-contenido.mjs` en cada `npm install`).
+
+El correo **no** importa ese archivo: `cal-webhook.js` tiene su propia copia de los datos. Si cambia un dato de pago hay que tocar los dos, y subir `REVISION` para poder comprobar el deploy. La separación es a propósito: el correo es la ruta crítica y no debe depender del bundle del sitio.
+
+Fuera de alcance a propósito: la guía de compra del bono (`ModalGuiaFonasa`) sigue sin región ni comuna. Es la guía del portal de Fonasa, no un espejo del correo.
 
 ## SEO y verificación de motores de búsqueda
 

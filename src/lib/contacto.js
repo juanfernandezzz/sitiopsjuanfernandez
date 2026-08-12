@@ -7,12 +7,23 @@
 
 export const PRESTADOR = {
   nombre: 'Juan Fernández',
+  // Nombre legal completo. Es el que devuelve Mi Fonasa al buscar por RUT y el
+  // que hay que reconocer para no comprar el bono a otro prestador; tambien es
+  // el titular de la cuenta bancaria. Se muestra solo donde importa esa
+  // verificacion (guia del bono, datos de transferencia, correo post reserva);
+  // en el resto del sitio el trato sigue siendo el nombre corto.
+  nombreCompleto: 'Juan Daniel Fernández Arce',
   titulo: 'Psicólogo Clínico',
   rut: '17.520.730-9',
   universidad: 'Universidad Viña del Mar',
   anioTitulo: 2025,
   rnpi: '876085',
   ciudadBase: 'Valparaíso',
+  // Datos geograficos que exige el formulario de compra del bono Fonasa. La
+  // atencion es online: esto no describe donde ocurre la sesion, solo lo que el
+  // sistema de Fonasa pide para emitirlo, y asi se le explica a la persona.
+  regionBono: 'Región de Valparaíso',
+  comunaBono: 'Valparaíso',
 };
 
 /**

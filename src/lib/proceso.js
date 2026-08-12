@@ -20,7 +20,7 @@ export const PROCESO_ONLINE = {
       num: '01',
       titulo: 'Tu reserva queda confirmada',
       texto: 'Recibes en tu email la confirmación con fecha, hora y enlace de la sesión. Todo desde Cal.com.',
-      nota: 'Antes de la sesión: compras tu bono Fonasa y me envías el folio, o pagas la sesión particular por transferencia o WebPay. Te lo recuerdo en el mismo correo.',
+      nota: 'Si vas con bono Fonasa, lo compras y me envías el folio antes de la sesión, sin excepción. La sesión particular se paga después de la sesión, por transferencia. Te llega todo detallado en el mismo correo.',
     },
     {
       num: '02',
