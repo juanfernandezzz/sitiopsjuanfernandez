@@ -162,7 +162,9 @@ export default function ModuloDisponibilidad({
     );
   }
 
-  // variante "seccion": el módulo completo.
+  // variante "seccion": el módulo completo. C50: el remanente de cupos es el
+  // que calcula la función en vivo (datos.cuposSemana), nunca la constante
+  // estática: esa cuenta cambia reserva a reserva y la constante mentiría.
   return (
     <div
       className={`bg-offwhite ring-1 ring-sage/25 rounded-2xl p-5 ${className}`}
@@ -175,7 +177,9 @@ export default function ModuloDisponibilidad({
         </span>
       </div>
 
-      <p className="font-display text-[22px] leading-snug text-ink">{datos.larga}</p>
+      <p className="font-display text-[22px] leading-snug text-ink">
+        {`Próxima hora: ${datos.larga}.`}
+      </p>
 
       {cercano && datos.horas.length > 0 ? (
         <p className="font-body text-[14px] text-sage mt-1">
@@ -183,7 +187,13 @@ export default function ModuloDisponibilidad({
         </p>
       ) : null}
 
-      <p className="font-body text-[12.5px] text-sage/90 mt-3">{AVISO_CUPOS_LIMITADOS}</p>
+      {cercano && typeof datos.cuposSemana === 'number' ? (
+        <p className="font-body text-[12.5px] text-sage/90 mt-3">
+          {`Cupos disponibles esta semana: ${datos.cuposSemana}`}
+        </p>
+      ) : (
+        <p className="font-body text-[12.5px] text-sage/90 mt-3">{AVISO_CUPOS_LIMITADOS}</p>
+      )}
 
       <div className="mt-4">
         {cercano ? (

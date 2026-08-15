@@ -19,7 +19,6 @@ const Cal = lazy(() =>
 
 const TABS = [
   { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: PRECIOS.fonasaCopago.display },
-  { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: PRECIOS.fonasaCopago.display },
   { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: PRECIOS.fonasaCopago.display },
   { key: 'particular', label: 'Sesión particular', price: PRECIOS.particular.display },
 ];
@@ -224,7 +223,7 @@ export default function Agendar() {
           variants={item}
           role="tablist"
           aria-label="Tipo de sesión"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 bg-offwhite"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6 bg-offwhite"
           style={{
             border: '1px solid rgba(63,91,74,0.15)',
             borderRadius: 14,

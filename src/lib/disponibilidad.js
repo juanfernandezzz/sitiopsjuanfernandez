@@ -25,9 +25,13 @@ export const ALERTA_DIAS = 4;
 
 // Cupos de ingreso reservados por semana. ESTE NUMERO DEBE COINCIDIR con el
 // límite semanal configurado en Cal.com para el evento de primera sesión
-// (y, por separado, para el particular). Si cambias uno, cambia el otro.
-// Para expandir a 4 o 5: cambia el número aquí y en Cal.com, nada más.
-export const CUPOS_INGRESO_SEMANALES = 3;
+// (evento 5776252, pestaña Límites y espacios, "Limitar frecuencia de
+// reservas"). El particular (evento 5785503) lleva su propia cuota, hoy en 3.
+// Para expandir a 3 o 4: cambia el número aquí y en Cal.com, nada más.
+//
+// C50: baja de 3 a 2. La cartera vigente ocupa casi toda la capacidad y los
+// cupos de ingreso salen de la rotación real, no de inventario libre.
+export const CUPOS_INGRESO_SEMANALES = 2;
 
 // Capacidad real semanal según los topes del limitador (Apps Script):
 // lunes 5, martes 4, miércoles 4, jueves 4, viernes 6, sábado 3.

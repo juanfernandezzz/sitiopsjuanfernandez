@@ -26,6 +26,7 @@ const LINK = 'https://psicologojuanfernandez.cl/consentimiento.html?nombre=Mar%C
 const TITULOS = {
   'primera-sesion-bonofonasa': 'Primera sesión de psicoterapia online (con bono Fonasa)',
   'sesiones-de-avance-bonofonasa': 'Control y avance de psicoterapia online (con bono Fonasa)',
+  'hora-fija': 'Hora fija de psicoterapia online (con bono Fonasa)',
   'psicoterapia-de-pareja-bonofonasa': 'Psicoterapia de pareja online (con bono Fonasa)',
   'psicoterapia-individual-online-particular':
     'Psicoterapia individual online (particular - $20.000)',

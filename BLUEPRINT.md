@@ -202,6 +202,15 @@ Las cifras de esta tabla son las vigentes. Ninguna se cita de memoria ni de una 
 | 3 | Unificación de `sesiones.js` | **Resuelta:** Opción 1, campo único `detalle`, con el precio renderizado por separado en cada superficie. Verificado en C39: no quedan referencias funcionales a `detalleModal` ni a `detalleApp` en el repositorio; la única mención restante es el comentario de cabecera que documenta el cambio | C36, verificada en C39 |
 | 4 | Perfil en directorios de salud tipo Doctoralia | **Archivada por alcance.** Ver 5.1.1 | C39 |
 | 5 | Asignación de agenda entre ingreso y continuidad | **Resuelta:** segmentación por banda de aviso mínimo (ver 5.1.2). Sube el particular de $15.000 a $20.000; renombra el slug del evento particular sin el monto (`psicoterapia-individual-online-particular`, con el slug antiguo conservado como alias de compatibilidad); agrega módulo de disponibilidad en vivo en 4 superficies y aviso interno de cupo liberado. **Hito de revisión: 8 de septiembre de 2026** (término del plan de Claude de Juan), con datos de 3 semanas de `CUPOS_INGRESO_SEMANALES`, para decidir si el límite de cupos de ingreso sube de 3 a 4 o 5 | C49 |
+| 6 | Control y avance público vs. oculto | **Resuelta:** Juan agenda todos los controles de sus pacientes; ningún paciente reserva el suyo. El control sale de `SESIONES` (deja de ofrecerse como opción pública) y el evento queda oculto en Cal.com, accesible solo por URL directa. Se agrega el evento "Hora fija" (oculto, recurrente hasta 4 ocurrencias semanales) para que Juan deje una franja estable a un paciente establecido sin agendar sesión por sesión. Cupos de ingreso semanales bajan de 3 a 2 (ver 5.1.3). Verificación por RUT **descartada**, ver 5.1.3 | C50 |
+
+#### 5.1.3 Decisión 6: por qué se descartó la verificación por RUT
+
+Antes de ocultar el evento de control en Cal.com se evaluó una alternativa: dejarlo público pero detrás de una verificación, donde el paciente ingresara su RUT y un endpoint confirmara si correspondía a alguien en tratamiento antes de dejarlo reservar.
+
+Se descartó. Verificar contra un RUT exige almacenar el RUT de personas en psicoterapia en algún sitio, lo que la Ley 21.719 (protección de datos personales) trata como dato sensible de salud: no es solo un identificador, es la prueba de que esa persona es paciente de un psicólogo. Y un endpoint público que responde "sí" o "no" a un RUT es, por diseño, un verificador de quién es paciente: cualquiera con acceso al endpoint podría probar RUTs y aprender quién está en tratamiento, sin que Juan se entere.
+
+Ocultar el evento resuelve el mismo problema (que un paciente nuevo no reserve por error un control, y que nadie externo llegue a un evento que no le corresponde) sin almacenar ningún dato de nadie. El costo es que Juan agenda los controles a mano en vez de que el paciente reserve solo, pero eso ya era la realidad operativa: ningún paciente estaba reservando su propio control.
 
 #### 5.1.2 Decisión 5: segmentación por banda de aviso mínimo
 

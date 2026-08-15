@@ -17,7 +17,23 @@ export const CAL_EVENTS = {
   controlAvanceFonasa: 'sesiones-de-avance-bonofonasa',
   parejaFonasa: 'psicoterapia-de-pareja-bonofonasa',
   particular: 'psicoterapia-individual-online-particular',
+  horaFija: 'hora-fija',
 };
+
+// C50: eventos OCULTOS en Cal.com. Existen y aceptan reservas por URL directa,
+// pero no aparecen en la pagina publica y NO deben figurar en SESIONES ni en
+// ninguna superficie de agendamiento del sitio o de la app.
+//   controlAvanceFonasa  Juan agenda todos los controles. Ningun paciente
+//                        reserva el suyo. Ocultarlo tambien impide que alguien
+//                        nuevo lo tome por error como si fuera primera sesion.
+//   horaFija             Evento recurrente (cada semana, hasta 4 ocurrencias)
+//                        que Juan usa para dejar la franja estable de un
+//                        paciente establecido. Tope de 4 por el vencimiento del
+//                        bono Fonasa a los 30 dias.
+export const CAL_EVENTOS_OCULTOS = [
+  CAL_EVENTS.controlAvanceFonasa,
+  CAL_EVENTS.horaFija,
+];
 
 // Decisión CRO: qué evento dispara el CTA primario del hero/header.
 // Opción A (recomendada): primera sesión Fonasa, copago $5.570 cubre ~80% del público chileno.

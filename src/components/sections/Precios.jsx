@@ -183,43 +183,8 @@ export default function Precios() {
             </div>
           </motion.article>
 
-          {/* Columna derecha: tres cards apiladas */}
+          {/* Columna derecha: dos cards apiladas */}
           <div className="flex flex-col gap-6 lg:gap-8">
-            {/* Sesión de avance (Fonasa) */}
-            <motion.article
-              variants={item}
-              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
-              style={SECONDARY_CARD_SHADOW}
-            >
-              <h3 className="font-display text-lg text-ink mb-2">
-                Sesión de avance con bono Fonasa
-              </h3>
-              <p className="mb-2">
-                <span
-                  className="font-display text-2xl md:text-3xl text-ink"
-                  style={{ fontVariationSettings: '"opsz" 144' }}
-                >
-                  {PRECIOS.fonasaCopago.display}
-                </span>
-                <span className="font-body text-[16px] text-sage ml-3">
-                  Copago Modalidad Libre Elección
-                </span>
-              </p>
-              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                Para quienes ya iniciaron tratamiento conmigo. Código 09 08 102, sesión de 45 minutos.
-              </p>
-              <div className="mt-auto">
-                <Button
-                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.controlAvanceFonasa}`}
-                  variant="primary"
-                  size="md"
-                  className="w-full sm:w-auto"
-                >
-                  Agendar sesión de avance
-                </Button>
-              </div>
-            </motion.article>
-
             {/* Terapia de pareja (Fonasa) */}
             <motion.article
               variants={item}
@@ -377,11 +342,6 @@ export default function Precios() {
               <tr className="border-b border-sage/15">
                 <th scope="row" className="py-3 pr-4 font-normal text-left">Primera sesión con bono Fonasa</th>
                 <td className="py-3 pr-4">09 08 101</td>
-                <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
-              </tr>
-              <tr className="border-b border-sage/15">
-                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión de avance con bono Fonasa</th>
-                <td className="py-3 pr-4">09 08 102</td>
                 <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
               </tr>
               <tr className="border-b border-sage/15">

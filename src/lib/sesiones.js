@@ -8,6 +8,12 @@
  * estructurado junto al titulo, asi el monto sale siempre de PRECIOS y el copy
  * no puede derivar entre superficies.
  *
+ * C50: el control y avance SALIO de este arreglo. Ningun paciente reserva su
+ * propio control: los agenda Juan. El evento sigue existiendo en Cal.com pero
+ * quedo OCULTO, accesible solo por URL directa, y por eso no puede figurar como
+ * opcion publica: llevaria a un evento que no acepta reservas desde la pagina
+ * publica. Su slug sigue en CAL_EVENTS (cal.js) para el webhook y los correos.
+ *
  * C40: bandera `sinCupos`. Una sesion con sinCupos: true sigue existiendo en el
  * sitio (no se borra: la gente la busca) pero no toma reservas. Cada superficie
  * la marca con la etiqueta y desactiva su enlace a Cal.com. Para reabrirla basta
@@ -28,13 +34,6 @@ export const SESIONES = [
     detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
     destacada: true,
     cta: 'Agendar primera sesión',
-  },
-  {
-    key: 'controlAvanceFonasa',
-    titulo: 'Sesión de avance con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Si ya iniciaste tratamiento conmigo.',
-    cta: 'Agendar sesión de avance',
   },
   {
     key: 'parejaFonasa',

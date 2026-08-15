@@ -198,6 +198,23 @@ export const CATALOGO = {
     asuntoSin: 'Antes de su sesión de pareja: cómo comprar el bono Fonasa',
     nota: 'La sesión de pareja requiere que ambos estén presentes durante los 45 minutos.',
   },
+  // C50: sesion de continuidad de "hora fija", recurrente hasta 4 ocurrencias en
+  // la misma franja semanal. Mismo tratamiento que el control y avance: nunca
+  // lleva consentimiento (no se llega a una hora fija sin haber pasado por la
+  // primera sesion) y avisa el cambio de codigo si el correo aun no lo sabia.
+  'hora-fija': {
+    tipo: 'fonasa',
+    nombreSesion: 'sesión de continuidad',
+    trato: 'tu',
+    codigo: '0908102',
+    codigoPortal: '09 08 102 Telerehabilitación: Psicoterapia individual',
+    consentimientoNunca: true,
+    asuntoSin: 'Antes de tus próximas sesiones: cómo comprar tu bono Fonasa',
+    asuntoPrimerControl:
+      'Antes de tus próximas sesiones: cómo comprar tu bono Fonasa (después de la primera)',
+    codigoAnterior: '0908101',
+    nota: 'Esta reserva agenda hasta cuatro sesiones semanales en la misma franja. El bono Fonasa se compra antes de cada sesión y vence a los 30 días de emitido.',
+  },
   'psicoterapia-individual-online-particular': {
     tipo: 'particular',
     nombreSesion: 'sesión particular',
@@ -307,7 +324,7 @@ const aviso = (texto) =>
     <tr><td style="padding:14px 16px;font-family:${FUENTE_CUERPO};font-size:14.5px;line-height:1.6;color:${C.ink};">${texto}</td></tr>
   </table>`;
 
-const numeroEnPalabra = (n) => ({ 1: 'un', 2: 'dos', 3: 'tres' })[n] || String(n);
+const numeroEnPalabra = (n) => ({ 1: 'un', 2: 'dos', 3: 'tres', 4: 'cuatro' })[n] || String(n);
 
 /**
  * Fecha y hora de la sesion en horario de Chile, lista para incrustar en una
@@ -365,12 +382,17 @@ export function construirCorreo({
   inicioTexto = '',
   linkConsentimiento = null,
   primerControl = false,
+  fechasTexto = null,
 }) {
   const ficha = reservaDeSlug(slug);
   const primerNombre = String(nombre || '').trim().split(/\s+/)[0] || 'hola';
   const conConsentimiento = Boolean(linkConsentimiento);
   const plural = ficha.trato === 'ustedes';
   const evento = tituloEvento || ficha.nombreSesion;
+  // C50: reserva recurrente ("hora fija"). Con mas de una fecha acumulada, el
+  // correo lista TODAS las ocurrencias de la serie en vez de solo la primera:
+  // cada una necesita su propio bono Fonasa.
+  const esRecurrente = Array.isArray(fechasTexto) && fechasTexto.length > 1;
 
   // Numeracion: solo se cuentan como "paso" las acciones que van ANTES de la
   // sesion. El consentimiento, cuando toca, siempre va primero (es el requisito
@@ -423,10 +445,16 @@ export function construirCorreo({
 
   const introHtml = [
     parrafo(`Hola ${esc(primerNombre)},`, 'font-size:16px;'),
-    parrafo(
-      `Confirmé ${plural ? 'su' : 'tu'} reserva de <strong>${esc(evento)}</strong>${inicioTexto ? ` para el <strong>${esc(inicioTexto)}</strong>` : ''}.`,
-      'font-size:16px;'
-    ),
+    esRecurrente
+      ? parrafo(
+          `Confirmé ${plural ? 'su' : 'tu'} reserva de <strong>${esc(evento)}</strong>. Quedaron agendadas estas ${numeroEnPalabra(fechasTexto.length)} sesiones, una por semana en la misma franja:`,
+          'font-size:16px;'
+        ) +
+        `<ul style="margin:0 0 12px;padding-left:20px;font-family:${FUENTE_CUERPO};font-size:15px;line-height:1.7;color:${C.ink};">${fechasTexto.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>`
+      : parrafo(
+          `Confirmé ${plural ? 'su' : 'tu'} reserva de <strong>${esc(evento)}</strong>${inicioTexto ? ` para el <strong>${esc(inicioTexto)}</strong>` : ''}.`,
+          'font-size:16px;'
+        ),
     frasePasos ? parrafo(frasePasos, 'font-size:16px;') : '',
     ficha.nota ? parrafo(esc(ficha.nota), `font-size:15px;color:${C.inkSoft};`) : '',
   ].join('');
@@ -434,7 +462,10 @@ export function construirCorreo({
   const introTexto = [
     `Hola ${primerNombre},`,
     '',
-    `Confirmé ${plural ? 'su' : 'tu'} reserva de "${evento}"${inicioTexto ? ` para el ${inicioTexto}` : ''}.`,
+    esRecurrente
+      ? `Confirmé ${plural ? 'su' : 'tu'} reserva de "${evento}". Quedaron agendadas estas ${numeroEnPalabra(fechasTexto.length)} sesiones, una por semana en la misma franja:`
+      : `Confirmé ${plural ? 'su' : 'tu'} reserva de "${evento}"${inicioTexto ? ` para el ${inicioTexto}` : ''}.`,
+    ...(esRecurrente ? fechasTexto.map((f) => `  - ${f}`) : []),
     ...(frasePasos ? ['', frasePasos] : []),
     ...(ficha.nota ? ['', ficha.nota] : []),
   ];
@@ -768,6 +799,31 @@ function obtenerRegistroControl() {
   }
 }
 
+// C50: candado de idempotencia para reservas recurrentes ("hora fija"). Cal.com
+// dispara un BOOKING_CREATED por CADA ocurrencia de la serie (hasta 4), y sin
+// este candado la primera hora fija que agende Juan mandaria cuatro correos al
+// paciente, cada uno con instrucciones de bono para una fecha distinta.
+let _crearRegistroRecurrencia = () => getStore('recurrencia-agendada');
+
+/** Solo para tests: sustituye la fabrica del registro de recurrencia. */
+export function _setRegistroRecurrenciaFactory(fn) {
+  _crearRegistroRecurrencia = fn;
+}
+
+function obtenerRegistroRecurrencia() {
+  try {
+    return _crearRegistroRecurrencia();
+  } catch (err) {
+    console.warn('Netlify Blobs no disponible para el candado de recurrencia:', err?.message);
+    return null;
+  }
+}
+
+// TTL manual: Netlify Blobs no expira solo, asi que una entrada mas vieja que
+// esto se trata como si no existiera (una serie nueva que reutilizara el mismo
+// id, algo extremadamente improbable, no quedaria bloqueada para siempre).
+const RECURRENCIA_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 /**
  * Aviso de cupo liberado (C49). Cal.com dispara BOOKING_CANCELLED con la
  * misma firma HMAC que BOOKING_CREATED (verificada antes de llegar aqui). El
@@ -916,6 +972,77 @@ export const handler = async (event) => {
     return { statusCode: 200, body: 'No attendee data' };
   }
 
+  // --- Candado de recurrencia: acumula ocurrencias, envia un solo correo -----
+  // El nombre del campo de agrupacion no esta documentado de forma estable por
+  // Cal.com: se prueban los candidatos conocidos en vez de asumir uno solo.
+  const grupoRecurrente =
+    booking.recurringEventId ||
+    booking.recurringBookingUid ||
+    booking.seriesId ||
+    null;
+
+  const inicioTexto = formatearInicio(booking.startTime);
+
+  // Si esta ocurrencia pertenece a una serie y no es la que dispara el correo
+  // (o la serie ya fue procesada), se corta aqui. `fechasSerie` solo queda con
+  // valor cuando SI corresponde enviar, y entonces trae todas las fechas.
+  let fechasSerie = null;
+  if (grupoRecurrente) {
+    const registroRecurrencia = obtenerRegistroRecurrencia();
+    if (registroRecurrencia) {
+      let estado = null;
+      try {
+        const raw = await registroRecurrencia.get(grupoRecurrente, { type: 'json' });
+        if (raw && Date.now() - new Date(raw.ts).getTime() < RECURRENCIA_TTL_MS) {
+          estado = raw;
+        }
+      } catch (err) {
+        console.warn(
+          'No se pudo leer el candado de recurrencia (se trata como serie nueva):',
+          err?.message
+        );
+      }
+
+      if (estado?.procesado) {
+        console.log('Serie recurrente %s ya procesada; se omite el correo', grupoRecurrente);
+        return { statusCode: 200, body: 'Recurring series already handled' };
+      }
+
+      const fechas = estado ? [...estado.fechas] : [];
+      if (inicioTexto && !fechas.includes(inicioTexto)) fechas.push(inicioTexto);
+
+      // Cal.com incluye el total de ocurrencias de la serie en la config del
+      // evento recurrente. Si no viniera, no hay forma de saber cuando llega la
+      // ultima: se envia con lo que se tenga en la primera ocurrencia y se
+      // marca la serie como procesada, para no arriesgar cuatro correos.
+      const totalEsperado = booking.eventType?.recurringEvent?.count || null;
+      const esUltima = totalEsperado ? fechas.length >= totalEsperado : true;
+
+      if (!esUltima) {
+        try {
+          await registroRecurrencia.set(
+            grupoRecurrente,
+            JSON.stringify({ ts: new Date().toISOString(), fechas, procesado: false })
+          );
+        } catch (err) {
+          console.warn('No se pudo guardar el progreso de la serie recurrente:', err?.message);
+        }
+        return { statusCode: 200, body: 'Recurring occurrence recorded' };
+      }
+
+      try {
+        await registroRecurrencia.set(
+          grupoRecurrente,
+          JSON.stringify({ ts: new Date().toISOString(), fechas, procesado: true })
+        );
+      } catch (err) {
+        console.warn('No se pudo marcar la serie recurrente como procesada:', err?.message);
+      }
+
+      fechasSerie = fechas;
+    }
+  }
+
   // --- Este correo ya paso por aqui alguna vez? -----------------------------
   // Clave normalizada a minusculas. `yaConocido` responde una sola pregunta: a
   // este correo ya se le pidio el consentimiento en algun momento. Se calcula
@@ -1027,8 +1154,6 @@ export const handler = async (event) => {
       `&email=${encodeURIComponent(attendee.email)}`
     : null;
 
-  const inicioTexto = formatearInicio(booking.startTime);
-
   const { asunto, html, texto } = construirCorreo({
     nombre: attendee.name,
     slug: eventSlug,
@@ -1036,6 +1161,7 @@ export const handler = async (event) => {
     inicioTexto,
     linkConsentimiento,
     primerControl,
+    fechasTexto: fechasSerie,
   });
 
   try {

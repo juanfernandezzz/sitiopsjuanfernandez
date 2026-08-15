@@ -35,7 +35,6 @@ const ZONA = 'America/Santiago';
 // Si se crea o migra un evento hay que actualizarlos aquí.
 const EVENTOS = {
   primeraSesionFonasa: 5776252,
-  controlAvanceFonasa: 5785345,
   particular: 5785503,
 };
 

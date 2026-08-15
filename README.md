@@ -57,9 +57,9 @@ sitio-juan/
 
 - [x] Hero (rotación de frase, foto con marco)
 - [x] Cómo trabajo
-- [x] Precios (grid 1+3, 4 modalidades)
+- [x] Precios (grid 1+2, 3 modalidades públicas)
 - [x] Cómo funciona online
-- [x] Agendar (Cal.com embed, 4 event types)
+- [x] Agendar (Cal.com embed, 3 event types públicos + 2 ocultos)
 - [x] Preguntas frecuentes
 - [x] Footer (privacidad Ley 21.719-ready)
 
@@ -67,6 +67,37 @@ sitio-juan/
 
 ### Event types requeridos
 Los 4 event types deben existir en cal.com/psicologojuanfernandez con los slugs declarados en `src/lib/cal.js` (`CAL_EVENTS`). Duración 45 min cada uno.
+
+### Eventos públicos y ocultos (C50)
+El sitio y la app solo ofrecen 3 de los 4 event types. Un quinto evento, "Hora fija", existe en Cal.com pero tampoco es público: lo usa Juan directamente. En total hay 4 eventos públicos y 2 ocultos.
+
+**Públicos** (aparecen en `src/lib/sesiones.js`, se agendan desde el sitio o la app):
+| Evento | Slug | ID Cal.com |
+|---|---|---|
+| Primera sesión con bono Fonasa | `primera-sesion-bonofonasa` | 5776252 |
+| Sesión de pareja con bono Fonasa | `psicoterapia-de-pareja-bonofonasa` | (sin cupos actualmente) |
+| Sesión particular | `psicoterapia-individual-online-particular` | 5785503 |
+
+**Ocultos** (existen y aceptan reservas por URL directa, pero no aparecen en la página pública ni en `SESIONES`; el slug sigue vivo en `CAL_EVENTS` porque lo necesitan el webhook y los correos):
+| Evento | Slug | ID Cal.com | Motivo |
+|---|---|---|---|
+| Control y avance | `sesiones-de-avance-bonofonasa` | 5785345 | Juan agenda todos los controles de sus pacientes; ningún paciente reserva el suyo. |
+| Hora fija | `hora-fija` | 6682136 | Franja semanal estable para un paciente ya establecido, agendada por Juan. |
+
+**Por qué ocultar en vez de verificar identidad**: se evaluó un sistema de verificación por RUT para dejar el control público solo a pacientes reales, y se descartó. Ver la fila C50 en `BLUEPRINT.md`.
+
+### Procedimiento: agendar una "hora fija"
+Juan usa este evento cuando quiere dejarle a un paciente establecido la misma franja semanal por un tiempo, en vez de coordinar sesión por sesión.
+
+1. Entra a `cal.com/psicologojuanfernandez/hora-fija`.
+2. Elige el día y la hora que va a ser fija para ese paciente.
+3. Marca la reserva como recurrente, hasta 4 ocurrencias semanales (el máximo que permite el evento).
+4. Carga los datos del paciente (nombre y correo) como en cualquier reserva.
+5. Quedan agendadas 4 sesiones en la misma franja, una por semana.
+
+**Por qué 4 y no 32 (o "para siempre")**: el bono Fonasa vence a los 30 días de emitido. Una reserva recurrente sin tope agendaría sesiones para las que, cuando llegara la fecha, el bono comprado con meses de antelación ya habría vencido. Cuatro semanas es lo más lejos que se puede reservar hoy sin dejar una sesión sin bono válido.
+
+El webhook (`netlify/functions/cal-webhook.js`) reconoce que las 4 reservas pertenecen a la misma serie recurrente y manda un único correo al paciente con las 4 fechas, en vez de un correo separado por cada ocurrencia.
 
 ### Inicialización
 Cal.com se inicializa una sola vez en `src/App.jsx` con namespace `psicojuan` (constante `CAL_NAMESPACE` en `src/lib/cal.js`). La config aplica branding sage, layout `month_view` y theme light.
