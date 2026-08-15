@@ -56,7 +56,12 @@ export const FONASA_POR_SLUG = {
   },
 };
 
-export const SLUG_PARTICULAR = 'psicoterapia-individual-online-particular-15.000';
+export const SLUG_PARTICULAR = 'psicoterapia-individual-online-particular';
+
+// C49: slug anterior del evento particular, de cuando el monto vivia en la
+// URL. Sigue habiendo un paciente particular vigente con el enlace viejo, asi
+// que este slug debe seguir clasificando como 'particular' indefinidamente.
+export const SLUG_PARTICULAR_LEGACY = 'psicoterapia-individual-online-particular-15.000';
 
 /**
  * Clasifica un slug de Cal en 'fonasa', 'particular' o null (desconocido).
@@ -66,7 +71,7 @@ export const SLUG_PARTICULAR = 'psicoterapia-individual-online-particular-15.000
 export function tipoDeReserva(slug) {
   if (!slug) return null;
   if (FONASA_POR_SLUG[slug]) return 'fonasa';
-  if (slug === SLUG_PARTICULAR) return 'particular';
+  if (slug === SLUG_PARTICULAR || slug === SLUG_PARTICULAR_LEGACY) return 'particular';
   return null;
 }
 

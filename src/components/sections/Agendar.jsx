@@ -6,6 +6,7 @@ import { SESIONES } from '../../lib/sesiones';
 import { recordarSlug } from '../../lib/seguimiento';
 import { useUI } from '../../lib/uiContext';
 import VeloSinCupos from '../ui/EtiquetaSinCupos';
+import ModuloDisponibilidad from '../ui/ModuloDisponibilidad';
 
 // Sesiones que existen pero no toman reservas. La bandera vive en
 // lib/sesiones.js: aqui solo se consulta.
@@ -20,7 +21,7 @@ const TABS = [
   { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: PRECIOS.fonasaCopago.display },
   { key: 'controlAvanceFonasa', label: 'Sesión individual de avance con bono Fonasa', price: PRECIOS.fonasaCopago.display },
   { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: PRECIOS.fonasaCopago.display },
-  { key: 'particular15000', label: 'Sesión particular', price: PRECIOS.particular.display },
+  { key: 'particular', label: 'Sesión particular', price: PRECIOS.particular.display },
 ];
 
 const REASSURANCES = [
@@ -182,6 +183,10 @@ export default function Agendar() {
         >
           Elige el tipo de sesión y la hora que te acomode.
         </motion.p>
+
+        <motion.div variants={item} className="mb-8" style={{ maxWidth: 420 }}>
+          <ModuloDisponibilidad evento="primeraSesionFonasa" variante="seccion" />
+        </motion.div>
 
         {/* Aviso: elige una opción antes de agendar */}
         <AnimatePresence>

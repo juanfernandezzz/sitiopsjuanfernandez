@@ -9,21 +9,24 @@
 export const CAL_USERNAME = 'psicologojuanfernandez';
 
 // Slugs reales de los 4 eventos. NO TOCAR sin verificar en cal.com.
+// C49: el slug del particular perdió el monto ($20.000 hoy, pero un cambio de
+// precio futuro no debería volver a tocar una URL pública). El slug antiguo
+// sigue vivo como SLUG_PARTICULAR_LEGACY en postReserva.js y cal-webhook.js.
 export const CAL_EVENTS = {
   primeraSesionFonasa: 'primera-sesion-bonofonasa',
   controlAvanceFonasa: 'sesiones-de-avance-bonofonasa',
   parejaFonasa: 'psicoterapia-de-pareja-bonofonasa',
-  particular15000: 'psicoterapia-individual-online-particular-15.000',
+  particular: 'psicoterapia-individual-online-particular',
 };
 
 // Decisión CRO: qué evento dispara el CTA primario del hero/header.
 // Opción A (recomendada): primera sesión Fonasa, copago $5.570 cubre ~80% del público chileno.
-// Opción B: particular $15.000, sin restricción de previsión.
+// Opción B: particular $20.000, sin restricción de previsión.
 // Cambiar aquí propaga el cambio a todos los CTAs primarios.
 export const HERO_PRIMARY_CTA = CAL_EVENTS.primeraSesionFonasa;
 
 // CTA secundario explícito en sección Precios (C4) para usuarios sin Fonasa.
-export const FALLBACK_PARTICULAR_CTA = CAL_EVENTS.particular15000;
+export const FALLBACK_PARTICULAR_CTA = CAL_EVENTS.particular;
 
 // Namespace del embed (separa configuración de Cal por sección si se necesita).
 export const CAL_NAMESPACE = 'psicojuan';

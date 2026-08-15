@@ -3,6 +3,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, calFullUrl } from '../../lib/cal';
 import { SESIONES } from '../../lib/sesiones';
 import VeloSinCupos from '../ui/EtiquetaSinCupos';
+import ModuloDisponibilidad from '../ui/ModuloDisponibilidad';
+
+// Solo estos dos eventos tienen disponibilidad en vivo (ver
+// netlify/functions/disponibilidad.js). El resto no muestra el chip.
+const EVENTO_DISPONIBILIDAD = { primeraSesionFonasa: 'primeraSesionFonasa', particular: 'particular' };
 
 /**
  * Modal que pregunta el tipo de usuario/pago ANTES de abrir Cal.com, para que el
@@ -152,6 +157,13 @@ export default function ModalTipoSesion({ open, onClose }) {
                   <span className="font-body text-ink/75 block" style={{ fontSize: 14, marginTop: 2 }}>
                     {op.detalle}
                   </span>
+                  {EVENTO_DISPONIBILIDAD[op.key] && !op.sinCupos && (
+                    <ModuloDisponibilidad
+                      evento={EVENTO_DISPONIBILIDAD[op.key]}
+                      variante="chip"
+                      className="block mt-1.5"
+                    />
+                  )}
                 </button>
               ))}
             </div>

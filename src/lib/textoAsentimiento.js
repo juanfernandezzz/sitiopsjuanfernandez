@@ -40,7 +40,7 @@ PARTE B. AUTORIZACIÓN DEL ADULTO RESPONSABLE
 
 6. Protección de datos. Otorgo mi consentimiento expreso para el tratamiento de los datos personales del adolescente, incluidos sus datos sensibles de salud, con la finalidad exclusiva de coordinar y prestar la atención psicológica descrita, cumplir las obligaciones legales del prestador y procesar bonos Fonasa cuando corresponda. Este tratamiento se rige por la Ley 19.628 sobre Protección de la Vida Privada y por la Ley 21.719 sobre Protección de Datos Personales (vigencia plena a partir del 1 de diciembre de 2026), que contempla resguardos reforzados para los datos de niños, niñas y adolescentes. Puedo revocar este consentimiento en cualquier momento, en forma gratuita y sin expresión de causa, escribiendo al correo del prestador; la revocación no tiene efecto retroactivo sobre lo ya tratado válidamente. La política de privacidad publicada en psicologojuanfernandez.cl/politica-privacidad detalla los derechos y la vía de reclamo ante la Agencia de Protección de Datos Personales.
 
-7. Honorarios. Acepto el valor informado al momento de agendar ($15.000 particular o $5.570 con bono Fonasa MLE). Con bono Fonasa, debo entregar el folio antes de la sesión.
+7. Honorarios. Acepto el valor informado al momento de agendar ($20.000 particular o $5.570 con bono Fonasa MLE). Con bono Fonasa, debo entregar el folio antes de la sesión.
 
 8. Cancelaciones. Puedo cancelar o reagendar hasta 6 horas antes sin costo. Cancelaciones con menos de 6 horas se reagendan caso a caso.
 

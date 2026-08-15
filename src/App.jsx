@@ -11,6 +11,7 @@ import { UIProvider, useUI } from './lib/uiContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
+import ModuloDisponibilidad from './components/ui/ModuloDisponibilidad'
 
 // Hero queda EAGER: es el LCP y debe renderizar de inmediato.
 // El resto del cuerpo se carga lazy y solo se monta cuando se acerca al viewport
@@ -164,6 +165,44 @@ function AppShell() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Barra fija de disponibilidad (móvil): aparece al salir del hero, se oculta
+  // cuando la sección Agendar (el embed de Cal) entra en viewport. Reobserva
+  // #agendar cada vez que aparece/desaparece del DOM (LazySection la monta
+  // recién al acercarse el scroll).
+  const [pasoElHero, setPasoElHero] = useState(false)
+  const [agendarEnVista, setAgendarEnVista] = useState(false)
+  useEffect(() => {
+    const onScroll = () => {
+      const sentinel = document.getElementById('hero-end-sentinel')
+      setPasoElHero(sentinel ? sentinel.getBoundingClientRect().top < 0 : window.scrollY > 400)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return
+    const obs = new IntersectionObserver(
+      (entries) => setAgendarEnVista(entries[0]?.isIntersecting ?? false),
+      { rootMargin: '0px' }
+    )
+    let el = document.getElementById('agendar')
+    const attach = () => {
+      const nuevo = document.getElementById('agendar')
+      if (nuevo && nuevo !== el) {
+        obs.disconnect()
+        obs.observe(nuevo)
+        el = nuevo
+      }
+    }
+    if (el) obs.observe(el)
+    const t = setInterval(attach, 500)
+    return () => {
+      clearInterval(t)
+      obs.disconnect()
+    }
+  }, [])
+
   // C27: captura el slug de la ultima sesion con la que se interactuo (clics en
   // elementos con data-cal-link), para que /cita-agendada muestre el bloque de
   // pago correcto. El slug vive solo en sessionStorage, nunca en la URL.
@@ -230,6 +269,10 @@ function AppShell() {
       <Suspense fallback={null}>
         <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
       </Suspense>
+
+      {pasoElHero && !agendarEnVista && (
+        <ModuloDisponibilidad evento="primeraSesionFonasa" variante="barra" />
+      )}
 
       {showWhatsApp && (
         <Suspense fallback={null}>

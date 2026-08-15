@@ -23,7 +23,7 @@ Referencia del primer bloque de la landing en la revisión de C39, en este orden
 3. Subtítulo: sesiones de 45 minutos, videollamada segura, bono Fonasa o particular
 4. Copago: primera sesión con bono Fonasa, copago $5.570
 5. Botones: agendar y WhatsApp
-6. Ruta particular: $15.000
+6. Ruta particular: $20.000
 7. Chips: psicólogo clínico, inscrito en Fonasa, videollamada cifrada
 
 ---

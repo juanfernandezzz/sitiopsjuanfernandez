@@ -293,7 +293,7 @@ export default function Precios() {
               </p>
               <div className="mt-auto flex flex-col gap-4">
                 <Button
-                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular15000}`}
+                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular}`}
                   variant="primary"
                   size="md"
                   className="w-full sm:w-auto"

@@ -85,7 +85,7 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C48';
+export const REVISION = 'C49';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -118,7 +118,7 @@ export const CONTACTO = {
 
 export const PRECIOS = {
   fonasaCopago: '$5.570',
-  particular: '$15.000',
+  particular: '$20.000',
 };
 
 // Cuenta de destino del pago particular. "Cuenta vista" es como BancoEstado
@@ -198,7 +198,7 @@ export const CATALOGO = {
     asuntoSin: 'Antes de su sesión de pareja: cómo comprar el bono Fonasa',
     nota: 'La sesión de pareja requiere que ambos estén presentes durante los 45 minutos.',
   },
-  'psicoterapia-individual-online-particular-15.000': {
+  'psicoterapia-individual-online-particular': {
     tipo: 'particular',
     nombreSesion: 'sesión particular',
     trato: 'tu',
@@ -209,6 +209,12 @@ export const CATALOGO = {
     nota: null,
   },
 };
+
+// C49: el slug del particular perdio el monto de la URL ($15.000 -> $20.000).
+// Hay un paciente particular vigente con el enlace viejo, asi que ese slug
+// tiene que seguir clasificando y respondiendo igual que el nuevo.
+CATALOGO['psicoterapia-individual-online-particular-15.000'] =
+  CATALOGO['psicoterapia-individual-online-particular'];
 
 // Entrada de respaldo para un slug que no reconocemos (evento nuevo en Cal.com
 // que todavia no se agrego aqui). El correo sale sin bloque de pago: preferimos
@@ -762,6 +768,56 @@ function obtenerRegistroControl() {
   }
 }
 
+/**
+ * Aviso de cupo liberado (C49). Cal.com dispara BOOKING_CANCELLED con la
+ * misma firma HMAC que BOOKING_CREATED (verificada antes de llegar aqui). El
+ * correo va SOLO a juanfernandezpsicologo@gmail.com, sin nombre ni email del
+ * paciente: la finalidad es operativa (Juan sabe que se abrio una hora), no
+ * un registro de quien cancelo.
+ *
+ * Si el slug no calza con ningun tipo conocido, se envia igual sin
+ * clasificar: preferimos un aviso generico a no avisar nada.
+ */
+async function handleBookingCancelled(booking) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('RESEND_API_KEY no configurada (aviso de cancelacion omitido)');
+    return { statusCode: 200, body: 'RESEND_API_KEY missing' };
+  }
+
+  const eventSlug = booking.eventType?.slug || '';
+  const eventTitle = booking.eventType?.title || eventSlug || 'sesion sin clasificar';
+  const inicioTexto = formatearInicio(booking.startTime) || 'fecha no disponible';
+
+  const resend = new Resend(apiKey);
+  const FROM =
+    process.env.EMAIL_FROM_AUTOMATICO ||
+    'Juan Fernández, Psicólogo Clínico <noresponder@psicologojuanfernandez.cl>';
+  const DESTINO = 'juanfernandezpsicologo@gmail.com';
+
+  const asunto = `Cupo liberado: ${eventTitle}`;
+  const texto = `Se liberó un cupo.\n\nTipo de sesión: ${eventTitle}\nFecha y hora: ${inicioTexto}\n\n(Aviso automático, sin datos del paciente.)`;
+  const html = `<p>Se liberó un cupo.</p><p><strong>Tipo de sesión:</strong> ${esc(eventTitle)}<br><strong>Fecha y hora:</strong> ${esc(inicioTexto)}</p><p style="color:#6A7480;font-size:13px;">Aviso automático, sin datos del paciente.</p>`;
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM,
+      to: [DESTINO],
+      subject: asunto,
+      html,
+      text: texto,
+    });
+    if (result.error) {
+      console.error('Resend error en aviso de cancelacion:', result.error);
+      return { statusCode: 200, body: 'Email send failed but webhook acknowledged' };
+    }
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+  } catch (err) {
+    console.error('Exception en aviso de cancelacion:', err);
+    return { statusCode: 200, body: 'Exception caught' };
+  }
+}
+
 export const handler = async (event) => {
   // Sonda de version. Sin esto no hay forma de saber desde fuera si un deploy
   // actualizo la funcion: la unica alternativa era reservar de verdad y mirar el
@@ -824,6 +880,12 @@ export const handler = async (event) => {
     payload = JSON.parse(rawBody);
   } catch {
     return { statusCode: 400, body: 'Bad JSON' };
+  }
+
+  // C49: aviso interno de cupo liberado. Solo a Juan, sin datos de terceros:
+  // el objetivo es que sepa que se abrio una hora, no quien la tenia.
+  if (payload.triggerEvent === 'BOOKING_CANCELLED') {
+    return handleBookingCancelled(payload.payload || {});
   }
 
   if (payload.triggerEvent !== 'BOOKING_CREATED') {

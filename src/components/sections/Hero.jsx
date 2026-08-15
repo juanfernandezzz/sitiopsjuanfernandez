@@ -3,6 +3,7 @@ import Button from '../ui/Button';
 import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
 import { HERO } from '../../lib/hero';
 import { useUI } from '../../lib/uiContext';
+import ModuloDisponibilidad from '../ui/ModuloDisponibilidad';
 
 // La foto del hero se sirve desde /public con nombre fijo (juan-720.webp /
 // juan-720.jpg) para que coincida EXACTAMENTE con el <link rel="preload"> de
@@ -196,6 +197,13 @@ export default function Hero() {
               >
                 {HERO.ctaSecundario}
               </Button>
+            </div>
+
+            {/* Píldora de disponibilidad en vivo. Va DESPUES del CTA, nunca
+                antes: así nunca empuja el botón primario bajo el pliegue en
+                móvil, se limite a lo que quede debajo. */}
+            <div className="anim-rise mt-3" style={delay(410)}>
+              <ModuloDisponibilidad evento="primeraSesionFonasa" variante="hero" />
             </div>
 
             {/* Ruta alternativa. Se queda DESPUES del CTA principal a

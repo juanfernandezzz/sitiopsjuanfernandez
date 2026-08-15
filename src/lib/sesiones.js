@@ -45,7 +45,7 @@ export const SESIONES = [
     sinCupos: true,
   },
   {
-    key: 'particular15000',
+    key: 'particular',
     titulo: 'Sesión particular',
     precio: PRECIOS.particular.display,
     detalle: 'Si tienes Isapre, otra previsión o ninguna. Boleta de honorarios para solicitar reembolso según tu plan.',

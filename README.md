@@ -82,7 +82,7 @@ Cal.com soporta preguntas adicionales por event type. Para los 3 eventos Fonasa 
 - Required: No (opcional, porque algunos lo compran después de agendar)
 - Placeholder: "Lo puedes enviar por WhatsApp si aún no lo tienes"
 
-Para `particular15000` NO agregar esta pregunta.
+Para `particular` NO agregar esta pregunta.
 
 ### Email de confirmación
 En cada event type, editar el "Confirmation email" para incluir:
@@ -118,7 +118,7 @@ Ramas por slug de Cal.com (catálogo `CATALOGO` en el mismo archivo):
 | `primera-sesion-bonofonasa` | bono Fonasa, código 0908101 | **siempre** |
 | `sesiones-de-avance-bonofonasa` | bono Fonasa, código 0908102 | **nunca** |
 | `psicoterapia-de-pareja-bonofonasa` | bono Fonasa, código 0908103 (trato en plural) | según registro |
-| `psicoterapia-individual-online-particular-15.000` | transferencia, se paga **después** de la sesión | según registro |
+| `psicoterapia-individual-online-particular` (y el slug legado `-15.000`, ver [src/lib/cal.js](src/lib/cal.js)) | transferencia, se paga **después** de la sesión | según registro |
 | slug desconocido | sin bloque de pago (degradación segura) | según registro |
 
 Los datos del prestador que pide Mi Fonasa (dónde comprarlo, nombre legal completo, RUT, región, comuna, código, copago) van en una tabla dentro del correo. La atención es online: región y comuna se incluyen solo porque el formulario del bono las exige, y el correo lo aclara. La URL del portal (`https://mi.fonasa.gob.cl`) va como texto visible además del botón, porque no es el mismo dominio que el sitio institucional `fonasa.cl` y ahí se pierde gente.
@@ -155,6 +155,38 @@ Genera en `dist-correos/` las siete variantes reales en HTML y texto plano, más
 El correo **no** importa ese archivo: `cal-webhook.js` tiene su propia copia de los datos. Si cambia un dato de pago hay que tocar los dos, y subir `REVISION` para poder comprobar el deploy. La separación es a propósito: el correo es la ruta crítica y no debe depender del bundle del sitio.
 
 Fuera de alcance a propósito: la guía de compra del bono (`ModalGuiaFonasa`) sigue sin región ni comuna. Es la guía del portal de Fonasa, no un espejo del correo.
+
+## Ciclo C49: disponibilidad en vivo y asignación de agenda
+
+### Por qué
+
+Medido el 15 de agosto de 2026: la primera hora libre para un paciente nuevo estaba a 9 días. Los 4 eventos de Cal.com compartían horario, exponían 47 cupos semanales contra una capacidad real de 26, y la ventana futura no tenía límite. El calendario se llenaba hasta 3 semanas adelante por orden de llegada, sin reserva de cupos para nadie.
+
+### Variable de entorno: `CAL_API_KEY`
+
+Requerida por `netlify/functions/disponibilidad.js` (lectura de `/v2/slots`) y por `scripts/configurar-cal.mjs`. Se crea en Cal.com > Settings > Developer > API Keys. En Netlify, agrégala como variable de entorno del sitio; la función nunca la expone al cliente. Sin ella, la función responde `{ eventos: {}, motivo: 'sin-clave' }` y el módulo de disponibilidad se oculta solo (estado desconocido).
+
+### Expandir los cupos de ingreso (de 3 a 4 o 5 por semana)
+
+Dos números tienen que moverse **juntos**, o el módulo de disponibilidad y el límite real de Cal.com quedan desalineados:
+
+1. `CUPOS_INGRESO_SEMANALES` en [src/lib/disponibilidad.js](src/lib/disponibilidad.js)
+2. El límite semanal (`bookingLimitsCount.week`) del evento 5776252 (primera sesión Fonasa) en Cal.com: se puede reaplicar con `node scripts/configurar-cal.mjs --aplicar` tras editar `OBJETIVO` en `scripts/configurar-cal.mjs`.
+
+### Módulo de disponibilidad en vivo
+
+`src/components/ui/ModuloDisponibilidad.jsx`, alimentado por la función de Netlify (caché 10 min, degradación a último valor bueno hasta 6 horas). Tres estados (`cercano`, `lejano`, `desconocido`) y cuatro variantes (`hero`, `seccion`, `chip`, `barra`), documentados en el propio archivo. La bandera manual `sinCupos` de `src/lib/sesiones.js` **siempre** gana sobre el dato en vivo: el dato en vivo puede cerrar una sesión, nunca abrir una cerrada a mano.
+
+### Apps Script (único paso manual)
+
+Los dos scripts (`apps-script/limitador.gs`, `apps-script/crearHorasFijas.gs`) no tienen ruta de despliegue automatizable: requeriría `clasp` y OAuth de Google. Se instalan a mano:
+
+1. Entrar a [script.google.com](https://script.google.com) y abrir el proyecto **existente** del limitador (no crear uno nuevo: el disparador temporal ya está asociado a ese proyecto).
+2. Reemplazar el contenido del archivo por el de `apps-script/limitador.gs`. Guardar.
+3. Ejecutar la función `probarConteo()` una vez. Solo escribe en el registro (Ver > Registros), no toca el calendario.
+4. Si el conteo se ve correcto, el disparador temporal existente sigue llamando a `ejecutarLimitador()` sin más cambios.
+
+`apps-script/crearHorasFijas.gs` se pega en el mismo proyecto como archivo adicional cuando haga falta crear horas fijas de continuidad (ver cabecera del archivo para el procedimiento).
 
 ## SEO y verificación de motores de búsqueda
 

@@ -34,7 +34,7 @@ Este documento define el proceso integral de auditoría y mejora del sitio en se
 | Dato | Valor | Verificable en |
 |---|---|---|
 | Copago Fonasa MLE | $5.570 CLP | Portal Fonasa |
-| Sesión particular | $15.000 CLP | Sitio propio |
+| Sesión particular | $20.000 CLP | Sitio propio |
 | Códigos Fonasa | 09 08 101, 09 08 102, 09 08 103 | Portal Fonasa |
 | Registro profesional | RNPI N° 876085 | rnpi.superdesalud.gob.cl |
 | Título | Psicólogo, UVM, enero 2025 | Registro MINEDUC |
@@ -42,7 +42,7 @@ Este documento define el proceso integral de auditoría y mejora del sitio en se
 | Agenda | cal.com/psicologojuanfernandez, 4 eventos | Cal.com |
 | Duración de sesión | 45 minutos, en todas las modalidades | Confirmado por Juan en C31 |
 
-En schema.org los precios se escriben como enteros sin separador de miles: "5570" y "15000". El punto es separador decimal en ese vocabulario; escribir "5.570" declararía cinco pesos con 57 centavos.
+En schema.org los precios se escriben como enteros sin separador de miles: "5570" y "20000". El punto es separador decimal en ese vocabulario; escribir "5.570" declararía cinco pesos con 57 centavos.
 
 ---
 
@@ -101,7 +101,7 @@ En schema.org los precios se escriben como enteros sin separador de miles: "5570
 
 **Objetivo:** grafo JSON-LD válido que declare la entidad profesional y el servicio.
 
-**Estructura:** @graph con MedicalBusiness (location: VirtualLocation con URL de teleconsulta; areaServed: Chile), Person (hasCredential: título UVM y registro; identifier: PropertyValue con propertyID RNPI y value 876085; sameAs a perfiles verificables), Service (availableChannel con serviceUrl de Cal.com; availableLanguage español). Corrección C35: HealthcareService tampoco existe en schema.org (es un recurso FHIR de HL7, no un tipo del vocabulario); el tipo válido para el nodo de servicio es Service, verificado en validator.schema.org. Offers con priceCurrency CLP y valores enteros "5570" y "15000". Sin aggregateRating, sin review.
+**Estructura:** @graph con MedicalBusiness (location: VirtualLocation con URL de teleconsulta; areaServed: Chile), Person (hasCredential: título UVM y registro; identifier: PropertyValue con propertyID RNPI y value 876085; sameAs a perfiles verificables), Service (availableChannel con serviceUrl de Cal.com; availableLanguage español). Corrección C35: HealthcareService tampoco existe en schema.org (es un recurso FHIR de HL7, no un tipo del vocabulario); el tipo válido para el nodo de servicio es Service, verificado en validator.schema.org. Offers con priceCurrency CLP y valores enteros "5570" y "20000". Sin aggregateRating, sin review.
 
 **Verificación autónoma:** Rich Results Test y validator.schema.org sin errores ni advertencias críticas; greps en cero.
 
@@ -201,6 +201,17 @@ Las cifras de esta tabla son las vigentes. Ninguna se cita de memoria ni de una 
 | 2 | Proveedor de analítica sin cookies | **Resuelta:** Umami Cloud, sin cookies, cargado después de `window.load`. Se descartó el autohospedaje por costo operativo para una práctica individual | C37 |
 | 3 | Unificación de `sesiones.js` | **Resuelta:** Opción 1, campo único `detalle`, con el precio renderizado por separado en cada superficie. Verificado en C39: no quedan referencias funcionales a `detalleModal` ni a `detalleApp` en el repositorio; la única mención restante es el comentario de cabecera que documenta el cambio | C36, verificada en C39 |
 | 4 | Perfil en directorios de salud tipo Doctoralia | **Archivada por alcance.** Ver 5.1.1 | C39 |
+| 5 | Asignación de agenda entre ingreso y continuidad | **Resuelta:** segmentación por banda de aviso mínimo (ver 5.1.2). Sube el particular de $15.000 a $20.000; renombra el slug del evento particular sin el monto (`psicoterapia-individual-online-particular`, con el slug antiguo conservado como alias de compatibilidad); agrega módulo de disponibilidad en vivo en 4 superficies y aviso interno de cupo liberado. **Hito de revisión: 8 de septiembre de 2026** (término del plan de Fonasa de Juan), con datos de 3 semanas de `CUPOS_INGRESO_SEMANALES`, para decidir si el límite de cupos de ingreso sube de 3 a 4 o 5 | C49 |
+
+#### 5.1.2 Decisión 5: segmentación por banda de aviso mínimo
+
+El problema medido el 15 de agosto de 2026: los 4 eventos de Cal.com compartían un único horario y exponían 47 cupos semanales contra una capacidad real de 26 (topes del limitador de Apps Script), con ventana futura sin límite. El calendario se llenaba hasta 3 semanas adelante por orden de llegada, sin reserva de cupos para pacientes nuevos.
+
+Mecanismo elegido: el aviso mínimo diferenciado por tipo de evento. Si el evento de avance exige 5 días de anticipación para reservar, esos próximos 5 días quedan disponibles solo para eventos de ingreso (primera sesión y particular). No se bloquea nada a mano en el calendario: un bloqueo de Google Calendar es ciego al tipo de evento y bloquearía los cuatro por igual, así que no sirve para reservar cupos de ingreso específicamente.
+
+Bandas resultantes: días 0-5 solo ingreso, días 5-14 ingreso y continuidad, días 14-30 solo continuidad. Los avisos mínimos de ingreso salen del flujo de pago real (bono Fonasa se compra antes, 24h; particular se paga después por transferencia, 4h), no de una regla comercial arbitraria.
+
+El aviso mínimo de 5 días del evento de avance queda pendiente de aplicar hasta que Juan confirme que ya creó las horas fijas de continuidad (`apps-script/crearHorasFijas.gs`): aplicarlo antes bloquearía sin aviso a pacientes que hoy agendan controles con menos de 5 días de anticipación.
 
 #### 5.1.1 Decisión 4: archivada
 
