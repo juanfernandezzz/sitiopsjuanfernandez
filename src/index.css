@@ -1,3 +1,5 @@
+@import './styles/fondo-ambiental.css';
+
 /* C31 fix pack 2: fuentes propias (OFL) servidas desde /fonts. Se elimina la
    cadena de terceros de Google Fonts: sin preconnect, sin hoja externa y con
    preload directo de las dos caras criticas desde el HTML. El archivo de

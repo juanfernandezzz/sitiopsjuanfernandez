@@ -76,6 +76,24 @@ export default function Footer() {
             {LEGAL.leyDatosFutura} (Protección de Datos Personales) y{' '}
             {LEGAL.leySaludMental} (Derechos en la Atención de Salud Mental).
           </p>
+          <p
+            className="font-body"
+            style={{
+              fontSize: 12,
+              color: 'rgba(246, 241, 232, 0.8)',
+              margin: '6px auto 0',
+              lineHeight: 1.55,
+            }}
+          >
+            <a
+              href="https://www.met.no/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2 }}
+            >
+              Datos meteorológicos: MET Norway
+            </a>
+          </p>
         </div>
       </div>
     </footer>

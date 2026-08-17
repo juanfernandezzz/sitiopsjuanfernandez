@@ -4,6 +4,7 @@ import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
 import { SOBRE_MI } from '../../lib/sobreMi';
 import { CREDENCIALES } from '../../lib/credenciales';
+import FondoAmbiental from '../FondoAmbiental.jsx';
 
 /**
  * Seccion "Sobre mi" (ancla #bio). Reune en un solo lugar la presentacion
@@ -33,7 +34,7 @@ const CheckIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="text-sage flex-shrink-0 mt-[2px]"
+    className="fa-suave flex-shrink-0 mt-[2px]"
     aria-hidden="true"
   >
     <polyline points="20 6 9 17 4 12" />
@@ -57,9 +58,10 @@ export default function SobreMi() {
 
   return (
     <section
-      className="relative bg-cream text-ink overflow-hidden"
+      className="relative overflow-hidden"
       aria-label="Sobre mí"
     >
+      <FondoAmbiental>
       {/* Separador superior fino, coherente con el resto del cuerpo */}
       <div className="mx-auto max-w-6xl px-5 lg:px-8">
         <div className="h-px bg-ink/10" aria-hidden="true" />
@@ -82,7 +84,7 @@ export default function SobreMi() {
         <div className="lg:col-span-3">
           <motion.span
             variants={item}
-            className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] text-sage mb-5"
+            className="inline-flex items-center gap-2 font-body text-[13px] uppercase tracking-[0.2em] fa-suave mb-5"
           >
             <span className="w-6 h-px bg-sage" aria-hidden="true" />
             {SOBRE_MI.eyebrow}
@@ -90,7 +92,7 @@ export default function SobreMi() {
 
           <motion.h2
             variants={item}
-            className="font-display text-ink max-w-[18ch]"
+            className="font-display max-w-[18ch]"
             style={{
               fontWeight: 600,
               fontVariationSettings: '"opsz" 144, "SOFT" 50, "WONK" 0',
@@ -120,7 +122,7 @@ export default function SobreMi() {
               className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover ring-1 ring-sage/30 shadow-[0_18px_36px_-22px_rgba(63,91,74,0.45)]"
             />
             <div className="border-l-2 border-terracota/55 pl-5 lg:pl-6">
-              <p className="font-body text-[18px] lg:text-[20px] leading-[1.7] text-ink/85 max-w-[52ch]">
+              <p className="font-body text-[18px] lg:text-[20px] leading-[1.7] max-w-[52ch]">
                 {SOBRE_MI.bio}
               </p>
             </div>
@@ -131,10 +133,10 @@ export default function SobreMi() {
           <div className="mt-10 grid gap-7 sm:grid-cols-2 max-w-[58ch]">
             {[SOBRE_MI.enfoque, SOBRE_MI.formato].map((bloque) => (
               <motion.div key={bloque.titulo} variants={item}>
-                <p className="font-body text-[12px] uppercase tracking-[0.18em] text-sage mb-2">
+                <p className="font-body text-[12px] uppercase tracking-[0.18em] fa-suave mb-2">
                   {bloque.titulo}
                 </p>
-                <p className="font-body text-[16px] leading-[1.6] text-ink/78">
+                <p className="font-body text-[16px] leading-[1.6] fa-suave">
                   {bloque.texto}
                 </p>
               </motion.div>
@@ -144,15 +146,15 @@ export default function SobreMi() {
 
         {/* Columna prueba: tarjeta de credenciales + CTA secundaria */}
         <motion.div variants={item} className="lg:col-span-2">
-          <div className="rounded-2xl bg-offwhite ring-1 ring-sage/20 shadow-[0_24px_50px_-30px_rgba(63,91,74,0.35)] p-7 lg:p-8">
-            <p className="font-body text-[12px] uppercase tracking-[0.18em] text-sage mb-5">
+          <div className="fa-credenciales rounded-2xl ring-1 ring-sage/20 shadow-[0_24px_50px_-30px_rgba(63,91,74,0.35)] p-7 lg:p-8">
+            <p className="font-body text-[12px] uppercase tracking-[0.18em] fa-suave mb-5">
               Formación y registro
             </p>
             <ul className="grid gap-4" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {CREDENCIALES.map((credencial) => (
                 <li
                   key={credencial}
-                  className="flex gap-3 font-body text-[15px] text-ink/82 leading-[1.5]"
+                  className="flex gap-3 font-body text-[15px] leading-[1.5]"
                 >
                   <CheckIcon />
                   <span>{credencial}</span>
@@ -172,6 +174,7 @@ export default function SobreMi() {
           </div>
         </motion.div>
       </motion.div>
+      </FondoAmbiental>
     </section>
   );
 }
