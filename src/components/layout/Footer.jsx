@@ -6,10 +6,6 @@ import {
   FONASA_CODIGOS,
   URLS_EXTERNAS,
 } from '../../lib/contacto';
-// C51: el enlace del pie tambien lleva mensaje prellenado. Un wa.me pelado abre
-// un chat en blanco, y quien escribe desde el pie ya recorrio la pagina entera:
-// obligarlo a redactar el primer mensaje es friccion gratis.
-import { mensajeWhatsApp, urlWhatsApp } from '../../lib/disponibilidad';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -247,7 +243,7 @@ function ColumnaContacto() {
           label={CONTACTO.email}
         />
         <LinkConIcono
-          href={urlWhatsApp(CONTACTO.whatsappE164, mensajeWhatsApp(null))}
+          href={CONTACTO.whatsappUrl}
           icon={<WhatsAppIcon />}
           label={`WhatsApp ${CONTACTO.whatsappDisplay}`}
           external

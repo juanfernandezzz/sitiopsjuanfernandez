@@ -72,9 +72,6 @@ import crypto from 'crypto';
  *   - EMAIL_FROM_AUTOMATICO
  *   - EMAIL_REPLY_TO
  *   - SITIO_URL            (default: https://psicologojuanfernandez.cl)
- *   - EMAIL_DESTINO_PRESTADOR  Direccion que recibe la COPIA OCULTA de cada
- *       correo post reserva (default: juanfernandezpsicologo@gmail.com). Es la
- *       prueba de que el envio ocurrio de verdad.
  *
  * Variable de entorno opcional:
  *   - CONSENTIMIENTO_YA_OBTENIDO  Lista de emails (separados por coma o salto de
@@ -88,7 +85,7 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C51';
+export const REVISION = 'C49';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -749,9 +746,6 @@ export function construirCorreo({
  *   - EMAIL_FROM_AUTOMATICO
  *   - EMAIL_REPLY_TO
  *   - SITIO_URL            (default: https://psicologojuanfernandez.cl)
- *   - EMAIL_DESTINO_PRESTADOR  Direccion que recibe la COPIA OCULTA de cada
- *       correo post reserva (default: juanfernandezpsicologo@gmail.com). Es la
- *       prueba de que el envio ocurrio de verdad.
  *
  * Variable de entorno opcional:
  *   - CONSENTIMIENTO_YA_OBTENIDO  Lista de emails (separados por coma o salto de
@@ -1153,14 +1147,6 @@ export const handler = async (event) => {
     'Juan Fernández, Psicólogo Clínico <noresponder@psicologojuanfernandez.cl>';
   const REPLY_TO = process.env.EMAIL_REPLY_TO || 'juanfernandezpsicologo@gmail.com';
   const SITIO_URL = process.env.SITIO_URL || 'https://psicologojuanfernandez.cl';
-  // C51: copia oculta al prestador. Hasta ahora el correo salia solo al paciente,
-  // asi que la unica forma de saber si un envio real ocurrio (y con que copy) era
-  // preguntarle a la persona. La sonda GET dice que version esta desplegada, no
-  // que se haya enviado nada. Con el BCC cada reserva deja evidencia en la bandeja
-  // de Juan: si no llega la copia, el envio no ocurrio. Va en BCC y no en CC para
-  // que el paciente no vea una direccion extra en su correo.
-  const BCC_PRESTADOR =
-    process.env.EMAIL_DESTINO_PRESTADOR || 'juanfernandezpsicologo@gmail.com';
 
   const linkConsentimiento = pedirConsentimiento
     ? `${SITIO_URL}/consentimiento.html` +
@@ -1182,7 +1168,6 @@ export const handler = async (event) => {
     const result = await resend.emails.send({
       from: FROM,
       to: [attendee.email],
-      bcc: [BCC_PRESTADOR],
       reply_to: REPLY_TO,
       subject: asunto,
       html,
