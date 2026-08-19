@@ -1,0 +1,74 @@
+/* Fondo ambiental: revelado gradual ligado al scroll.
+ *
+ * Donde hay soporte de animation-timeline la opacidad avanza con la posicion
+ * de scroll y corre en el compositor, sin trabajo en el hilo principal.
+ * Donde no lo hay (Firefox estable a la fecha, cerca del 17 por ciento del
+ * trafico global) la capa usa una transicion larga disparada por
+ * IntersectionObserver. Mismo efecto, sin progresion continua.
+ */
+
+.fondo-ambiental-capa {
+  transition: opacity 1400ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fondo-ambiental-scroll {
+      opacity: 0;
+      animation: fondo-ambiental-revelar linear both;
+      animation-timeline: view();
+      /* Entra durante el primer tercio de la seccion y se sostiene.
+         No se desvanece a la salida: eso produciria parpadeo al leer. */
+      animation-range: entry 8% cover 34%;
+    }
+  }
+}
+
+@keyframes fondo-ambiental-revelar {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sin movimiento: el gradiente aparece de inmediato y no se anima. */
+@media (prefers-reduced-motion: reduce) {
+  .fondo-ambiental-capa {
+    opacity: 1 !important;
+    transition: none;
+    animation: none;
+  }
+}
+
+/* El texto de la seccion hereda el color garantizado por paletaFondo.
+   No se declaran colores fijos aqui: los define el componente segun el
+   polo de luminancia, que es lo que asegura el contraste. */
+.fondo-ambiental :where(h1, h2, h3, h4, p, li, strong, em, span) {
+  color: inherit;
+}
+
+.fondo-ambiental :where(.fa-suave) {
+  color: var(--fa-texto-suave);
+}
+
+.fondo-ambiental :where(hr, .fa-borde) {
+  border-color: var(--fa-borde);
+}
+
+/* Bloque de credenciales: nunca flota sobre la escena.
+   Va sobre una superficie propia para que los datos de registro y titulo
+   se lean igual en cualquier estado del cielo. */
+.fondo-ambiental .fa-credenciales {
+  background-color: color-mix(in srgb, var(--fa-cenit) 62%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--fa-borde);
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+  .fondo-ambiental .fa-credenciales {
+    background-color: color-mix(in srgb, var(--fa-cenit) 92%, transparent);
+  }
+}

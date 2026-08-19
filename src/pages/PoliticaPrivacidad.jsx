@@ -450,6 +450,45 @@ export default function PoliticaPrivacidad() {
         </a>
         . Responderé en los plazos legales aplicables.
       </p>
+
+      {/* 13 */}
+      <h2 className="font-display" style={STYLES.h2}>
+        13. Ubicación aproximada y elementos visuales del sitio
+      </h2>
+      <p style={STYLES.p}>
+        La sección &ldquo;Quién te atiende&rdquo; muestra un fondo animado que
+        refleja la hora local y las condiciones atmosféricas del lugar desde
+        donde te conectas. Su finalidad es exclusivamente estética: no forma
+        parte de la atención clínica, no condiciona el acceso a ninguna
+        función del sitio y no se utiliza para publicidad, elaboración de
+        perfiles ni analítica.
+      </p>
+      <p style={STYLES.p}>
+        Para generarlo, el servidor deriva de tu dirección IP una ubicación
+        aproximada de nivel regional. Tu dirección IP no se almacena en ningún
+        momento. Las coordenadas se redondean a celdas de aproximadamente 25
+        kilómetros antes de salir del servidor, y únicamente esa celda
+        redondeada se comunica al Instituto Meteorológico de Noruega (MET
+        Norway), proveedor de los datos atmosféricos, cuya política está
+        disponible en{' '}
+        <a
+          href="https://www.met.no/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkStyle}
+        >
+          https://www.met.no/
+        </a>
+        . El resultado se conserva en memoria caché por un máximo de seis
+        horas para evitar consultas repetidas.
+      </p>
+      <p style={STYLES.p}>
+        No se registra tu ubicación, no se asocia a tu persona ni a ninguna
+        consulta, y el sitio no muestra en pantalla el nombre de tu ciudad ni
+        de tu región. Si prefieres no ver este elemento, puedes desactivar el
+        movimiento en las preferencias de accesibilidad de tu sistema
+        operativo o navegador.
+      </p>
     </article>
   );
 }

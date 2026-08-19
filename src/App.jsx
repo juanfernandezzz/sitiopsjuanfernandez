@@ -90,7 +90,7 @@ function LazySection({ id, scrollMarginTop = '80px', minHeight, children }) {
         scrollMarginTop,
         minHeight: visible ? undefined : minHeight,
         contentVisibility: 'auto',
-        containIntrinsicSize: minHeight ? `auto ${minHeight}px` : 'auto 800px',
+        containIntrinsicSize: 'auto',
       }}
     >
       {visible ? <Suspense fallback={null}>{children}</Suspense> : null}
