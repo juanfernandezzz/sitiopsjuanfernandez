@@ -8,6 +8,9 @@ const FloatingWhatsApp = lazy(() =>
 import { CAL_NAMESPACE } from './lib/cal'
 import { iniciarCapturaSlug, registrarConversionReserva } from './lib/seguimiento'
 import { UIProvider, useUI } from './lib/uiContext'
+// C51: no cambia el botón, solo lo que ocurre al pulsarlo (abre WhatsApp
+// directamente en vez de la ventana interna de la librería).
+import AbrirWhatsAppDirecto from './components/ui/AbrirWhatsAppDirecto'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Hero from './components/sections/Hero'
@@ -276,17 +279,19 @@ function AppShell() {
 
       {showWhatsApp && (
         <Suspense fallback={null}>
-          <FloatingWhatsApp
-            phoneNumber="56973394530"
-            accountName="Juan Fernández"
-            statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
-            chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
-            placeholder="Escribe tu mensaje..."
-            avatar="/juan.jpg"
-            notification={false}
-            allowClickAway
-            allowEsc
-          />
+          <AbrirWhatsAppDirecto>
+            <FloatingWhatsApp
+              phoneNumber="56973394530"
+              accountName="Juan Fernández"
+              statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
+              chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
+              placeholder="Escribe tu mensaje..."
+              avatar="/juan.jpg"
+              notification={false}
+              allowClickAway
+              allowEsc
+            />
+          </AbrirWhatsAppDirecto>
         </Suspense>
       )}
     </div>

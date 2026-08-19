@@ -35,6 +35,12 @@ import {
 } from '../../lib/disponibilidad';
 
 let promesa = null;
+// Exportada (C51) para que el interceptor del botón flotante de WhatsApp reuse
+// esta misma promesa. Sin esto, ese botón dispararía una segunda petición a la
+// función de Netlify por cada carga de página.
+export function cargarDisponibilidad() {
+  return cargar();
+}
 function cargar() {
   if (!promesa) {
     promesa = fetch('/.netlify/functions/disponibilidad')
