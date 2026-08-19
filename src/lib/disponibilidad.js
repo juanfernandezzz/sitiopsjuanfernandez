@@ -145,12 +145,18 @@ export function normalizar(payload, claveEvento) {
  * fecha en vez de inventar una.
  *
  * `sesion` describe el tipo en lenguaje de paciente, no el slug.
+ *
+ * C51: aquí se pasa la fecha LARGA ("martes 1 de septiembre"), no la corta.
+ * La píldora del sitio puede permitirse "martes 1" porque el mes se infiere del
+ * contexto visual; un mensaje de WhatsApp viaja solo, se lee días después y
+ * cruza el cambio de mes con frecuencia (la primera sesión suele estar a más de
+ * una semana). "martes 1" a secas es ambiguo justo cuando más importa.
  */
-export function mensajeWhatsApp(fechaCortaTexto, sesion = 'una primera sesión') {
-  if (!fechaCortaTexto) {
+export function mensajeWhatsApp(fechaTexto, sesion = 'una primera sesión') {
+  if (!fechaTexto) {
     return `Hola Juan, quisiera hablar sobre ${sesion}.`;
   }
-  return `Hola Juan, vi que tu próxima hora disponible es el ${fechaCortaTexto}, y quisiera hablar sobre ${sesion}.`;
+  return `Hola Juan, vi que tu próxima hora disponible es el ${fechaTexto}, y quisiera hablar sobre ${sesion}.`;
 }
 
 /** URL de WhatsApp lista para usar. El número va sin el signo inicial. */

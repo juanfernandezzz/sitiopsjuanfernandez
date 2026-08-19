@@ -23,26 +23,17 @@
  *   Varias instancias conviven en la misma página. La promesa se memoiza a nivel
  *   de módulo para que la función de Netlify se llame una vez por carga.
  */
-import { useEffect, useState } from 'react';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { CONTACTO } from '../../lib/contacto';
 import {
   ESTADOS,
   AVISO_CUPOS_LIMITADOS,
-  normalizar,
   mensajeWhatsApp,
   urlWhatsApp,
 } from '../../lib/disponibilidad';
-
-let promesa = null;
-function cargar() {
-  if (!promesa) {
-    promesa = fetch('/.netlify/functions/disponibilidad')
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null);
-  }
-  return promesa;
-}
+// C51: el fetch memoizado se movio a usarDisponibilidad para poder compartirlo
+// con el boton flotante de WhatsApp sin duplicar la peticion.
+import { usarDisponibilidad } from './usarDisponibilidad';
 
 const SESION_LEGIBLE = {
   primeraSesionFonasa: 'una primera sesión',
@@ -59,17 +50,7 @@ export default function ModuloDisponibilidad({
   variante = 'hero',
   className = '',
 }) {
-  const [datos, setDatos] = useState(null);
-
-  useEffect(() => {
-    let vivo = true;
-    cargar().then((p) => {
-      if (vivo) setDatos(normalizar(p, evento));
-    });
-    return () => {
-      vivo = false;
-    };
-  }, [evento]);
+  const datos = usarDisponibilidad(evento);
 
   const estado = datos ? datos.estado : null;
 
@@ -90,9 +71,10 @@ export default function ModuloDisponibilidad({
 
   const cercano = estado === ESTADOS.CERCANO;
   const enlaceCal = `https://cal.com/${CAL_USERNAME}/${SLUG_POR_CLAVE[evento]}`;
+  // C51: fecha larga en el mensaje de WhatsApp. Ver nota en lib/disponibilidad.
   const enlaceWa = urlWhatsApp(
     CONTACTO.whatsappE164,
-    mensajeWhatsApp(datos.corta, SESION_LEGIBLE[evento] || 'una sesión')
+    mensajeWhatsApp(datos.larga, SESION_LEGIBLE[evento] || 'una sesión')
   );
 
   // Punto verde solo cuando hay disponibilidad cercana. En estado lejano el

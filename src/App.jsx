@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, lazy, Suspense } from 'react'
-// C31 fix pack: react-floating-whatsapp incrusta ~196 KB de imagenes en base64
-// dentro de su modulo. Cargarlo diferido lo saca del bundle critico; como el
-// widget recien se muestra tras hacer scroll, el cambio es invisible.
-const FloatingWhatsApp = lazy(() =>
-  import('react-floating-whatsapp').then((m) => ({ default: m.FloatingWhatsApp }))
-)
+// C51: fuera react-floating-whatsapp. Abria una ventana que IMITA WhatsApp
+// dentro del sitio (avatar aplastado, saludo falso, campo vacio) y recien al
+// escribir ahi saltaba a la app, perdiendo el mensaje prellenado. El reemplazo
+// es un enlace directo a wa.me que abre la conversacion con el texto ya puesto.
+// Sigue siendo lazy: solo aparece tras hacer scroll, asi que no pertenece al
+// bundle critico.
+const BotonWhatsAppFlotante = lazy(() => import('./components/ui/BotonWhatsAppFlotante'))
 import { CAL_NAMESPACE } from './lib/cal'
 import { iniciarCapturaSlug, registrarConversionReserva } from './lib/seguimiento'
 import { UIProvider, useUI } from './lib/uiContext'
@@ -276,17 +277,7 @@ function AppShell() {
 
       {showWhatsApp && (
         <Suspense fallback={null}>
-          <FloatingWhatsApp
-            phoneNumber="56973394530"
-            accountName="Juan Fernández"
-            statusMessage="Psicólogo clínico · Responde habitualmente en pocas horas"
-            chatMessage="Hola, gracias por escribir. ¿En qué puedo acompañarte?"
-            placeholder="Escribe tu mensaje..."
-            avatar="/juan.jpg"
-            notification={false}
-            allowClickAway
-            allowEsc
-          />
+          <BotonWhatsAppFlotante />
         </Suspense>
       )}
     </div>
