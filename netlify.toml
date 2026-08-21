@@ -35,11 +35,6 @@
   status = 301
 
 [[redirects]]
-  from   = "/api/ambiente"
-  to     = "/.netlify/functions/ambiente"
-  status = 200
-
-[[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200

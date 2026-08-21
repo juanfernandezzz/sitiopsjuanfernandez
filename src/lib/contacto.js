@@ -64,8 +64,8 @@ export const REDES = {
 };
 
 export const LEGAL = {
-  ultimaActualizacionPolitica: '18 de agosto de 2026',
-  versionPolitica: '4',
+  ultimaActualizacionPolitica: '16 de julio de 2026',
+  versionPolitica: '3',
   autoridadDatos: 'Agencia de Protección de Datos Personales',
   leyTelemedicina: 'Ley 21.541',
   leyDatosVigente: 'Ley 19.628',
