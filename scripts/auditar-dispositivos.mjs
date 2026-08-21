@@ -32,12 +32,7 @@ function cajas(W,H){
  for(let i=0;i<n;i++) out.push({x0:mx,x1:W-mx,y0:H*0.06+i*paso,y1:H*0.06+i*paso+paso*0.7})
  return out
 }
-// La banda vegetal del borde inferior son tallos: lineas verticales
-// intencionales. Se excluyen del analisis de bordes para no contarlas como
-// costuras. Su altura maxima es 0.12 del lienzo mas margen.
-const BANDA_VEGETAL = 0.18
 function costura(img,W,H){
- const yTope = Math.floor(H * (1 - BANDA_VEGETAL))
  let peor=0
  for(let x=2;x<W-2;x+=2){let r=0
   for(let y=2;y<H-2;y++){
@@ -45,7 +40,7 @@ function costura(img,W,H){
    const d1=Math.abs(img[i]-img[iz])+Math.abs(img[i+1]-img[iz+1])+Math.abs(img[i+2]-img[iz+2])
    const d0=Math.abs(img[iz]-img[iz2])+Math.abs(img[iz+1]-img[iz2+1])+Math.abs(img[iz+2]-img[iz2+2])
    if(d1>12 && Math.abs(d1-d0)>9){r++;if(r>peor)peor=r}else r=0}}
- for(let y=2;y<yTope;y+=2){let r=0
+ for(let y=2;y<H-2;y+=2){let r=0
   for(let x=2;x<W-2;x++){
    const i=(y*W+x)*4, ar=((y-1)*W+x)*4, ar2=((y-2)*W+x)*4
    const d1=Math.abs(img[i]-img[ar])+Math.abs(img[i+1]-img[ar+1])+Math.abs(img[i+2]-img[ar+2])

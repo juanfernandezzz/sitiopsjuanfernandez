@@ -41,19 +41,6 @@ export default function FondoAmbiental({ children, className = '' }) {
   const escena = useMemo(() => construirEscena(clima, ahora), [clima, ahora])
   const paleta = useMemo(() => paletaFondo(escena), [escena])
 
-  // Referencias vivas a la escena. El motor se destruye al salir de viewport
-  // y se vuelve a crear al entrar, pero el efecto que le entrega la escena
-  // depende de [escena, paleta, ahora]: si esos valores no cambiaron entre
-  // medias, no se dispara, y el motor nuevo se queda sin escena. Entonces
-  // cuadro() retorna de inmediato y solo se ve el degradado CSS.
-  // Ese era el fondo que quedaba estatico tras desplazarse un rato.
-  const escenaRef = useRef(escena)
-  const paletaRef = useRef(paleta)
-  const ahoraRef = useRef(ahora)
-  escenaRef.current = escena
-  paletaRef.current = paleta
-  ahoraRef.current = ahora
-
   useEffect(() => {
     const nodo = contenedor.current
     if (!nodo || typeof IntersectionObserver === 'undefined') {
@@ -166,36 +153,15 @@ export default function FondoAmbiental({ children, className = '' }) {
     const motor = crearMotor(canvas, { dprMax: 1.5 })
     if (!motor) return undefined
     motorRef.current = motor
-    // Se le entrega la escena de inmediato, sin esperar al efecto siguiente.
-    motor.actualizarEscena(escenaRef.current, paletaRef.current, ahoraRef.current)
 
     let raf = 0
     let corriendo = true
     let ultimo = 0
+    let suma = 0
+    let n = 0
     let calidad = 1
     let objetivo = OBJETIVO_MS
     let apagado = false
-
-    // Muestras de tiempo de cuadro para la degradacion adaptativa.
-    //
-    // Antes se promediaban 45 cuadros seguidos. Durante un desplazamiento el
-    // hilo principal esta saturado y ese promedio se dispara, asi que la
-    // degradacion se activaba por el scroll y no por el dispositivo. Dos
-    // reducciones seguidas apagaban el lienzo de forma permanente, sin
-    // ninguna via de vuelta: eso convertia un tiron pasajero en un fondo
-    // muerto para el resto de la visita.
-    //
-    // Ahora se usa la MEDIANA, que ignora los picos aislados del scroll, no
-    // se mide mientras hay desplazamiento en curso, y la degradacion es
-    // reversible: si el dispositivo se recupera, la calidad vuelve a subir.
-    let muestras = []
-    let ultimoScroll = 0
-    let estable = 0
-
-    const marcarScroll = () => {
-      ultimoScroll = performance.now()
-    }
-    window.addEventListener('scroll', marcarScroll, { passive: true })
 
     const dimensionar = () => {
       const r = canvas.getBoundingClientRect()
@@ -213,37 +179,24 @@ export default function FondoAmbiental({ children, className = '' }) {
       if (dt < objetivo - 1) return
       ultimo = t
 
-      // No se mide durante el desplazamiento ni en los 400 ms siguientes.
-      const enScroll = t - ultimoScroll < 400
-      if (!enScroll) muestras.push(dt)
-
-      if (muestras.length >= 45) {
-        muestras.sort((a, b) => a - b)
-        const mediana = muestras[Math.floor(muestras.length / 2)]
-        muestras = []
-
-        if (mediana > objetivo * 1.7) {
-          estable = 0
+      suma += dt
+      n++
+      if (n >= 45) {
+        const medio = suma / n
+        if (medio > objetivo * 1.7) {
           if (calidad > 0.4) {
             calidad *= 0.65
             motor.calidad(0.65)
             objetivo = 1000 / 24
-          } else if (calidad > 0.18) {
-            // Ultimo escalon antes de rendirse: densidad minima, no apagado.
-            calidad *= 0.5
-            motor.calidad(0.5)
-          }
-        } else if (mediana < objetivo * 0.85) {
-          // El dispositivo sostiene el ritmo. Si lleva varias ventanas
-          // estable y antes se habia degradado, se recupera densidad.
-          estable++
-          if (estable >= 3 && calidad < 1) {
-            calidad = Math.min(1, calidad / 0.65)
-            motor.calidad(1 / 0.65)
-            if (calidad > 0.9) objetivo = OBJETIVO_MS
-            estable = 0
+          } else {
+            corriendo = false
+            apagado = true
+            cancelAnimationFrame(raf)
+            return
           }
         }
+        suma = 0
+        n = 0
       }
 
       const nodo = contenedor.current
@@ -282,7 +235,6 @@ export default function FondoAmbiental({ children, className = '' }) {
       corriendo = false
       cancelAnimationFrame(raf)
       if (ro) ro.disconnect()
-      window.removeEventListener('scroll', marcarScroll)
       document.removeEventListener('visibilitychange', alternar)
       motor.destruir()
       motorRef.current = null

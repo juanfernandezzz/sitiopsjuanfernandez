@@ -150,14 +150,12 @@ function analizar(a, b, umbral = 5) {
  * columna o fila. Una particula produce rachas de pocos pixeles; un borde mal
  * difuminado produce una linea recta larga.
  */
-const BANDA_VEGETAL = 0.18
 function costuraMaxima(img, w, h) {
-  const yTope = Math.floor(h * (1 - BANDA_VEGETAL))
   let peorCol = 0
   let peorFila = 0
   for (let x = 2; x < w - 2; x++) {
     let racha = 0
-    for (let y = 2; y < yTope; y++) {
+    for (let y = 2; y < h - 2; y++) {
       const i = (y * w + x) * 4
       const iz = (y * w + x - 1) * 4
       const d =
@@ -170,7 +168,7 @@ function costuraMaxima(img, w, h) {
       } else racha = 0
     }
   }
-  for (let y = 2; y < yTope; y++) {
+  for (let y = 2; y < h - 2; y++) {
     let racha = 0
     for (let x = 2; x < w - 2; x++) {
       const i = (y * w + x) * 4
