@@ -72,6 +72,18 @@ function diasEntre(desdeISO, hastaISO) {
   return Math.round(ms / 86400000);
 }
 
+// Juan nunca atiende domingo (ver limitador.gs: LIMITES_POR_DIA_SEMANA no
+// gestiona el día 0). Cal.com abrió un domingo suelto por un glitch propio en
+// C49 pese a tener el horario semanal correctamente cerrado ese día; este
+// filtro es el cinturón de seguridad para que el sitio nunca vuelva a mostrar
+// un domingo como "próxima hora disponible", pase lo que pase del lado de
+// Cal.com. Mediodía local evita que el cálculo del día de la semana se corra
+// por el cambio de horario de verano.
+function esDomingo(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  return new Date(a, m - 1, d, 12, 0, 0).getDay() === 0;
+}
+
 /** "2026-08-24T14:00:00-04:00" -> "14:00" en la zona de Santiago. */
 function horaLocal(iso) {
   const fmt = new Intl.DateTimeFormat('es-CL', {
@@ -107,6 +119,7 @@ async function consultarEvento(id, clave, apiKey, hoy) {
   const dias = Object.keys(data)
     .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= hoy)
     .filter((d) => Array.isArray(data[d]) && data[d].length > 0)
+    .filter((d) => !esDomingo(d))
     .sort();
 
   if (dias.length === 0) return { estado: 'desconocido' };
