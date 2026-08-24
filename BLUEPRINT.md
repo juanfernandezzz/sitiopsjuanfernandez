@@ -2,7 +2,7 @@
 
 **Sitio:** psicologojuanfernandez.cl (forma canónica: apex sin www, declarada en canonical, hreflang, og:url y sitemap)
 **Repositorio:** github.com/juanfernandezzz/sitiopsjuanfernandez
-**Documento de gobierno del proceso. Versión 2.0. Ciclo de origen: C30. Última actualización: C39, 18 de julio de 2026.**
+**Documento de gobierno del proceso. Versión 2.1. Ciclo de origen: C30. Última actualización: C51, 24 de agosto de 2026.**
 
 **Estado: las seis fases están ejecutadas y cerradas.** Este documento deja de ser un plan de trabajo y pasa a ser el registro de lo hecho más la rutina de observación permanente de la sección 5.3. No existe una Fase 7. Cualquier trabajo posterior es o bien mantenimiento dentro de la rutina, o bien un proyecto nuevo que requiere su propio documento de gobierno.
 
@@ -24,6 +24,7 @@ Este documento define el proceso integral de auditoría y mejora del sitio en se
 ### 0.2 Restricciones permanentes
 
 - Alcance: solo el sitio web. Si un cambio toca copy compartido en `src/lib/`, el script postinstall lo propaga a la app Android; la app no es objeto de auditoría.
+- **La operación de agenda queda fuera de este documento y se gobierna en `docs/operacion-agenda.md`** (planilla de horas agendadas, limitador de topes diarios, horas fijas recurrentes). Este BLUEPRINT solo registra de esa operación lo que toca al sitio: la cuenta de tipos de evento en la sección 0.3 y la capacidad semanal que se cita en la decisión 5. Regla fijada en C51 para no ensanchar un documento cerrado.
 - Sin contenido nuevo: no blog, no artículos, no páginas editoriales. Solo optimización de secciones existentes (hero, sobre mí, cómo trabajo y teleconsulta, sesiones y precios, motivos de consulta, preguntas frecuentes, contacto, flujo Cal.com, página de confirmación).
 - Design system fijo: paleta Cream, Sage, Terracotta, Ink; tipografías Fraunces y Karla. Ninguna fase introduce tipografías, paletas ni insignias visuales nuevas. Las directivas de diseño externas al proyecto se subordinan a este sistema.
 - Los siete greps obligatorios del proyecto deben retornar cero antes de cada commit. Este documento evita deliberadamente escribir los dos términos prohibidos por los greps 3 y 6 (la certificación estadounidense de privacidad sanitaria y la frase de cifrado punto a punto) para que el repositorio se mantenga en cero. Doxy.me se describe siempre y únicamente como "plataforma certificada por Fonasa".
@@ -39,7 +40,7 @@ Este documento define el proceso integral de auditoría y mejora del sitio en se
 | Registro profesional | RNPI N° 876085 | rnpi.superdesalud.gob.cl |
 | Título | Psicólogo, UVM, enero 2025 | Registro MINEDUC |
 | Teleconsulta | Doxy.me, plataforma certificada por Fonasa | Confirmación Fonasa junio 2025 |
-| Agenda | cal.com/psicologojuanfernandez, 4 eventos | Cal.com |
+| Agenda | cal.com/psicologojuanfernandez, 8 tipos de evento: 1 público, 3 ocultos no recurrentes, 4 ocultos recurrentes de hora fija | Cal.com, verificado en C51 |
 | Duración de sesión | 45 minutos, en todas las modalidades | Confirmado por Juan en C31 |
 
 En schema.org los precios se escriben como enteros sin separador de miles: "5570" y "20000". El punto es separador decimal en ese vocabulario; escribir "5.570" declararía cinco pesos con 57 centavos.
@@ -202,7 +203,8 @@ Las cifras de esta tabla son las vigentes. Ninguna se cita de memoria ni de una 
 | 3 | Unificación de `sesiones.js` | **Resuelta:** Opción 1, campo único `detalle`, con el precio renderizado por separado en cada superficie. Verificado en C39: no quedan referencias funcionales a `detalleModal` ni a `detalleApp` en el repositorio; la única mención restante es el comentario de cabecera que documenta el cambio | C36, verificada en C39 |
 | 4 | Perfil en directorios de salud tipo Doctoralia | **Archivada por alcance.** Ver 5.1.1 | C39 |
 | 5 | Asignación de agenda entre ingreso y continuidad | **Resuelta:** segmentación por banda de aviso mínimo (ver 5.1.2). Sube el particular de $15.000 a $20.000; renombra el slug del evento particular sin el monto (`psicoterapia-individual-online-particular`, con el slug antiguo conservado como alias de compatibilidad); agrega módulo de disponibilidad en vivo en 4 superficies y aviso interno de cupo liberado. **Hito de revisión: 8 de septiembre de 2026** (término del plan de Claude de Juan), con datos de 3 semanas de `CUPOS_INGRESO_SEMANALES`, para decidir si el límite de cupos de ingreso sube de 3 a 4 o 5 | C49 |
-| 6 | Control y avance público vs. oculto | **Resuelta:** Juan agenda todos los controles de sus pacientes; ningún paciente reserva el suyo. El control sale de `SESIONES` (deja de ofrecerse como opción pública) y el evento queda oculto en Cal.com, accesible solo por URL directa. Se agrega el evento "Hora fija" (oculto, recurrente hasta 4 ocurrencias semanales) para que Juan deje una franja estable a un paciente establecido sin agendar sesión por sesión. Cupos de ingreso semanales bajan de 3 a 2 (ver 5.1.3). Verificación por RUT **descartada**, ver 5.1.3 | C50 |
+| 6 | Control y avance público vs. oculto | **Resuelta:** Juan agenda todos los controles de sus pacientes; ningún paciente reserva el suyo. El control sale de `SESIONES` (deja de ofrecerse como opción pública) y el evento queda oculto en Cal.com, accesible solo por URL directa. Se agrega el evento "Hora fija" (oculto, recurrente) para que Juan deje una franja estable a un paciente establecido sin agendar sesión por sesión. **Ampliado en C51 a cuatro tipos de hora fija** (semanal y quincenal, cada uno en Fonasa y particular). Detalle operativo en `docs/operacion-agenda.md`. Cupos de ingreso semanales bajan de 3 a 2 (ver 5.1.3). Verificación por RUT **descartada**, ver 5.1.3 | C50 |
+| 7 | Fuente única de los topes diarios | **Resuelta:** los seis topes viven en la hoja Configuración de la planilla de horas agendadas y el limitador de Apps Script los lee desde ahí. Antes estaban escritos en dos lugares y habían derivado: el limitador tenía el viernes en 5 y la operación asumía 6. Ver `docs/operacion-agenda.md` | C51 |
 
 #### 5.1.3 Decisión 6: por qué se descartó la verificación por RUT
 
@@ -221,6 +223,8 @@ Mecanismo elegido: el aviso mínimo diferenciado por tipo de evento. Si el event
 Bandas resultantes: días 0-5 solo ingreso, días 5-14 ingreso y continuidad, días 14-30 solo continuidad. Los avisos mínimos de ingreso salen del flujo de pago real (bono Fonasa se compra antes, 24h; particular se paga después por transferencia, 4h), no de una regla comercial arbitraria.
 
 El aviso mínimo de 5 días del evento de avance queda pendiente de aplicar hasta que Juan confirme que ya creó las horas fijas de continuidad (`apps-script/crearHorasFijas.gs`): aplicarlo antes bloquearía sin aviso a pacientes que hoy agendan controles con menos de 5 días de anticipación.
+
+**Estado al 24 de agosto de 2026 (C51):** la migración está a medias. De las 29 personas marcadas con periodicidad en la carpeta clínica, 17 ya tienen hora fija reservada y 12 no. El aviso mínimo de 5 días **sigue sin aplicarse** y no debe aplicarse hasta que las 29 estén migradas, porque las 12 restantes todavía dependen del evento de avance para agendar. La cuenta viva está en la hoja Horas fijas de la planilla, columna Estado.
 
 #### 5.1.1 Decisión 4: archivada
 
@@ -248,6 +252,8 @@ Cada una nació de un error concreto y gobierna todos los ciclos posteriores.
 | Verificación de datos frágiles | Toda cifra, política de terceros o condición de plataforma se verifica contra fuente primaria antes de escribirla. Si no se puede verificar, se declara desconocida en vez de rellenarla | C35 |
 | Pliegue móvil | El orden DOM no es el orden visual cuando hay `flex-col-reverse`. Cualquier cambio en el hero exige recontar qué queda sobre el pliegue en móvil, no solo confirmar que el texto existe en el HTML crudo | C39 |
 | Medición del pliegue | No estimar por aritmética de clases si se puede medir. Método: montar la página en un iframe de 390px de ancho y mismo origen dentro del Chrome de Juan, y leer `getBoundingClientRect`. Da la posición real en píxeles CSS sin depender de emulación manual ni de que alguien mire una pantalla | C39 |
+| Recurrencia de Cal.com | Un evento recurrente de Cal.com genera un número finito de ocurrencias y después se agota. Toda serie de hora fija muere a las cuatro semanas y hay que volver a crearla. No es un defecto: es cómo funciona la plataforma. Cualquier razonamiento sobre capacidad futura que asuma series perpetuas está mal | C51 |
+| Escritura en Google Sheets desde Apps Script | `Sheet.clear()` no borra validaciones de datos ni formato de número. Sheets convierte a fecha cadenas como `Lun 17-08` salvo que se llame a `setNumberFormat('@')` **antes** de `setValues`. Y `setFrozenColumns` falla si la fila de título tiene celdas combinadas | C51 |
 | Puente de Claude in Chrome | Los desplegables nativos de `select` congelan el puente en Windows: las llamadas siguientes agotan el tiempo a los 4 minutos. Nunca abrirlos con clic. Manipular el `select` por JavaScript con el setter nativo de `value` más un evento `change` | C39 |
 
 ### 5.3 Rutina de monitoreo permanente
@@ -265,6 +271,7 @@ Este es el criterio de cierre de la Fase 6 y el régimen en el que queda el proy
 | Citación en asistentes | Set fijo de prompts de la sección 5.3.1, en sesión temporal o cerrada | ChatGPT y Perplexity | Trimestral | Ausencia en dos rondas seguidas obliga a revisar la densidad de datos canónicos en el HTML crudo |
 | Vigencia de datos canónicos | Copago, valor particular, códigos Fonasa MLE, vigencia del RNPI | Portal Fonasa y rnpi.superdesalud.gob.cl | Semestral, y ante cualquier aviso de reajuste | Un cambio de monto obliga a actualizar `src/lib/precios.js`, el JSON-LD, la tabla de precios y los RSA en el mismo ciclo |
 | Cumplimiento legal | Política de privacidad frente a la Ley 21.719, con plena vigencia el 1 de diciembre de 2026 | Repositorio y sitio | Revisión antes de noviembre de 2026, luego anual | Cualquier tratamiento nuevo sin base de licitud declarada |
+| Avisos de la planilla de agenda | La hoja Avisos de la planilla de horas agendadas. Prioridad alta primero: series recurrentes por vencer y reservas de hora fija sin carpeta clínica | Planilla en Drive, Consultantes, Actuales | Semanal, e inevitablemente antes de cada tanda de reagendamiento | Cualquier fila de prioridad alta se resuelve la misma semana. Una serie que venza deja a esa persona sin hora, y eso no se recupera con una corrección posterior |
 | Higiene de repositorio | `node scripts/greps.mjs` en 7 de 7 en cero y `npm run build` verde con las 6 páginas prerenderizadas | Local, antes del commit | Cada commit | Cualquier grep distinto de cero bloquea el commit |
 
 #### 5.3.1 Set fijo de prompts de citación
@@ -302,4 +309,5 @@ Ninguna de estas es un defecto conocido con corrección obvia. Son puntos que la
 
 1. **Dominio canónico frente a dominio primario de Netlify.** Todo el sitio declara la forma apex `https://psicologojuanfernandez.cl/` en canonical, hreflang, `og:url`, sitemap y la línea `Sitemap:` de robots.txt. Falta confirmar que el dominio primario configurado en Netlify sea también el apex. Si el primario fuera `www`, cada URL canónica respondería con una redirección y la URL final de los anuncios sumaría un salto innecesario. Verificación: en Netlify, Domain management, ver cuál aparece como primary domain.
 2. **Reescritura comodín a `index.html`.** `netlify.toml` termina con `/*` hacia `/index.html` con estado 200. Es lo que hace funcionar la MPA, pero implica que cualquier ruta inexistente devuelve la portada con estado 200 en vez de 404. El `canonical` de la portada evita la indexación duplicada, y por eso no se toca. La consecuencia esperable es que Search Console reporte esas rutas como "página con redirección" o "404 blanda". Si aparecen, son explicables y no exigen acción salvo que afecten a una de las 3 URLs indexables.
-3. **PSI de escritorio sin serie propia desde C37.** No se cita como estado actual hasta que exista una serie de 3 corridas bajo el protocolo de la sección 4.
+3. **Cal.com solo tiene suscrito `BOOKING_CREATED`.** Registrado en C51: `netlify/functions/cal-webhook.js` implementa desde C49 un aviso interno de cupo liberado ante `BOOKING_CANCELLED`, pero ese evento nunca se ha suscrito en la interfaz de Cal.com, así que el aviso jamás se ha disparado. Es código vivo que no se ejecuta. Se corrige en Cal.com, no en el repositorio. No bloquea nada: solo significa que la cancelación no avisa.
+4. **PSI de escritorio sin serie propia desde C37.** No se cita como estado actual hasta que exista una serie de 3 corridas bajo el protocolo de la sección 4.
