@@ -9,9 +9,13 @@ import VeloSinCupos from '../ui/EtiquetaSinCupos';
 
 // La disponibilidad se lee de la fuente unica (lib/sesiones.js), no se repite
 // aqui: al quitar la bandera alla, esta card vuelve sola a su estado normal.
-const PAREJA_SIN_CUPOS = SESIONES.some(
-  (s) => s.key === 'parejaFonasa' && s.sinCupos
-);
+// C52: la bandera se deriva por clave, no se escribe a mano. Antes existia
+// una sola constante atada a 'parejaFonasa', asi que marcar otra sesion sin
+// cupos en sesiones.js no tenia ningun efecto aqui. Ese fue el punto de
+// conmutacion que quedo suelto en el primer intento de C52.
+const sinCuposDe = (clave) => SESIONES.some((s) => s.key === clave && s.sinCupos);
+const PAREJA_SIN_CUPOS = sinCuposDe('parejaFonasa');
+const FONASA_PRIMERA_SIN_CUPOS = sinCuposDe('primeraSesionFonasa');
 
 const WEBPAY_PAGO_URL = 'https://www.webpay.cl/form-pay/388212';
 
@@ -36,6 +40,13 @@ const FEATURES_FONASA_PRIMERA = [
   'Sesión de 45 minutos',
   'Disponible para afiliados Fonasa tramos B, C y D',
   'Código 09 08 101 para usuarios nuevos',
+  'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
+];
+
+const FEATURES_PARTICULAR = [
+  'Sesión de 45 minutos por videollamada',
+  'Para cualquier previsión de salud, o ninguna',
+  'Boleta de honorarios para pedir reembolso en tu Isapre o seguro',
   'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
 ];
 
@@ -99,8 +110,10 @@ export default function Precios() {
 
         {/* Grid 1 + 3 en desktop: destacada a la izquierda, tres apiladas a la derecha */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-start">
-          {/* Columna izquierda: card destacada (se dimensiona a su contenido,
-              sin estirarse a la altura de las tres apiladas: evita el hueco). */}
+          {/* C52: la destacada pasa a ser la sesion particular. El ingreso
+              Fonasa esta cerrado, asi que dejarlo en el lugar mas grande de la
+              pagina con un boton vivo mandaba gente a reservar algo que el
+              resto del sitio ya declara sin cupos. */}
           <motion.article
             variants={item}
             className="relative bg-offwhite rounded-2xl p-8 md:p-10 flex flex-col"
@@ -111,44 +124,27 @@ export default function Precios() {
             }}
           >
             <span className="absolute -top-3 left-6 bg-terracotta-deep text-cream font-body text-[12px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
-              Para tu primera sesión
+              Agenda abierta
             </span>
 
             <h3 className="font-display text-xl text-ink mb-6 mt-2">
-              Primera sesión con bono Fonasa
+              Sesión particular
             </h3>
 
-            {/* C31: logo institucional de Fonasa como señal simbólica de
-                confianza, par del botón WebPay. El archivo oficial vive en
-                public/logos/; si faltara, la imagen se oculta sola. */}
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p
-                  className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
-                  style={{ fontVariationSettings: '"opsz" 144' }}
-                >
-                  {PRECIOS.fonasaCopago.display}
-                </p>
-                <p className="font-body text-[16px] text-sage">
-                  Copago Modalidad Libre Elección
-                </p>
-              </div>
-              <img
-                src="/logos/fonasa.svg"
-                alt="Fonasa"
-                width={96}
-                height={32}
-                loading="lazy"
-                decoding="async"
-                className="h-7 md:h-8 w-auto flex-shrink-0 mb-1"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                }}
-              />
+            <div className="mb-8">
+              <p
+                className="font-display text-5xl md:text-6xl text-ink leading-none mb-2"
+                style={{ fontVariationSettings: '"opsz" 144' }}
+              >
+                {PRECIOS.particular.display}
+              </p>
+              <p className="font-body text-[16px] text-sage">
+                Con transferencia electrónica o WebPay
+              </p>
             </div>
 
             <ul className="space-y-3 mb-5">
-              {FEATURES_FONASA_PRIMERA.map((feature) => (
+              {FEATURES_PARTICULAR.map((feature) => (
                 <li
                   key={feature}
                   className="flex gap-3 font-body text-[16px] text-ink/80 leading-snug"
@@ -160,31 +156,151 @@ export default function Precios() {
             </ul>
 
             <p className="font-body text-[15px] text-ink/75 leading-relaxed mb-7">
-              Compras el bono antes de la sesión y me envías el folio por WhatsApp (o una foto donde se vea el número).
+              Si tienes Isapre, otra previsión o ninguna. El pago se coordina por WhatsApp y puede ser después de la sesión.
             </p>
 
-            <button
-              type="button"
-              onClick={() => openFonasaModal()}
-              className="font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
-            >
-              Ver guía paso a paso para comprar el bono →
-            </button>
-
-            <div className="mt-auto">
+            <div className="mt-auto flex flex-col gap-4">
               <Button
-                calLink={`${CAL_USERNAME}/${CAL_EVENTS.primeraSesionFonasa}`}
+                calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular}`}
                 variant="primary"
                 size="lg"
                 className="w-full"
               >
-                Agendar primera sesión Fonasa
+                Agendar sesión particular
               </Button>
+
+              {/* Pago WebPay: form POST oficial. Sale directo a WebPay (sin
+                  preventDefault) y abre en pestaña nueva para no perder el sitio.
+                  El SVG del botón se sirve local desde /public (sin hotlinking). */}
+              <div className="flex flex-col gap-3 pt-4 border-t border-sage/15">
+                <p className="font-body text-[14px] text-ink/75 leading-snug">
+                  ¿Prefieres pagar ahora? Hazlo con WebPay:
+                </p>
+                <div className="flex items-center gap-4">
+                  <form
+                    method="post"
+                    action="https://www.webpay.cl/backpub/external/form-pay"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex"
+                  >
+                    <input type="hidden" name="idFormulario" value="388212" />
+                    <input type="hidden" name="monto" value={PRECIOS.particular.montoWebpay} />
+                    <input
+                      type="image"
+                      name="button1"
+                      src="/boton-webpay.svg"
+                      alt={`Pagar la sesión particular de ${PRECIOS.particular.display} con WebPay`}
+                      title="Pagar con WebPay"
+                      className="block transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite rounded-md"
+                      style={{ height: 56, width: 'auto' }}
+                    />
+                  </form>
+
+                  {/* QR: solo escritorio (escanear la pantalla del propio teléfono
+                      no sirve en mobile; ahí basta el botón de arriba). */}
+                  <a
+                    href={WEBPAY_PAGO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Pagar con WebPay escaneando el código QR con tu teléfono"
+                    className="hidden md:flex flex-shrink-0 rounded-lg p-1.5 bg-offwhite ring-1 ring-sage/20 hover:ring-sage/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light"
+                  >
+                    <img
+                      src="/webpay-qr.png"
+                      alt="Código QR para pagar con WebPay"
+                      width={128}
+                      height={128}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ display: 'block', width: 128, height: 128 }}
+                    />
+                  </a>
+                </div>
+                <p className="hidden md:block font-body text-[14px] text-ink/75 leading-snug">
+                  Pulsa el botón, o escanea el código con tu teléfono.
+                </p>
+              </div>
             </div>
           </motion.article>
 
-          {/* Columna derecha: dos cards apiladas */}
+          {/* Columna derecha: las dos modalidades Fonasa, apiladas */}
           <div className="flex flex-col gap-6 lg:gap-8">
+            {/* Primera sesión con bono Fonasa */}
+            <motion.article
+              variants={item}
+              className="relative bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
+              style={SECONDARY_CARD_SHADOW}
+            >
+              {FONASA_PRIMERA_SIN_CUPOS && <VeloSinCupos />}
+
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-2">
+                <h3 className="font-display text-lg text-ink">
+                  Primera sesión con bono Fonasa
+                </h3>
+                {/* C31: logo institucional de Fonasa como señal simbólica de
+                    confianza. El archivo oficial vive en public/logos/; si
+                    faltara, la imagen se oculta sola. */}
+                <img
+                  src="/logos/fonasa.svg"
+                  alt="Fonasa"
+                  width={96}
+                  height={32}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-6 w-auto flex-shrink-0 mt-1"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              </div>
+              <p className="mb-2">
+                <span
+                  className="font-display text-2xl md:text-3xl text-ink"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  {PRECIOS.fonasaCopago.display}
+                </span>
+                <span className="font-body text-[16px] text-sage ml-3">
+                  Copago Modalidad Libre Elección
+                </span>
+              </p>
+              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
+                Código 09 08 101. Sesión de 45 minutos para afiliados de los tramos B, C y D.
+                {FONASA_PRIMERA_SIN_CUPOS && (
+                  <>
+                    {' '}
+                    Por ahora no tengo cupos de ingreso con bono Fonasa. Sigo
+                    atendiendo a quienes ya están en tratamiento, y las sesiones
+                    particulares tienen agenda abierta.
+                  </>
+                )}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => openFonasaModal()}
+                className="font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"
+              >
+                Ver guía paso a paso para comprar el bono →
+              </button>
+
+              <div className="mt-auto">
+                {/* Sin cupos: el boton desaparece del DOM, no queda un CTA
+                    detras del velo que alguien pueda alcanzar con el teclado. */}
+                {!FONASA_PRIMERA_SIN_CUPOS && (
+                  <Button
+                    calLink={`${CAL_USERNAME}/${CAL_EVENTS.primeraSesionFonasa}`}
+                    variant="primary"
+                    size="md"
+                    className="w-full sm:w-auto"
+                  >
+                    Agendar primera sesión Fonasa
+                  </Button>
+                )}
+              </div>
+            </motion.article>
+
             {/* Terapia de pareja (Fonasa) */}
             <motion.article
               variants={item}
@@ -213,13 +329,11 @@ export default function Precios() {
                   <>
                     {' '}
                     Por ahora tengo la agenda de pareja cerrada. Las sesiones
-                    individuales siguen disponibles.
+                    individuales particulares siguen disponibles.
                   </>
                 )}
               </p>
               <div className="mt-auto">
-                {/* Sin cupos: el boton desaparece del DOM, no queda un CTA
-                    detras del velo que alguien pueda alcanzar con el teclado. */}
                 {!PAREJA_SIN_CUPOS && (
                   <Button
                     calLink={`${CAL_USERNAME}/${CAL_EVENTS.parejaFonasa}`}
@@ -232,95 +346,8 @@ export default function Precios() {
                 )}
               </div>
             </motion.article>
-
-            {/* Sesión particular */}
-            <motion.article
-              variants={item}
-              className="bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
-              style={SECONDARY_CARD_SHADOW}
-            >
-              <h3 className="font-display text-lg text-ink mb-2">
-                Sesión particular
-              </h3>
-              <p className="mb-2">
-                <span
-                  className="font-display text-2xl md:text-3xl text-ink"
-                  style={{ fontVariationSettings: '"opsz" 144' }}
-                >
-                  {PRECIOS.particular.display}
-                </span>
-                <span className="font-body text-[16px] text-sage ml-3">
-                  Con transferencia electrónica o WebPay
-                </span>
-              </p>
-              <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                Si tienes otra previsión de salud o ninguna. Incluye boleta de honorarios para solicitar reembolso en tu Isapre o seguro complementario, en los casos que aplique.
-              </p>
-              <div className="mt-auto flex flex-col gap-4">
-                <Button
-                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular}`}
-                  variant="primary"
-                  size="md"
-                  className="w-full sm:w-auto"
-                >
-                  Agendar particular
-                </Button>
-
-                {/* Pago WebPay: form POST oficial. Sale directo a WebPay (sin
-                    preventDefault) y abre en pestaña nueva para no perder el sitio.
-                    El SVG del botón se sirve local desde /public (sin hotlinking). */}
-                <div className="flex flex-col gap-3 pt-4 border-t border-sage/15">
-                  <p className="font-body text-[14px] text-ink/75 leading-snug">
-                    ¿Prefieres pagar ahora? Hazlo con WebPay:
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <form
-                      method="post"
-                      action="https://www.webpay.cl/backpub/external/form-pay"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex"
-                    >
-                      <input type="hidden" name="idFormulario" value="388212" />
-                      <input type="hidden" name="monto" value={PRECIOS.particular.montoWebpay} />
-                      <input
-                        type="image"
-                        name="button1"
-                        src="/boton-webpay.svg"
-                        alt={`Pagar la sesión particular de ${PRECIOS.particular.display} con WebPay`}
-                        title="Pagar con WebPay"
-                        className="block transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite rounded-md"
-                        style={{ height: 56, width: 'auto' }}
-                      />
-                    </form>
-
-                    {/* QR: solo escritorio (escanear la pantalla del propio teléfono
-                        no sirve en mobile; ahí basta el botón de arriba). */}
-                    <a
-                      href={WEBPAY_PAGO_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Pagar con WebPay escaneando el código QR con tu teléfono"
-                      className="hidden md:flex flex-shrink-0 rounded-lg p-1.5 bg-offwhite ring-1 ring-sage/20 hover:ring-sage/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light"
-                    >
-                      <img
-                        src="/webpay-qr.png"
-                        alt="Código QR para pagar con WebPay"
-                        width={128}
-                        height={128}
-                        loading="lazy"
-                        decoding="async"
-                        style={{ display: 'block', width: 128, height: 128 }}
-                      />
-                    </a>
-                  </div>
-                  <p className="hidden md:block font-body text-[14px] text-ink/75 leading-snug">
-                    Pulsa el botón, o escanea el código con tu teléfono.
-                  </p>
-                </div>
-              </div>
-            </motion.article>
           </div>
+
         </div>
 
         {/* C36 (BLUEPRINT Fase 3): tabla resumen extraíble. Estructura semántica
