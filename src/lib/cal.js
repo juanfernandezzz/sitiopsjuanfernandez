@@ -5,6 +5,8 @@
  * Verificado en cal.com/psicologojuanfernandez (mayo 2026).
  */
 
+import { INGRESO_FONASA_ABIERTO } from './modalidades';
+
 // Username
 export const CAL_USERNAME = 'psicologojuanfernandez';
 
@@ -36,10 +38,13 @@ export const CAL_EVENTOS_OCULTOS = [
 ];
 
 // Decisión CRO: qué evento dispara el CTA primario del hero/header.
-// Opción A (recomendada): primera sesión Fonasa, copago $5.570 cubre ~80% del público chileno.
-// Opción B: particular $20.000, sin restricción de previsión.
-// Cambiar aquí propaga el cambio a todos los CTAs primarios.
-export const HERO_PRIMARY_CTA = CAL_EVENTS.primeraSesionFonasa;
+// C52: ya no se elige aquí. Lo decide INGRESO_FONASA_ABIERTO en modalidades.js,
+// que es el único interruptor del sitio. Antes este comentario prometía "cambiar
+// aquí propaga el cambio a todos los CTAs primarios" y era falso: había siete
+// puntos de conmutación repartidos. Ahora sí hay uno solo, y no está aquí.
+export const HERO_PRIMARY_CTA = INGRESO_FONASA_ABIERTO
+  ? CAL_EVENTS.primeraSesionFonasa
+  : CAL_EVENTS.particular;
 
 // CTA secundario explícito en sección Precios (C4) para usuarios sin Fonasa.
 export const FALLBACK_PARTICULAR_CTA = CAL_EVENTS.particular;

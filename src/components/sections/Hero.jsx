@@ -1,3 +1,4 @@
+import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import React, { useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
@@ -203,7 +204,7 @@ export default function Hero() {
                 antes: así nunca empuja el botón primario bajo el pliegue en
                 móvil, se limite a lo que quede debajo. */}
             <div className="anim-rise mt-3" style={delay(410)}>
-              <ModuloDisponibilidad evento="primeraSesionFonasa" variante="hero" />
+              <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="hero" />
             </div>
 
             {/* Ruta alternativa. Se queda DESPUES del CTA principal a

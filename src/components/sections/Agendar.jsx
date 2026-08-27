@@ -1,3 +1,4 @@
+import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
@@ -17,10 +18,13 @@ const Cal = lazy(() =>
   import('@calcom/embed-react').then((m) => ({ default: m.default }))
 );
 
+// C52: el particular pasa al primer lugar. El orden de las pestanas tiene que
+// espejar el de SESIONES (sesiones.js) o la jerarquia visual dice una cosa en
+// Precios y otra aca.
 const TABS = [
+  { key: 'particular', label: 'Sesión particular', price: PRECIOS.particular.display },
   { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: PRECIOS.fonasaCopago.display },
   { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: PRECIOS.fonasaCopago.display },
-  { key: 'particular', label: 'Sesión particular', price: PRECIOS.particular.display },
 ];
 
 const REASSURANCES = [
@@ -184,7 +188,7 @@ export default function Agendar() {
         </motion.p>
 
         <motion.div variants={item} className="mb-8" style={{ maxWidth: 420 }}>
-          <ModuloDisponibilidad evento="primeraSesionFonasa" variante="seccion" />
+          <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="seccion" />
         </motion.div>
 
         {/* Aviso: elige una opción antes de agendar */}

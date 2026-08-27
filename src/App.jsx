@@ -1,3 +1,4 @@
+import { EVENTO_PRINCIPAL } from './lib/modalidades'
 import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 // C31 fix pack: react-floating-whatsapp incrusta ~196 KB de imagenes en base64
 // dentro de su modulo. Cargarlo diferido lo saca del bundle critico; como el
@@ -274,7 +275,7 @@ function AppShell() {
       </Suspense>
 
       {pasoElHero && !agendarEnVista && (
-        <ModuloDisponibilidad evento="primeraSesionFonasa" variante="barra" />
+        <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="barra" />
       )}
 
       {showWhatsApp && (

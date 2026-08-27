@@ -23,6 +23,7 @@
  *   Varias instancias conviven en la misma página. La promesa se memoiza a nivel
  *   de módulo para que la función de Netlify se llame una vez por carga.
  */
+import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import { useEffect, useState } from 'react';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { CONTACTO } from '../../lib/contacto';
@@ -61,7 +62,7 @@ const SLUG_POR_CLAVE = {
 };
 
 export default function ModuloDisponibilidad({
-  evento = 'primeraSesionFonasa',
+  evento = EVENTO_PRINCIPAL,
   variante = 'hero',
   className = '',
 }) {

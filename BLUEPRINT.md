@@ -35,7 +35,7 @@ Este documento define el proceso integral de auditoría y mejora del sitio en se
 | Dato | Valor | Verificable en |
 |---|---|---|
 | Copago Fonasa MLE | $5.570 CLP | Portal Fonasa |
-| Sesión particular | $20.000 CLP | Sitio propio |
+| Sesión particular | $25.000 CLP | Sitio propio |
 | Códigos Fonasa | 09 08 101, 09 08 102, 09 08 103 | Portal Fonasa |
 | Registro profesional | RNPI N° 876085 | rnpi.superdesalud.gob.cl |
 | Título | Psicólogo, UVM, enero 2025 | Registro MINEDUC |

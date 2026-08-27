@@ -29,6 +29,7 @@
  *   dato no llegó o no es confiable, cae al mensaje sin fecha: nunca se inventa
  *   una hora.
  */
+import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import { useEffect, useRef } from 'react';
 import { CONTACTO } from '../../lib/contacto';
 import { ESTADOS, normalizar, mensajeWhatsApp, urlWhatsApp } from '../../lib/disponibilidad';
@@ -36,7 +37,7 @@ import { cargarDisponibilidad } from './ModuloDisponibilidad';
 
 const CLASE_BURBUJA = '.floating-whatsapp-button';
 
-export default function AbrirWhatsAppDirecto({ children, evento = 'primeraSesionFonasa' }) {
+export default function AbrirWhatsAppDirecto({ children, evento = EVENTO_PRINCIPAL }) {
   const contenedor = useRef(null);
   // En una ref y no en estado: el destino se lee dentro del click, así que no
   // hace falta repintar cuando llega el dato (y repintar remontaría la burbuja).

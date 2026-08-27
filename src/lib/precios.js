@@ -15,5 +15,10 @@
  */
 export const PRECIOS = {
   fonasaCopago: { display: '$5.570', clp: 5570 },
-  particular: { display: '$20.000', clp: 20000, montoWebpay: '20000' },
+  // C52: el particular sube de $20.000 a $25.000.
+  // montoWebpay queda en '20000' A PROPOSITO. El formulario de pago 388212 no se
+  // pudo verificar (cuenta bloqueada) y no se sabe si acepta monto variable o lo
+  // tiene fijo. Nadie ha pagado nunca por esa via: el cobro real es por
+  // transferencia y despues de la sesion. Se corrige apenas se verifique.
+  particular: { display: '$25.000', clp: 25000, montoWebpay: '20000' },
 };

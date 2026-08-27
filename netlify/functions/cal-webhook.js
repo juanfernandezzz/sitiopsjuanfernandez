@@ -118,7 +118,7 @@ export const CONTACTO = {
 
 export const PRECIOS = {
   fonasaCopago: '$5.570',
-  particular: '$20.000',
+  particular: '$25.000',
 };
 
 // Cuenta de destino del pago particular. "Cuenta vista" es como BancoEstado

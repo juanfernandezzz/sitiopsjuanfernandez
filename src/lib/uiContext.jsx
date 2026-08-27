@@ -13,6 +13,7 @@
  *  - navigateToAgendarFonasa(): atajo combinado (setea tab Fonasa, cierra modal, scroll a #agendar).
  */
 
+import { EVENTO_PRINCIPAL } from './modalidades';
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 
 const UIContext = createContext(null);
@@ -78,7 +79,7 @@ export function UIProvider({ children }) {
   // Combo: setea tab Fonasa, cierra modal, scroll a #agendar.
   // Se ejecuta cuando el usuario aprieta "Agendar mi sesión ahora" dentro del modal.
   const navigateToAgendarFonasa = useCallback(() => {
-    setPendingAgendarTab('primeraSesionFonasa');
+    setPendingAgendarTab(EVENTO_PRINCIPAL);
     setIsFonasaModalOpen(false);
     if (typeof window !== 'undefined') {
       // Esperamos a que el body recupere overflow y el modal se desmonte.

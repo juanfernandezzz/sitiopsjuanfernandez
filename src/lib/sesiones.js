@@ -20,6 +20,7 @@
  * con quitar la bandera aqui: no hay que tocar ningun componente.
  */
 import { PRECIOS } from './precios';
+import { INGRESO_FONASA_ABIERTO } from './modalidades';
 
 // Texto unico de la etiqueta. Vive aqui para que las cuatro superficies de
 // agendamiento (Precios, menu del header, modal de tipo de sesion, seccion
@@ -27,14 +28,6 @@ import { PRECIOS } from './precios';
 export const AVISO_SIN_CUPOS = 'Sin cupos por ahora';
 
 export const SESIONES = [
-  {
-    key: 'primeraSesionFonasa',
-    titulo: 'Primera sesión con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
-    destacada: true,
-    cta: 'Agendar primera sesión',
-  },
   {
     key: 'parejaFonasa',
     titulo: 'Sesión de pareja con bono Fonasa',
@@ -48,6 +41,15 @@ export const SESIONES = [
     titulo: 'Sesión particular',
     precio: PRECIOS.particular.display,
     detalle: 'Si tienes Isapre, otra previsión o ninguna. Boleta de honorarios para solicitar reembolso según tu plan.',
+    destacada: true,
     cta: 'Agendar sesión particular',
+  },
+  {
+    key: 'primeraSesionFonasa',
+    titulo: 'Primera sesión con bono Fonasa',
+    precio: PRECIOS.fonasaCopago.display,
+    detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
+    cta: 'Agendar primera sesión',
+    sinCupos: !INGRESO_FONASA_ABIERTO,
   },
 ];

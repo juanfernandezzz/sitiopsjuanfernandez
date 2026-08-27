@@ -29,10 +29,10 @@ const TITULOS = {
   'hora-fija': 'Hora fija de psicoterapia online (con bono Fonasa)',
   'psicoterapia-de-pareja-bonofonasa': 'Psicoterapia de pareja online (con bono Fonasa)',
   'psicoterapia-individual-online-particular':
-    'Psicoterapia individual online (particular - $20.000)',
+    'Psicoterapia individual online (particular - $25.000)',
   // Slug legado (C49): sigue sirviendo a un paciente particular vigente.
   'psicoterapia-individual-online-particular-15.000':
-    'Psicoterapia individual online (particular - $20.000)',
+    'Psicoterapia individual online (particular - $25.000)',
 };
 
 fs.rmSync(SALIDA, { recursive: true, force: true });
