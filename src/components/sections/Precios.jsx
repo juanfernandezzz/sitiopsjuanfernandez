@@ -36,18 +36,11 @@ const CheckIcon = () => (
   </svg>
 );
 
-const FEATURES_FONASA_PRIMERA = [
-  'Sesión de 45 minutos',
-  'Disponible para afiliados Fonasa tramos B, C y D',
-  'Código 09 08 101 para usuarios nuevos',
-  'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
-];
-
 const FEATURES_PARTICULAR = [
   'Sesión de 45 minutos por videollamada',
   'Para cualquier previsión de salud, o ninguna',
   'Boleta de honorarios para pedir reembolso en tu Isapre o seguro',
-  'Plataforma de videollamada segura certificada por Fonasa (Doxy.me)',
+  'Videollamada privada desde el navegador, sin instalar nada',
 ];
 
 const SECONDARY_CARD_SHADOW = {

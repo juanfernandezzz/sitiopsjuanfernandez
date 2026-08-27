@@ -25,7 +25,7 @@ export const PROCESO_ONLINE = {
     {
       num: '02',
       titulo: 'Recibes el link de la sala',
-      texto: 'Te envío por email el link a mi sala virtual en Doxy.me, la plataforma de teleconsulta que certifica Fonasa. No necesitas descargar nada.',
+      texto: 'Te envío por email el link a mi sala virtual en Doxy.me. No necesitas descargar ni instalar nada.',
     },
     {
       num: '03',
@@ -71,6 +71,10 @@ export const PROCESO_TRABAJO = {
       cuerpo: 'Trabajamos en los objetivos definidos, revisamos avances y obstáculos, y dejamos espacio para lo que necesites traer al proceso.',
     },
   ],
+  // C52d: la certificacion de Fonasa se mantiene donde responde una pregunta
+  // (FAQ de proteccion de datos, footer, consentimiento, politica de privacidad
+  // y schema). Aca gastaba la linea de cierre en una credencial institucional en
+  // vez de en lo que le importa a quien va a entrar a la sala.
   cierreTrust:
-    'Videollamada por Doxy.me, plataforma certificada por Fonasa para teleconsulta. Conexión segura, sin descargas ni instalaciones.',
+    'Videollamada por Doxy.me. Conexión segura y cifrada, sin descargas ni instalaciones. No grabo las sesiones.',
 };
