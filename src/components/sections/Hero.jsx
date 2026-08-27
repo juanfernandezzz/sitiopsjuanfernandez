@@ -1,7 +1,6 @@
 import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import React, { useEffect, useState } from 'react';
 import Button from '../ui/Button';
-import { CAL_USERNAME, FALLBACK_PARTICULAR_CTA } from '../../lib/cal';
 import { HERO } from '../../lib/hero';
 import { useUI } from '../../lib/uiContext';
 import ModuloDisponibilidad from '../ui/ModuloDisponibilidad';
@@ -21,7 +20,6 @@ const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '56973394530';
 const WA_MESSAGE = encodeURIComponent(HERO.mensajeWhatsApp);
 const WA_HREF = `https://wa.me/${WA_NUMBER}?text=${WA_MESSAGE}`;
 
-const PARTICULAR_CAL_LINK = `${CAL_USERNAME}/${FALLBACK_PARTICULAR_CTA}`;
 
 // Frases del cierre del H1, desde la fuente unica compartida con la app. La
 // primera se renderiza en la carga (es el LCP y lo que lee Google). La mas
@@ -214,21 +212,12 @@ export default function Hero() {
               className="anim-rise mt-3 font-body text-[15px] text-ink/75"
               style={delay(450)}
             >
-              <button
-                type="button"
-                data-cal-link={PARTICULAR_CAL_LINK}
-                data-cal-namespace="psicojuan"
-                data-cal-config='{"layout":"month_view"}'
-                onClick={() => {
-                  // Fallback: si Cal aún no está inicializado, abre la URL directa.
-                  if (typeof window !== 'undefined' && !window.Cal) {
-                    window.open(`https://cal.com/${PARTICULAR_CAL_LINK}`, '_blank', 'noopener,noreferrer');
-                  }
-                }}
+              <a
+                href="#precios"
                 className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
               >
-                {HERO.enlaceParticular}
-              </button>
+                {HERO.enlaceSecundario}
+              </a>
             </p>
 
             <ul

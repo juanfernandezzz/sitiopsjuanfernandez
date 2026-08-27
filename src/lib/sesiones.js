@@ -29,14 +29,6 @@ export const AVISO_SIN_CUPOS = 'Sin cupos por ahora';
 
 export const SESIONES = [
   {
-    key: 'parejaFonasa',
-    titulo: 'Sesión de pareja con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Con ambos miembros presentes.',
-    cta: 'Agendar sesión de pareja',
-    sinCupos: true,
-  },
-  {
     key: 'particular',
     titulo: 'Sesión particular',
     precio: PRECIOS.particular.display,
@@ -51,5 +43,13 @@ export const SESIONES = [
     detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
     cta: 'Agendar primera sesión',
     sinCupos: !INGRESO_FONASA_ABIERTO,
+  },
+  {
+    key: 'parejaFonasa',
+    titulo: 'Sesión de pareja con bono Fonasa',
+    precio: PRECIOS.fonasaCopago.display,
+    detalle: 'Con ambos miembros presentes.',
+    cta: 'Agendar sesión de pareja',
+    sinCupos: true,
   },
 ];

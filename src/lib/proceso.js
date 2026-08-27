@@ -43,7 +43,8 @@ export const PROCESO_ONLINE = {
     { clave: 'privacidad', titulo: 'Privacidad', texto: 'Lugar tranquilo y solo tú' },
     { clave: 'cifrado', titulo: 'Llamada cifrada', texto: 'Conexión protegida' },
   ],
-  notaPago: `El pago es simple: copago de ${PRECIOS.fonasaCopago.display} con bono Fonasa, o ${PRECIOS.particular.display} en modalidad particular. Lo eliges al momento de agendar.`,
+  // C52c: dejaba de liderar con el copago Fonasa, que ya no se puede agendar.
+  notaPago: `El pago es simple: la sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia después de la sesión.`,
   cierre: 'Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.',
 };
 
@@ -57,7 +58,7 @@ export const PROCESO_TRABAJO = {
     {
       num: '01',
       titulo: 'Agendas tu sesión',
-      cuerpo: 'Eliges horario y modalidad, con bono Fonasa o particular. Si usas bono Fonasa, lo emites y lo envías por WhatsApp antes del horario de la sesión. Recibes el enlace de videollamada al confirmar la reserva.',
+      cuerpo: 'Eliges el horario que te acomode y reservas en línea. Recibes el enlace de videollamada al confirmar la reserva. El pago de la sesión particular es por transferencia, después de la sesión.',
     },
     {
       num: '02',

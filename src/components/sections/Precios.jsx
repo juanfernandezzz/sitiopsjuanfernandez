@@ -104,7 +104,7 @@ export default function Precios() {
             ¿Cuánto cuesta la terapia online?
           </h2>
           <p className="font-body text-lg text-ink/75 leading-relaxed">
-            {`Con bono Fonasa Modalidad Libre Elección pagas un copago de ${PRECIOS.fonasaCopago.display}. La sesión particular cuesta ${PRECIOS.particular.display}. Misma dedicación, independiente del modo de pago.`}
+            {`La sesión particular cuesta ${PRECIOS.particular.display} y la pagas después, por transferencia. La atención con bono Fonasa sigue explicada más abajo, aunque por ahora no tengo cupos de ingreso.`}
           </p>
         </motion.div>
 
@@ -367,7 +367,19 @@ export default function Precios() {
             </thead>
             <tbody>
               <tr className="border-b border-sage/15">
-                <th scope="row" className="py-3 pr-4 font-normal text-left">Primera sesión con bono Fonasa</th>
+                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión particular</th>
+                <td className="py-3 pr-4">No aplica</td>
+                <td className="py-3">{PRECIOS.particular.display}</td>
+              </tr>
+              <tr className="border-b border-sage/15">
+                <th scope="row" className="py-3 pr-4 font-normal text-left">
+                  Primera sesión con bono Fonasa
+                  {FONASA_PRIMERA_SIN_CUPOS && (
+                    <span className="block text-[13px] text-sage/85 mt-0.5">
+                      Sin cupos por ahora
+                    </span>
+                  )}
+                </th>
                 <td className="py-3 pr-4">09 08 101</td>
                 <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
               </tr>
@@ -382,11 +394,6 @@ export default function Precios() {
                 </th>
                 <td className="py-3 pr-4">09 08 103</td>
                 <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
-              </tr>
-              <tr className="border-b border-sage/15">
-                <th scope="row" className="py-3 pr-4 font-normal text-left">Sesión particular</th>
-                <td className="py-3 pr-4">No aplica</td>
-                <td className="py-3">{PRECIOS.particular.display}</td>
               </tr>
             </tbody>
           </table>

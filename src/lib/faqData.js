@@ -41,7 +41,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una sesión?',
-    a: `Hay dos modalidades: sesión particular por ${PRECIOS.particular.display}, o sesión con bono Fonasa Modalidad Libre Elección por ${PRECIOS.fonasaCopago.display} (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión.`,
+    a: `La sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia después de la sesión. También atiendo con bono Fonasa Modalidad Libre Elección, con un copago de ${PRECIOS.fonasaCopago.display} para afiliados de tramos B, C y D bajo los códigos 09 08 101, 09 08 102 y 09 08 103, pero por ahora no tengo cupos de ingreso con bono: sigo atendiendo a quienes ya están en tratamiento. Misma duración y dedicación en ambos casos.`,
   },
   {
     q: '¿Cómo compro un bono Fonasa?',

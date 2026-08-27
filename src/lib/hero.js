@@ -19,11 +19,16 @@ export const HERO = {
   rotativaMasLarga: 'sin salir de casa, a tu propio ritmo',
   rotacionMs: 4500,
   salidaMs: 300,
-  sub: 'Trabajemos lo que hoy te limita y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura, con bono Fonasa o particular.',
+  sub: 'Trabajemos lo que hoy te limita y dale un nuevo sentido a lo que vives. Sesiones de 45 minutos por videollamada segura.',
   ctaPrimario: 'Agendar tu sesión',
   ctaSecundario: 'Conversemos por WhatsApp',
   mensajeWhatsApp: 'Hola Juan, vi tu sitio y me gustaría conversar sobre una primera sesión.',
-  microcopia: `Primera sesión con bono Fonasa: copago ${PRECIOS.fonasaCopago.display}.`,
-  enlaceParticular: `¿Sin Fonasa? Ver sesión particular (${PRECIOS.particular.display}) →`,
+  // C52: la microcopia dejo de anunciar el copago Fonasa. El ingreso Fonasa
+  // esta cerrado, y este parrafo es el dato que queda sobre el pliegue en movil.
+  microcopia: `Sesión particular: ${PRECIOS.particular.display}. Pagas después de la sesión, por transferencia.`,
+  // C52: la ruta alternativa se invirtio. Antes empujaba de Fonasa hacia
+  // particular; ahora explica el estado de Fonasa sin prometer una reserva que
+  // no existe. Lleva a la seccion de precios, no a Cal.com.
+  enlaceSecundario: '¿Usas bono Fonasa? Mira cómo está la agenda →',
   chips: ['Psicólogo clínico', 'Inscrito en Fonasa', 'Videollamada cifrada'],
 };
