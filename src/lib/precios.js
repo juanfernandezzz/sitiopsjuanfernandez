@@ -15,10 +15,14 @@
  */
 export const PRECIOS = {
   fonasaCopago: { display: '$5.570', clp: 5570 },
-  // C52: el particular sube de $20.000 a $25.000.
-  // montoWebpay queda en '20000' A PROPOSITO. El formulario de pago 388212 no se
-  // pudo verificar (cuenta bloqueada) y no se sabe si acepta monto variable o lo
-  // tiene fijo. Nadie ha pagado nunca por esa via: el cobro real es por
-  // transferencia y despues de la sesion. Se corrige apenas se verifique.
-  particular: { display: '$25.000', clp: 25000, montoWebpay: '20000' },
+  // C52e: montoWebpay se pone al dia con el precio. Juan corrigio el formulario
+  // 388212 en Transbank y ahora cobra $25.000 con el mismo idFormulario.
+  //
+  // No sabemos si ese formulario esta en modo monto fijo (ignora el campo que le
+  // manda el sitio) o monto variable (lo usa). '25000' es correcto en los dos
+  // casos, por eso se cambia igual. Pero la diferencia importa para el futuro:
+  // si es fijo, cambiar el precio aca NO cambia lo que se cobra y hay que
+  // editarlo tambien en Transbank; si es variable, basta con esta linea. Mientras
+  // no se sepa, cualquier cambio de precio tiene que tocar los dos lados.
+  particular: { display: '$25.000', clp: 25000, montoWebpay: '25000' },
 };
