@@ -23,7 +23,21 @@
  * PARA REABRIR FONASA: cambiar false por true y desplegar. Eso propaga a la
  * tarjeta de Precios, al CTA primario, a los tres modulos de disponibilidad
  * (hero, seccion y barra de movil), al mensaje de WhatsApp y a la pestana por
- * defecto del modal. No hay que tocar nada mas.
+ * defecto del modal.
+ *
+ * PERO YA NO BASTA CON ESO. C53: el 29 de agosto de 2026 se descubrio que
+ * 'primera-sesion-bonofonasa' y 'psicoterapia-de-pareja-bonofonasa' seguian
+ * PUBLICOS en cal.com/psicologojuanfernandez y aceptando reservas Fonasa,
+ * mientras este archivo declaraba el ingreso cerrado. Cerrar aqui nunca cerro
+ * Cal.com: este booleano solo controla lo que el sitio DICE. Los dos eventos se
+ * ocultaron a mano ese mismo dia.
+ * Consecuencia: reabrir Fonasa son DOS pasos, y el segundo no lo hace el codigo.
+ *   1. Poner true aqui y desplegar.
+ *   2. Entrar a app.cal.com/event-types y quitar el oculto a esos dos eventos.
+ * Si se hace solo el paso 1, el sitio ofrece Fonasa y la reserva funciona (un
+ * evento oculto acepta reservas por embed y por URL directa), pero el evento no
+ * reaparece en la pagina publica de Cal.com. El fallo es silencioso y va en la
+ * direccion contraria a la que documenta la cascada de arriba.
  */
 export const INGRESO_FONASA_ABIERTO = false;
 

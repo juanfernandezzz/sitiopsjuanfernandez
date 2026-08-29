@@ -233,6 +233,16 @@ export const CATALOGO = {
 CATALOGO['psicoterapia-individual-online-particular-15.000'] =
   CATALOGO['psicoterapia-individual-online-particular'];
 
+// C53: 'primera-sesion' es el evento PUBLICO de primera sesion particular
+// (Cal.com 6862582). El slug de arriba quedo OCULTO y paso a ser el control
+// particular que agenda Juan: los dos siguen recibiendo reservas y los dos
+// necesitan el mismo bloque de pago, que es identico porque la transferencia
+// posterior a la sesion no cambia entre primera sesion y control.
+// SIN ESTA LINEA el correo de toda primera sesion particular sale por la rama
+// GENERICO, es decir sin los datos de transferencia y sin fallar de forma
+// visible. Verificable con: node scripts/previsualizar-correos.mjs
+CATALOGO['primera-sesion'] = CATALOGO['psicoterapia-individual-online-particular'];
+
 // Entrada de respaldo para un slug que no reconocemos (evento nuevo en Cal.com
 // que todavia no se agrego aqui). El correo sale sin bloque de pago: preferimos
 // no decir nada de pago antes que decir un codigo o un monto equivocado.

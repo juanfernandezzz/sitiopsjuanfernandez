@@ -70,8 +70,28 @@ const OBJETIVO = [
     },
   },
   {
+    // C53: evento publico de primera sesion particular, creado el 29 de agosto
+    // de 2026. Nace con paridad verificada campo a campo contra el 5785503:
+    // mismos 240 minutos de aviso, misma ventana movil de 14 dias naturales,
+    // mismo tope de 3 por semana y mismos intervalos de 60 minutos. Sin los
+    // intervalos de 60 los espacios caen cada 45 minutos y salen fuera de la
+    // grilla horaria de la Planilla (12:00, 12:45, 13:30).
+    id: 6862582,
+    nombre: 'Primera sesión particular',
+    slug: 'primera-sesion',
+    cambios: {
+      minimumBookingNotice: 4 * 60,
+      periodType: 'ROLLING',
+      periodDays: 14,
+      periodCountCalendarDays: true,
+      bookingLimitsCount: { week: 3 },
+    },
+  },
+  {
+    // C53: dejo de ser el evento publico. Ahora es el control particular que
+    // agenda Juan, y queda oculto en Cal.com.
     id: 5785503,
-    nombre: 'Particular',
+    nombre: 'Control particular',
     slug: 'psicoterapia-individual-online-particular',
     cambios: {
       minimumBookingNotice: 4 * 60,

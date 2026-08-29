@@ -10,15 +10,27 @@ import { INGRESO_FONASA_ABIERTO } from './modalidades';
 // Username
 export const CAL_USERNAME = 'psicologojuanfernandez';
 
-// Slugs reales de los 4 eventos. NO TOCAR sin verificar en cal.com.
+// Slugs reales de los eventos. NO TOCAR sin verificar en cal.com.
 // C49: el slug del particular perdió el monto ($20.000 hoy, pero un cambio de
 // precio futuro no debería volver a tocar una URL pública). El slug antiguo
 // sigue vivo como SLUG_PARTICULAR_LEGACY en postReserva.js y cal-webhook.js.
+//
+// C53: la via particular se parte en dos eventos, igual que la Fonasa.
+//   particular         'primera-sesion' (Cal.com 6862582, PUBLICO, creado el 29
+//                      de agosto de 2026). Es el unico evento publico de la
+//                      cuenta: cal.com/psicologojuanfernandez redirige a el.
+//                      Sin el monto en el slug, por la misma razon de C49.
+//   controlParticular  el slug anterior, que quedo OCULTO. NO es un legado: es
+//                      el control particular que agenda Juan, espejo exacto de
+//                      controlAvanceFonasa. Sigue recibiendo reservas.
+// Ambos tienen que clasificar como 'particular' en postReserva.js y tener ficha
+// de pago en cal-webhook.js.
 export const CAL_EVENTS = {
   primeraSesionFonasa: 'primera-sesion-bonofonasa',
   controlAvanceFonasa: 'sesiones-de-avance-bonofonasa',
   parejaFonasa: 'psicoterapia-de-pareja-bonofonasa',
-  particular: 'psicoterapia-individual-online-particular',
+  particular: 'primera-sesion',
+  controlParticular: 'psicoterapia-individual-online-particular',
   horaFija: 'hora-fija',
 };
 
@@ -32,8 +44,22 @@ export const CAL_EVENTS = {
 //                        que Juan usa para dejar la franja estable de un
 //                        paciente establecido. Tope de 4 por el vencimiento del
 //                        bono Fonasa a los 30 dias.
+//   controlParticular    C53: mismo caso que el control Fonasa. Juan agenda
+//                        todos los controles particulares al final de cada
+//                        sesion. Nadie reserva el suyo.
+//
+// OJO, DOS CLASES DE OCULTO. Esta lista enumera el oculto ESTRUCTURAL: eventos
+// que solo agenda Juan, y que seguiran ocultos pase lo que pase con el ingreso
+// Fonasa. Existe ademas un oculto COMERCIAL que esta lista NO recoge a
+// proposito: el 29 de agosto de 2026 se ocultaron en Cal.com primeraSesionFonasa
+// y parejaFonasa, porque seguian aceptando reservas desde la pagina publica
+// mientras el sitio declaraba el ingreso Fonasa cerrado. Si estuvieran aqui,
+// reabrir Fonasa desde modalidades.js los dejaria fuera de las superficies del
+// sitio y el interruptor no funcionaria. Ver la nota de reapertura en
+// modalidades.js: hay que quitarles el oculto A MANO en Cal.com.
 export const CAL_EVENTOS_OCULTOS = [
   CAL_EVENTS.controlAvanceFonasa,
+  CAL_EVENTS.controlParticular,
   CAL_EVENTS.horaFija,
 ];
 

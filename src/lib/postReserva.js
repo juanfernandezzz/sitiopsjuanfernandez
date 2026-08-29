@@ -56,7 +56,14 @@ export const FONASA_POR_SLUG = {
   },
 };
 
-export const SLUG_PARTICULAR = 'psicoterapia-individual-online-particular';
+// C53: evento PUBLICO de primera sesion particular (Cal.com 6862582).
+export const SLUG_PARTICULAR = 'primera-sesion';
+
+// C53: el slug anterior del particular NO paso a legado. El evento quedo OCULTO
+// en Cal.com y ahora es el control particular que agenda Juan, espejo del
+// control Fonasa. Recibe reservas todas las semanas: tiene que clasificar como
+// 'particular' indefinidamente.
+export const SLUG_CONTROL_PARTICULAR = 'psicoterapia-individual-online-particular';
 
 // C49: slug anterior del evento particular, de cuando el monto vivia en la
 // URL. Sigue habiendo un paciente particular vigente con el enlace viejo, asi
@@ -71,7 +78,13 @@ export const SLUG_PARTICULAR_LEGACY = 'psicoterapia-individual-online-particular
 export function tipoDeReserva(slug) {
   if (!slug) return null;
   if (FONASA_POR_SLUG[slug]) return 'fonasa';
-  if (slug === SLUG_PARTICULAR || slug === SLUG_PARTICULAR_LEGACY) return 'particular';
+  if (
+    slug === SLUG_PARTICULAR ||
+    slug === SLUG_CONTROL_PARTICULAR ||
+    slug === SLUG_PARTICULAR_LEGACY
+  ) {
+    return 'particular';
+  }
   return null;
 }
 

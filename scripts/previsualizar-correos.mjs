@@ -28,6 +28,10 @@ const TITULOS = {
   'sesiones-de-avance-bonofonasa': 'Control y avance de psicoterapia online (con bono Fonasa)',
   'hora-fija': 'Hora fija de psicoterapia online (con bono Fonasa)',
   'psicoterapia-de-pareja-bonofonasa': 'Psicoterapia de pareja online (con bono Fonasa)',
+  // C53: evento publico de primera sesion particular.
+  'primera-sesion': 'Primera sesión de psicoterapia online ($25.000)',
+  // C53: el slug de abajo dejo de ser el evento publico. Quedo oculto y ahora
+  // es el control particular que agenda Juan.
   'psicoterapia-individual-online-particular':
     'Psicoterapia individual online (particular - $25.000)',
   // Slug legado (C49): sigue sirviendo a un paciente particular vigente.
