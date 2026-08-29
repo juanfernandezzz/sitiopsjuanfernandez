@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:cliente && npm run build:servidor && node scripts/prerender.mjs",
+    "build": "node scripts/estado-ingreso.mjs && npm run build:cliente && npm run build:servidor && node scripts/prerender.mjs",
     "preview": "vite preview",
     "build:cliente": "vite build",
     "build:servidor": "vite build --ssr src/entry-server.jsx --outDir dist-ssr"

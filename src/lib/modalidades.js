@@ -25,27 +25,43 @@
  * (hero, seccion y barra de movil), al mensaje de WhatsApp y a la pestana por
  * defecto del modal.
  *
- * PERO YA NO BASTA CON ESO. C53: el 29 de agosto de 2026 se descubrio que
- * 'primera-sesion-bonofonasa' y 'psicoterapia-de-pareja-bonofonasa' seguian
- * PUBLICOS en cal.com/psicologojuanfernandez y aceptando reservas Fonasa,
- * mientras este archivo declaraba el ingreso cerrado. Cerrar aqui nunca cerro
- * Cal.com: este booleano solo controla lo que el sitio DICE. Los dos eventos se
- * ocultaron a mano ese mismo dia.
- * Consecuencia: reabrir Fonasa son DOS pasos, y el segundo no lo hace el codigo.
- *   1. Poner true aqui y desplegar.
- *   2. Entrar a app.cal.com/event-types y quitar el oculto a esos dos eventos.
- * Si se hace solo el paso 1, el sitio ofrece Fonasa y la reserva funciona (un
- * evento oculto acepta reservas por embed y por URL directa), pero el evento no
- * reaparece en la pagina publica de Cal.com. El fallo es silencioso y va en la
- * direccion contraria a la que documenta la cascada de arriba.
+ * C53: el valor dejo de estar escrito aca. Se lee de estadoIngreso.js, que
+ * scripts/estado-ingreso.mjs sobrescribe en cada build con lo que dice la hoja
+ * Configuracion de la Planilla. La cascada de arriba se cumple igual, porque el
+ * valor versionado de ese archivo es false: un fallo de lectura no cierra nada,
+ * deja el cierre que ya estaba. Lo que se adelanto de C54 a C53 es solo de
+ * donde viene el dato, no la direccion del fallo.
+ *
+ * PARA REABRIR FONASA: son TRES pasos y solo el primero lo hace el codigo.
+ *   1. Poner en TRUE la celda de la Planilla, hoja Configuracion, la fila cuya
+ *      etiqueta en la columna A es "Ingreso Fonasa abierto". El disparador
+ *      onEdit llama al build hook de Netlify y el sitio se reconstruye solo en
+ *      unos dos minutos. Eso propaga a la tarjeta de Precios, al CTA primario,
+ *      a los tres modulos de disponibilidad (hero, seccion y barra de movil),
+ *      al mensaje de WhatsApp y a la pestana por defecto del modal.
+ *   2. Entrar a app.cal.com/event-types y quitar el oculto a
+ *      'primera-sesion-bonofonasa' y 'psicoterapia-de-pareja-bonofonasa'. C53:
+ *      el 29 de agosto de 2026 se descubrio que los dos seguian PUBLICOS y
+ *      aceptando reservas Fonasa mientras el sitio declaraba el ingreso
+ *      cerrado. Este interruptor solo controla lo que el sitio DICE, nunca lo
+ *      que Cal.com ACEPTA. Si se salta este paso la reserva igual funciona (un
+ *      evento oculto acepta reservas por embed y por URL directa) pero el
+ *      evento no reaparece en la pagina publica de Cal.com.
+ *   3. Publicar una OTA de la app. La app NO corre el prebuild del sitio: su
+ *      postinstall solo copia archivos, asi que se queda con el false
+ *      versionado de estadoIngreso.js hasta que alguien reconstruya. Falla en
+ *      la direccion segura, la app ofrece de menos y nunca de mas, pero diverge
+ *      del sitio en silencio.
  */
-export const INGRESO_FONASA_ABIERTO = false;
+export { INGRESO_FONASA_ABIERTO_PLANILLA as INGRESO_FONASA_ABIERTO } from './estadoIngreso';
+
+import { INGRESO_FONASA_ABIERTO_PLANILLA } from './estadoIngreso';
 
 /**
  * Evento que usan por defecto los CTAs y los modulos de disponibilidad.
  * Derivado, no escrito a mano, para que no exista forma de que una superficie
  * quede anunciando horas de una modalidad que no acepta reservas.
  */
-export const EVENTO_PRINCIPAL = INGRESO_FONASA_ABIERTO
+export const EVENTO_PRINCIPAL = INGRESO_FONASA_ABIERTO_PLANILLA
   ? 'primeraSesionFonasa'
   : 'particular';

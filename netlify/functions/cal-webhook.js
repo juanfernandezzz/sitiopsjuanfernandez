@@ -85,7 +85,19 @@ import crypto from 'crypto';
 
 // Identificador de la version desplegada. SUBIR ESTE NUMERO en cada cambio del
 // correo: es lo que permite comprobar con un GET si el deploy llego de verdad.
-export const REVISION = 'C49';
+//
+// C53: este campo se quedo en 'C49' durante C50, C51, C52 y C53a, y en C51 se
+// uso como evidencia de que el deploy habia llegado. La conclusion resulto
+// cierta, pero el razonamiento no valia: el campo habria dicho 'C49' igual si
+// el deploy no hubiera llegado. Un instrumento que solo puede confirmar no
+// mide nada.
+// El campo de la sonda que SI es fiable es `slugs`, porque sale de
+// Object.keys(CATALOGO) y por construccion refleja el codigo desplegado.
+// `commit` es el experimento para jubilar esta constante: si Netlify expone
+// COMMIT_REF en tiempo de ejecucion de la funcion, ese campo trae el commit
+// real y no puede quedar desactualizado nunca. Si sale null, no lo expone y
+// hay que seguir subiendo REVISION a mano.
+export const REVISION = 'C53b';
 
 /* ===========================================================================
  * PARTE 1: contenido del correo (datos y funciones puras, sin red)
@@ -895,6 +907,7 @@ export const handler = async (event) => {
       body: JSON.stringify({
         funcion: 'cal-webhook',
         revision: REVISION,
+        commit: process.env.COMMIT_REF || null,
         slugs: Object.keys(CATALOGO),
       }),
     };
