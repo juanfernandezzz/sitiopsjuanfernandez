@@ -40,10 +40,23 @@ const COMUN = {
   ctaPrimario: 'Agendar tu sesión',
   ctaSecundario: 'Conversemos por WhatsApp',
   mensajeWhatsApp: 'Hola Juan, vi tu sitio y me gustaría conversar sobre una primera sesión.',
-  // C54: el chip "Inscrito en Fonasa" se queda en los dos modos. Es una
-  // credencial verificable del prestador, no una oferta.
-  chips: ['Psicólogo clínico', 'Inscrito en Fonasa', 'Videollamada cifrada'],
 };
+
+/*
+ * Los chips de confianza cambian por modo, y el del medio es el unico que
+ * cambia. "Inscrito en Fonasa" es cierto en los dos casos (Juan esta inscrito en
+ * MLE y sigue atendiendo con bono a quienes ya estan en tratamiento), pero en
+ * modo particular era lo unico que quedaba nombrando Fonasa en pantalla, justo
+ * bajo el CTA: quien llega por un anuncio de sesion particular lo lee como
+ * "aca puedo usar mi bono" y escribe para descubrir que no.
+ *
+ * El reemplazo no es un chip mas debil. El registro en la Superintendencia de
+ * Salud es la credencial mas fuerte que hay, es verificable por cualquiera en
+ * rnpi.superdesalud.gob.cl (el pie enlaza esa busqueda con el numero), y no se
+ * puede confundir con una forma de pago.
+ */
+const CHIP_PRIMERO = 'Psicólogo clínico';
+const CHIP_ULTIMO = 'Videollamada cifrada';
 
 /**
  * Modo particular. C52: la microcopia dejo de anunciar el copago Fonasa, y este
@@ -57,6 +70,7 @@ export const HERO_PARTICULAR = {
   microcopia: `Sesión particular: ${PRECIOS.particular.display}.`,
   lineaPago: 'Pagas por transferencia o WebPay, después de la sesión',
   enlaceSecundario: null,
+  chips: [CHIP_PRIMERO, 'Registrado en la Superintendencia de Salud', CHIP_ULTIMO],
 };
 
 /**
@@ -73,6 +87,7 @@ export const HERO_FONASA = {
     texto: `¿Sin Fonasa? Mira la sesión particular (${PRECIOS.particular.display}) →`,
     href: '#precios',
   },
+  chips: [CHIP_PRIMERO, 'Inscrito en Fonasa', CHIP_ULTIMO],
 };
 
 export const HERO = HERO_MODO === 'fonasa' ? HERO_FONASA : HERO_PARTICULAR;
