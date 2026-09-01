@@ -6,6 +6,7 @@ import {
   FONASA_CODIGOS,
   URLS_EXTERNAS,
 } from '../../lib/contacto';
+import { OFERTA_FONASA_VISIBLE } from '../../lib/modalidades';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -192,16 +193,24 @@ function ColumnaCredenciales() {
             </li>
           )
         )}
-        <li style={{ marginTop: 8 }}>
-          Códigos Fonasa:
-          <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0' }}>
-            {FONASA_CODIGOS.map(({ codigo, etiqueta }) => (
-              <li key={codigo} style={{ color: 'rgba(246, 241, 232, 0.8)' }}>
-                {codigo} ({etiqueta})
-              </li>
-            ))}
-          </ul>
-        </li>
+        {/* C54: los codigos de prestacion MLE solo se listan cuando la oferta
+            Fonasa esta en pantalla. La inscripcion del prestador en MLE, que es
+            la credencial, se queda arriba en los dos modos: lo que sale es el
+            dato operativo de compra del bono, que en modo particular no le
+            sirve a nadie y sugiere una via que no esta abierta. Quien lo
+            necesita lo tiene completo en la guia del bono. */}
+        {OFERTA_FONASA_VISIBLE && (
+          <li style={{ marginTop: 8 }}>
+            Códigos Fonasa:
+            <ul style={{ listStyle: 'none', padding: 0, margin: '4px 0 0' }}>
+              {FONASA_CODIGOS.map(({ codigo, etiqueta }) => (
+                <li key={codigo} style={{ color: 'rgba(246, 241, 232, 0.8)' }}>
+                  {codigo} ({etiqueta})
+                </li>
+              ))}
+            </ul>
+          </li>
+        )}
       </ul>
     </div>
   );
@@ -280,6 +289,10 @@ function ColumnaContacto() {
           { label: 'Agendar', href: '/#agendar' },
           { label: 'Preguntas frecuentes', href: '/#faq' },
           { label: 'Respira conmigo', href: '/respira' },
+          // C54: la guia del bono salio del recorrido principal y vive aca, en
+          // los DOS modos. Los pacientes Fonasa en tratamiento la siguen
+          // usando aunque el ingreso este cerrado y el hero hable de particular.
+          { label: 'Guía del bono Fonasa', href: '/guia-bono-fonasa.html' },
         ]}
       />
 

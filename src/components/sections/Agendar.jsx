@@ -2,10 +2,8 @@ import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
-import { PRECIOS } from '../../lib/precios';
 import { SESIONES } from '../../lib/sesiones';
 import { recordarSlug } from '../../lib/seguimiento';
-import { useUI } from '../../lib/uiContext';
 import VeloSinCupos from '../ui/EtiquetaSinCupos';
 import ModuloDisponibilidad from '../ui/ModuloDisponibilidad';
 
@@ -21,11 +19,16 @@ const Cal = lazy(() =>
 // C52: el particular pasa al primer lugar. El orden de las pestanas tiene que
 // espejar el de SESIONES (sesiones.js) o la jerarquia visual dice una cosa en
 // Precios y otra aca.
-const TABS = [
-  { key: 'particular', label: 'Sesión particular', price: PRECIOS.particular.display },
-  { key: 'primeraSesionFonasa', label: 'Primera sesión individual con bono Fonasa', price: PRECIOS.fonasaCopago.display },
-  { key: 'parejaFonasa', label: 'Sesión de pareja con bono Fonasa', price: PRECIOS.fonasaCopago.display },
-];
+//
+// C54: dejaron de escribirse a mano y se derivan de SESIONES. Antes eran una
+// copia con sus propias etiquetas y precios, asi que el modo del hero podia
+// sacar la primera sesion Fonasa de Precios y dejarla viva aca. Derivadas, el
+// orden y el contenido no pueden divergir.
+const TABS = SESIONES.map((s) => ({ key: s.key, label: s.titulo, price: s.precio }));
+
+// Tailwind necesita las clases literales en el fuente, por eso el mapa en vez
+// de armar el nombre con una plantilla.
+const COLUMNAS = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' };
 
 const REASSURANCES = [
   'Recibes confirmación inmediata por correo',
@@ -71,7 +74,6 @@ export default function Agendar() {
   const refTabs = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const reduce = useReducedMotion();
-  const { pendingAgendarTab, clearPendingAgendarTab } = useUI();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -81,21 +83,6 @@ export default function Agendar() {
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
   }, []);
-
-  // Sincroniza tab activo con pendingAgendarTab (seteado desde el modal Fonasa).
-  useEffect(() => {
-    if (!pendingAgendarTab) return;
-    if (CAL_EVENTS[pendingAgendarTab] && !SIN_CUPOS.has(pendingAgendarTab)) {
-      setSelectedKey(pendingAgendarTab);
-    }
-    if (typeof window !== 'undefined') {
-      const section = document.getElementById('agendar');
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-    clearPendingAgendarTab();
-  }, [pendingAgendarTab, clearPendingAgendarTab]);
 
   const calLink = selectedKey ? `${CAL_USERNAME}/${CAL_EVENTS[selectedKey]}` : null;
 
@@ -227,7 +214,7 @@ export default function Agendar() {
           variants={item}
           role="tablist"
           aria-label="Tipo de sesión"
-          className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6 bg-offwhite"
+          className={`grid grid-cols-1 ${COLUMNAS[TABS.length] || 'sm:grid-cols-3'} gap-2 mb-6 bg-offwhite`}
           style={{
             border: '1px solid rgba(63,91,74,0.15)',
             borderRadius: 14,
@@ -280,15 +267,19 @@ export default function Agendar() {
               >
                 {sinCupos && <VeloSinCupos radio="rounded-[10px]" />}
                 <span style={{ whiteSpace: 'normal' }}>{tab.label}</span>
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    marginTop: 2,
-                  }}
-                >
-                  {tab.price}
-                </span>
+                {/* C54: una sesion puede no tener monto que mostrar en la
+                    campana activa (precio null en sesiones.js). */}
+                {tab.price && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                      marginTop: 2,
+                    }}
+                  >
+                    {tab.price}
+                  </span>
+                )}
               </button>
             );
           })}

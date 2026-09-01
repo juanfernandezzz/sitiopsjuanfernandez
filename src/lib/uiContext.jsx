@@ -5,23 +5,25 @@
  * NO exportar UIContext crudo (forzamos el hook).
  *
  * Estado expuesto:
- *  - isFonasaModalOpen: bool
- *  - openFonasaModal(options?): abre el modal. options.targetTab opcional, options.onCloseScrollTo opcional.
- *  - closeFonasaModal(): cierra y devuelve focus al elemento que abrió.
- *  - pendingAgendarTab: string | null. Lo lee Agendar.jsx al montarse / cambiar.
- *  - clearPendingAgendarTab(): el consumidor lo limpia tras aplicar.
- *  - navigateToAgendarFonasa(): atajo combinado (setea tab Fonasa, cierra modal, scroll a #agendar).
+ *  - isTipoSesionOpen: bool
+ *  - openTipoSesionModal(): abre el selector de tipo de sesión.
+ *  - closeTipoSesionModal(): cierra y devuelve focus al elemento que abrió.
+ *
+ * C54: aquí vivía además todo el estado del modal de la guía Fonasa
+ * (isFonasaModalOpen, openFonasaModal, closeFonasaModal, navigateToAgendarFonasa
+ * y el pendingAgendarTab que ese modal seteaba para preseleccionar una pestaña
+ * de Agendar). La guía dejó de ser un modal y pasó a página propia
+ * (/guia-bono-fonasa.html), así que ese estado se fue completo: sin el modal,
+ * nadie escribía pendingAgendarTab y Agendar quedaba leyendo un valor que
+ * siempre era null.
  */
 
-import { EVENTO_PRINCIPAL } from './modalidades';
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 
 const UIContext = createContext(null);
 
 export function UIProvider({ children }) {
-  const [isFonasaModalOpen, setIsFonasaModalOpen] = useState(false);
   const [isTipoSesionOpen, setIsTipoSesionOpen] = useState(false);
-  const [pendingAgendarTab, setPendingAgendarTab] = useState(null);
 
   // Guarda el elemento que tenía foco al abrir el modal (para devolverlo al cerrar).
   const previousFocusRef = useRef(null);
@@ -48,60 +50,10 @@ export function UIProvider({ children }) {
     }
   }, []);
 
-  const openFonasaModal = useCallback((options = {}) => {
-    if (typeof document !== 'undefined') {
-      previousFocusRef.current = document.activeElement;
-    }
-    if (options.targetTab) {
-      setPendingAgendarTab(options.targetTab);
-    }
-    setIsFonasaModalOpen(true);
-  }, []);
-
-  const closeFonasaModal = useCallback(() => {
-    setIsFonasaModalOpen(false);
-    // Devuelve focus al elemento que abrió el modal en el siguiente frame
-    // (para no pelear con AnimatePresence durante el unmount).
-    if (typeof window !== 'undefined') {
-      requestAnimationFrame(() => {
-        const el = previousFocusRef.current;
-        if (el && typeof el.focus === 'function') {
-          el.focus();
-        }
-      });
-    }
-  }, []);
-
-  const clearPendingAgendarTab = useCallback(() => {
-    setPendingAgendarTab(null);
-  }, []);
-
-  // Combo: setea tab Fonasa, cierra modal, scroll a #agendar.
-  // Se ejecuta cuando el usuario aprieta "Agendar mi sesión ahora" dentro del modal.
-  const navigateToAgendarFonasa = useCallback(() => {
-    setPendingAgendarTab(EVENTO_PRINCIPAL);
-    setIsFonasaModalOpen(false);
-    if (typeof window !== 'undefined') {
-      // Esperamos a que el body recupere overflow y el modal se desmonte.
-      requestAnimationFrame(() => {
-        const section = document.getElementById('agendar');
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-  }, []);
-
   const value = {
-    isFonasaModalOpen,
-    openFonasaModal,
-    closeFonasaModal,
     isTipoSesionOpen,
     openTipoSesionModal,
     closeTipoSesionModal,
-    pendingAgendarTab,
-    clearPendingAgendarTab,
-    navigateToAgendarFonasa,
   };
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

@@ -18,9 +18,20 @@
  * sitio (no se borra: la gente la busca) pero no toma reservas. Cada superficie
  * la marca con la etiqueta y desactiva su enlace a Cal.com. Para reabrirla basta
  * con quitar la bandera aqui: no hay que tocar ningun componente.
+ *
+ * C54: la lista se arma segun OFERTA_FONASA_VISIBLE (el modo del hero). En modo
+ * particular la primera sesion Fonasa SALE del arreglo, y la de pareja se queda
+ * pero sin marca ni copago Fonasa: en esa campana el copago hace pensar que se
+ * puede usar el bono, y el bono no esta disponible para entrar. La terapia de
+ * pareja se muestra en los DOS modos, siempre con la etiqueta de sin cupos.
+ * Como este arreglo es la fuente unica, el cambio propaga solo a Precios, al
+ * menu del header, al modal de tipo de sesion, a la seccion Agendar y a la app.
+ *
+ * `precio` puede venir en null: significa que esa sesion no tiene monto que
+ * mostrar en esta campana. Cada superficie lo omite en vez de imprimir vacio.
  */
 import { PRECIOS } from './precios';
-import { INGRESO_FONASA_ABIERTO } from './modalidades';
+import { INGRESO_FONASA_ABIERTO, OFERTA_FONASA_VISIBLE } from './modalidades';
 
 // Texto unico de la etiqueta. Vive aqui para que las cuatro superficies de
 // agendamiento (Precios, menu del header, modal de tipo de sesion, seccion
@@ -36,19 +47,25 @@ export const SESIONES = [
     destacada: true,
     cta: 'Agendar sesión particular',
   },
-  {
-    key: 'primeraSesionFonasa',
-    titulo: 'Primera sesión con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
-    cta: 'Agendar primera sesión',
-    sinCupos: !INGRESO_FONASA_ABIERTO,
-  },
+  ...(OFERTA_FONASA_VISIBLE
+    ? [
+        {
+          key: 'primeraSesionFonasa',
+          titulo: 'Primera sesión con bono Fonasa',
+          precio: PRECIOS.fonasaCopago.display,
+          detalle: 'Si es tu primera vez conmigo. Conversamos y entendemos juntos qué te trae.',
+          cta: 'Agendar primera sesión',
+          sinCupos: !INGRESO_FONASA_ABIERTO,
+        },
+      ]
+    : []),
   {
     key: 'parejaFonasa',
-    titulo: 'Sesión de pareja con bono Fonasa',
-    precio: PRECIOS.fonasaCopago.display,
-    detalle: 'Con ambos miembros presentes.',
+    titulo: OFERTA_FONASA_VISIBLE
+      ? 'Sesión de pareja con bono Fonasa'
+      : 'Terapia de pareja',
+    precio: OFERTA_FONASA_VISIBLE ? PRECIOS.fonasaCopago.display : null,
+    detalle: 'Con ambos miembros presentes. Hoy está sin cupos.',
     cta: 'Agendar sesión de pareja',
     sinCupos: true,
   },

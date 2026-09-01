@@ -30,7 +30,6 @@ const FAQ = lazy(() => import('./components/sections/FAQ'))
 // C24 fixpack: sección Respira conmigo en el inicio, justo antes de Preguntas
 // frecuentes. Comparte el visor generativo con la página /respira.
 const Respira = lazy(() => import('./components/sections/Respira'))
-const ModalGuiaFonasa = lazy(() => import('./components/modals/ModalGuiaFonasa'))
 // C24: el modal de tipo de sesión también va lazy. Junto con el Hero y el Header
 // sin Framer Motion, la librería de animación queda fuera del bundle crítico:
 // solo viaja en los chunks diferidos (secciones bajo el fold y modales).
@@ -265,10 +264,6 @@ function AppShell() {
       </main>
 
       <Footer />
-
-      <Suspense fallback={null}>
-        <ModalGuiaFonasa />
-      </Suspense>
 
       <Suspense fallback={null}>
         <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />

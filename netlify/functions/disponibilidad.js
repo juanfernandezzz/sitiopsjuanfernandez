@@ -33,10 +33,31 @@ const ZONA = 'America/Santiago';
 
 // Identificadores numéricos verificados en la cuenta el 15 de agosto de 2026.
 // Si se crea o migra un evento hay que actualizarlos aquí.
+//
+// C54: `particular` apuntaba al 5785503, y ese evento dejó de ser el público en
+// C53a: hoy es el control particular, OCULTO en Cal.com. El módulo estaba
+// publicando (o no publicando) la agenda de un evento que nadie puede reservar
+// desde el sitio, mientras el evento realmente público, el 6862582
+// ('primera-sesion'), no se consultaba. Al crear o migrar un evento hay que
+// tocar TRES lugares: cal.js (slug), scripts/configurar-cal.mjs (id) y este
+// mapa; C53a movió los dos primeros y se olvidó de este.
 const EVENTOS = {
   primeraSesionFonasa: 5776252,
-  particular: 5785503,
+  particular: 6862582,
 };
+
+// Días de la semana en que cada evento puede tener horas legítimas. Cinturón de
+// seguridad contra glitches de Cal.com, no una copia de la agenda: solo excluye
+// lo que es imposible, nunca acota lo posible.
+//
+// C49 filtraba el domingo para TODOS los eventos, porque el limitador
+// (limitador.gs) no gestiona el día 0 y Cal.com había abierto un domingo suelto
+// por un glitch propio. C54: eso dejó de ser cierto para el particular. El único
+// cupo de ingreso que Juan tiene hoy es domingo 14:00, así que el filtro estaba
+// borrando justamente la hora que el sitio necesita anunciar, y por eso el hero
+// no decía nunca cuándo había hora. El domingo sigue siendo imposible para el
+// evento Fonasa, que sí depende del limitador.
+const DOMINGO_IMPOSIBLE = { primeraSesionFonasa: true, particular: false };
 
 // Solo estos eventos alimentan el módulo público. El de pareja está cerrado por
 // decisión de negocio (bandera sinCupos en src/lib/sesiones.js) y no se consulta.
@@ -72,13 +93,9 @@ function diasEntre(desdeISO, hastaISO) {
   return Math.round(ms / 86400000);
 }
 
-// Juan nunca atiende domingo (ver limitador.gs: LIMITES_POR_DIA_SEMANA no
-// gestiona el día 0). Cal.com abrió un domingo suelto por un glitch propio en
-// C49 pese a tener el horario semanal correctamente cerrado ese día; este
-// filtro es el cinturón de seguridad para que el sitio nunca vuelva a mostrar
-// un domingo como "próxima hora disponible", pase lo que pase del lado de
-// Cal.com. Mediodía local evita que el cálculo del día de la semana se corra
-// por el cambio de horario de verano.
+// Mediodía local evita que el cálculo del día de la semana se corra por el
+// cambio de horario de verano. Quién aplica este filtro y quién no lo decide
+// DOMINGO_IMPOSIBLE, arriba.
 function esDomingo(iso) {
   const [a, m, d] = iso.split('-').map(Number);
   return new Date(a, m - 1, d, 12, 0, 0).getDay() === 0;
@@ -119,7 +136,7 @@ async function consultarEvento(id, clave, apiKey, hoy) {
   const dias = Object.keys(data)
     .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= hoy)
     .filter((d) => Array.isArray(data[d]) && data[d].length > 0)
-    .filter((d) => !esDomingo(d))
+    .filter((d) => !(DOMINGO_IMPOSIBLE[clave] && esDomingo(d)))
     .sort();
 
   if (dias.length === 0) return { estado: 'desconocido' };

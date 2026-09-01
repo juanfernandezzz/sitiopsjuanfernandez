@@ -150,9 +150,13 @@ export default function ModalTipoSesion({ open, onClose }) {
                     <span className="font-body font-semibold text-ink" style={{ fontSize: 16 }}>
                       {op.titulo}
                     </span>
-                    <span className="font-body font-semibold text-sage flex-shrink-0" style={{ fontSize: 15 }}>
-                      {op.precio}
-                    </span>
+                    {/* C54: precio null significa "sin monto que mostrar en esta
+                        campana" (ver sesiones.js). No se imprime un hueco. */}
+                    {op.precio && (
+                      <span className="font-body font-semibold text-sage flex-shrink-0" style={{ fontSize: 15 }}>
+                        {op.precio}
+                      </span>
+                    )}
                   </span>
                   <span className="font-body text-ink/75 block" style={{ fontSize: 14, marginTop: 2 }}>
                     {op.detalle}

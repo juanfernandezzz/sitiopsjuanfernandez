@@ -85,9 +85,13 @@ export function OpcionesAgendar({ onPick, autoFocusFirst = false }) {
             <span className="font-body font-semibold text-ink" style={{ fontSize: 15 }}>
               {op.titulo}
             </span>
-            <span className="font-body font-semibold text-sage flex-shrink-0" style={{ fontSize: 14 }}>
-              {op.precio}
-            </span>
+            {/* C54: una sesion puede venir sin monto que mostrar en la campana
+                activa (precio null en sesiones.js). No se imprime un hueco. */}
+            {op.precio && (
+              <span className="font-body font-semibold text-sage flex-shrink-0" style={{ fontSize: 14 }}>
+                {op.precio}
+              </span>
+            )}
           </span>
           <span className="font-body text-ink/70 block" style={{ fontSize: 13.5, marginTop: 2 }}>
             {op.detalle}

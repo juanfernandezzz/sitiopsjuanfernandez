@@ -15,6 +15,16 @@
  * Drift entre ambos no rompe el sitio pero invalida rich snippets en Google.
  */
 import { PRECIOS } from './precios';
+import { OFERTA_FONASA_VISIBLE } from './modalidades';
+
+// C54: la respuesta de precios tiene dos caras, igual que el hero. En modo
+// particular no nombra el copago ni los codigos MLE: quien llega por un anuncio
+// de sesion particular no puede usar el bono, y ver el copago es justo lo que
+// hace pensar que si. La pregunta de como comprar el bono se queda en los dos
+// modos, porque los pacientes Fonasa en tratamiento la siguen necesitando.
+const RESPUESTA_PRECIO = OFERTA_FONASA_VISIBLE
+  ? `La primera sesión con bono Fonasa Modalidad Libre Elección tiene un copago de ${PRECIOS.fonasaCopago.display} para afiliados de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103. La sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia o WebPay, después de la sesión. Misma duración y dedicación en ambos casos.`
+  : `La sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia o WebPay, después de la sesión. Con bono Fonasa sigo atendiendo a quienes ya están en tratamiento: el ingreso con bono está sin cupos. Misma duración y dedicación en ambos casos.`;
 
 export const FAQ_ITEMS = [
   {
@@ -41,12 +51,14 @@ export const FAQ_ITEMS = [
   },
   {
     q: '¿Cuánto cuesta una sesión?',
-    a: `La sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia después de la sesión. También atiendo con bono Fonasa Modalidad Libre Elección, con un copago de ${PRECIOS.fonasaCopago.display} para afiliados de tramos B, C y D bajo los códigos 09 08 101, 09 08 102 y 09 08 103, pero por ahora no tengo cupos de ingreso con bono: sigo atendiendo a quienes ya están en tratamiento. Misma duración y dedicación en ambos casos.`,
+    a: RESPUESTA_PRECIO,
   },
   {
     q: '¿Cómo compro un bono Fonasa?',
     a: 'Puedes comprarlo online desde Mi Fonasa con tu ClaveÚnica, o presencial en sucursales Fonasa, Caja Los Andes, Caja Los Héroes, ChileAtiende y Servipag. Lo importante: compra el bono ANTES de la sesión y envíame el folio por WhatsApp para validarlo.',
-    cta: { label: 'Ver guía paso a paso →', action: 'openFonasaModal' },
+    // C54: la guia dejo de abrirse como modal sobre el inicio y tiene pagina
+    // propia. El campo `link` solo lo renderiza el sitio; la app muestra q y a.
+    link: { label: 'Ver la guía del bono paso a paso →', href: '/guia-bono-fonasa.html' },
   },
   {
     q: '¿Qué pasa si tengo Isapre o un seguro complementario?',

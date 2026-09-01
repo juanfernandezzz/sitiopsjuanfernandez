@@ -166,7 +166,7 @@ export default function Hero() {
               {HERO.sub}
             </p>
 
-            {/* C39: el copago Fonasa sube por encima de los botones. Antes
+            {/* C39: la linea de precio sube por encima de los botones. Antes
                 vivia debajo de ellos y en movil caia fuera del pliegue, que es
                 justo el dato que prometen los anuncios de Google Ads. Va en su
                 propio parrafo y sin interpolaciones, asi el HTML crudo entrega
@@ -198,27 +198,42 @@ export default function Hero() {
               </Button>
             </div>
 
+            {/* C54: la forma de pago va bajo el CTA primario, no junto al
+                precio. Arriba queda el monto (el dato que se busca antes de
+                decidir) y aca la fricción de pagar, que recién importa cuando
+                ya se está mirando el botón. */}
+            <p
+              className="anim-rise mt-3 font-body text-[15px] lg:text-[16px] text-ink/75"
+              style={delay(400)}
+            >
+              {HERO.lineaPago}
+            </p>
+
             {/* Píldora de disponibilidad en vivo. Va DESPUES del CTA, nunca
                 antes: así nunca empuja el botón primario bajo el pliegue en
                 móvil, se limite a lo que quede debajo. */}
-            <div className="anim-rise mt-3" style={delay(410)}>
+            <div className="anim-rise mt-3" style={delay(430)}>
               <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="hero" />
             </div>
 
             {/* Ruta alternativa. Se queda DESPUES del CTA principal a
                 proposito: un enlace secundario sobre el boton competiria con
-                la accion primaria. */}
-            <p
-              className="anim-rise mt-3 font-body text-[15px] text-ink/75"
-              style={delay(450)}
-            >
-              <a
-                href="#precios"
-                className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
+                la accion primaria. C54: solo existe en modo Fonasa. En modo
+                particular no hay otra via que ofrecer, y el enlace mandaba a
+                mirar una tarjeta sin cupos. */}
+            {HERO.enlaceSecundario && (
+              <p
+                className="anim-rise mt-3 font-body text-[15px] text-ink/75"
+                style={delay(450)}
               >
-                {HERO.enlaceSecundario}
-              </a>
-            </p>
+                <a
+                  href={HERO.enlaceSecundario.href}
+                  className="underline decoration-sage/40 underline-offset-2 hover:text-ink hover:decoration-sage transition-colors"
+                >
+                  {HERO.enlaceSecundario.texto}
+                </a>
+              </p>
+            )}
 
             <ul
               className="anim-rise mt-6 sm:mt-7 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-body text-[15px] lg:text-[16px] text-sage"

@@ -7,6 +7,7 @@ import ConsentimientoApp from './ConsentimientoApp.jsx'
 import AsentimientoApp from './AsentimientoApp.jsx'
 import PoliticaPrivacidadApp from './PoliticaPrivacidadApp.jsx'
 import RespiraApp from './RespiraApp.jsx'
+import GuiaBonoApp from './GuiaBonoApp.jsx'
 
 /*
  * C31: entrada de servidor para el prerender de build (SSG).
@@ -32,7 +33,17 @@ const PAGINAS = {
   asentimiento: AsentimientoApp,
   politica: PoliticaPrivacidadApp,
   respira: RespiraApp,
+  guiaBono: GuiaBonoApp,
 }
+
+/*
+ * C54: el prerender necesita saber en que modo se construyo para exigir los
+ * textos canonicos correctos. Se reexporta desde aca en vez de que
+ * scripts/prerender.mjs lea src/lib/estadoIngreso.js por su cuenta: asi el modo
+ * que se verifica es exactamente el que se acaba de renderizar, y no una
+ * segunda lectura que podria discrepar.
+ */
+export { HERO_MODO } from './lib/modalidades'
 
 export function render(clave) {
   const Componente = PAGINAS[clave]

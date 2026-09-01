@@ -26,7 +26,7 @@ export const ALERTA_DIAS = 4;
 // Cupos de ingreso reservados por semana. ESTE NUMERO DEBE COINCIDIR con el
 // límite semanal configurado en Cal.com para el evento de primera sesión
 // (evento 5776252, pestaña Límites y espacios, "Limitar frecuencia de
-// reservas"). El particular (evento 5785503) lleva su propia cuota, hoy en 3.
+// reservas"). El particular publico (evento 6862582, C53a) lleva su propia cuota, hoy en 3.
 // Para expandir a 3 o 4: cambia el número aquí y en Cal.com, nada más.
 //
 // C50: baja de 3 a 2. La cartera vigente ocupa casi toda la capacidad y los

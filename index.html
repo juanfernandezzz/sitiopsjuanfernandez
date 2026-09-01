@@ -73,9 +73,17 @@
          la URL coincide exactamente con la que renderiza Hero.jsx. -->
     <link rel="preload" as="image" href="/juan-720.webp" type="image/webp" fetchpriority="high" />
 
-    <!-- SEO core -->
+    <!-- SEO core. C54: title y description tienen dos caras, una por campana.
+         El plugin modoHero (vite.config.js) borra el bloque del modo que no
+         corre antes de que Vite parsee este archivo. -->
+    <!--modo:particular-->
+    <title>Juan Fernández | Psicólogo Clínico Online en Chile</title>
+    <meta name="description" content="Psicólogo clínico titulado. Terapia online por videollamada, sesión particular de $25.000. Enfoque integrativo. Sesiones de 45 minutos." />
+    <!--/modo:particular-->
+    <!--modo:fonasa-->
     <title>Juan Fernández | Psicólogo Clínico Online en Chile | Fonasa</title>
     <meta name="description" content="Psicólogo clínico titulado. Atención online por videollamada con bono Fonasa ($5.570) o particular ($25.000). Enfoque integrativo. Sesiones de 45 minutos." />
+    <!--/modo:fonasa-->
     <meta name="author" content="Juan Fernández" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://psicologojuanfernandez.cl/" />
@@ -86,7 +94,12 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Juan Fernández, Psicólogo Clínico" />
     <meta property="og:title" content="Juan Fernández | Psicólogo Clínico Online en Chile" />
+    <!--modo:particular-->
     <meta property="og:description" content="Atención psicológica online particular, $25.000 la sesión. Enfoque integrativo. Sesiones de 45 minutos por videollamada." />
+    <!--/modo:particular-->
+    <!--modo:fonasa-->
+    <meta property="og:description" content="Atención psicológica online con bono Fonasa (copago $5.570) o particular ($25.000). Enfoque integrativo. Sesiones de 45 minutos por videollamada." />
+    <!--/modo:fonasa-->
     <meta property="og:image" content="https://psicologojuanfernandez.cl/og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -97,7 +110,12 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Juan Fernández | Psicólogo Clínico Online en Chile" />
+    <!--modo:particular-->
     <meta name="twitter:description" content="Atención psicológica online particular, $25.000 la sesión. Sesiones de 45 minutos por videollamada." />
+    <!--/modo:particular-->
+    <!--modo:fonasa-->
+    <meta name="twitter:description" content="Atención psicológica online con bono Fonasa (copago $5.570) o particular ($25.000). Sesiones de 45 minutos por videollamada." />
+    <!--/modo:fonasa-->
     <meta name="twitter:image" content="https://psicologojuanfernandez.cl/og.jpg" />
     <meta name="twitter:image:alt" content="Juan Fernández, psicólogo clínico, atención online en Chile" />
 
@@ -110,7 +128,12 @@
           "@type": "MedicalBusiness",
           "@id": "https://psicologojuanfernandez.cl/#consulta",
           "name": "Juan Fernández, Psicólogo Clínico",
+          <!--modo:particular-->
+          "description": "Consulta psicológica 100% online para adultos en Chile. Sesiones de 45 minutos por videollamada, en modalidad particular.",
+          <!--/modo:particular-->
+          <!--modo:fonasa-->
           "description": "Consulta psicológica 100% online para adultos en Chile. Sesiones de 45 minutos por videollamada, con bono Fonasa MLE o particular.",
+          <!--/modo:fonasa-->
           "url": "https://psicologojuanfernandez.cl/",
           "image": "https://psicologojuanfernandez.cl/juan.jpg",
           "telephone": "+56973394530",
@@ -129,7 +152,12 @@
           "areaServed": { "@type": "Country", "name": "Chile" },
           "founder": { "@id": "https://psicologojuanfernandez.cl/#prestador" },
           "currenciesAccepted": "CLP",
+          <!--modo:particular-->
+          "priceRange": "$25.000 CLP"
+          <!--/modo:particular-->
+          <!--modo:fonasa-->
           "priceRange": "$5.570 a $25.000 CLP"
+          <!--/modo:fonasa-->
         },
         {
           "@type": "Person",
@@ -184,7 +212,12 @@
           "@type": "Service",
           "@id": "https://psicologojuanfernandez.cl/#servicio",
           "name": "Psicoterapia online por videollamada",
+          <!--modo:particular-->
+          "description": "Sesiones de psicoterapia de 45 minutos por videollamada, en modalidad particular.",
+          <!--/modo:particular-->
+          <!--modo:fonasa-->
           "description": "Sesiones de psicoterapia de 45 minutos por videollamada, en modalidad Fonasa MLE (códigos 09 08 101, 09 08 102 y 09 08 103) o particular.",
+          <!--/modo:fonasa-->
           "provider": { "@id": "https://psicologojuanfernandez.cl/#consulta" },
           "serviceType": "Psicoterapia",
           "areaServed": { "@type": "Country", "name": "Chile" },
@@ -199,6 +232,7 @@
             }
           },
           "offers": [
+            <!--modo:fonasa-->
             {
               "@type": "Offer",
               "name": "Sesión con bono Fonasa MLE",
@@ -206,6 +240,7 @@
               "price": "5570",
               "priceCurrency": "CLP"
             },
+            <!--/modo:fonasa-->
             {
               "@type": "Offer",
               "name": "Sesión particular",
@@ -255,7 +290,12 @@
           "name": "¿Cuánto cuesta una sesión?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Hay dos modalidades: sesión particular por $25.000, o sesión con bono Fonasa Modalidad Libre Elección por $5.570 (este último disponible para afiliados Fonasa de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103). Misma duración y dedicación en ambos casos. La forma de pago no cambia lo que pasa en la sesión."
+            <!--modo:particular-->
+            "text": "La sesión particular cuesta $25.000 y la pagas por transferencia o WebPay, después de la sesión. Con bono Fonasa sigo atendiendo a quienes ya están en tratamiento: el ingreso con bono está sin cupos. Misma duración y dedicación en ambos casos."
+            <!--/modo:particular-->
+            <!--modo:fonasa-->
+            "text": "La primera sesión con bono Fonasa Modalidad Libre Elección tiene un copago de $5.570 para afiliados de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103. La sesión particular cuesta $25.000 y la pagas por transferencia o WebPay, después de la sesión. Misma duración y dedicación en ambos casos."
+            <!--/modo:fonasa-->
           }
         },
         {

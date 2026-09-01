@@ -1,27 +1,37 @@
 /**
- * Lee el estado del ingreso Fonasa desde la Planilla y lo escribe en
+ * Lee los dos interruptores del sitio desde la Planilla y los escribe en
  * src/lib/estadoIngreso.js, ANTES de que corra Vite. Con eso el HTML
- * prerenderizado sale ya con el valor correcto: no hay peticion en el navegador,
- * no hay parpadeo del CTA primario y el crawler indexa la verdad, no un valor
- * por defecto que se corrige despues.
+ * prerenderizado sale ya con los valores correctos: no hay peticion en el
+ * navegador, no hay parpadeo del CTA primario y el crawler indexa la verdad, no
+ * un valor por defecto que se corrige despues.
+ *
+ * LOS DOS INTERRUPTORES
+ *   ingresoFonasaAbierto  booleano. Si el ingreso Fonasa acepta reservas.
+ *   heroModo              'particular' o 'fonasa'. Que cara muestra el sitio,
+ *                         segun cual de las dos campanas de Google Ads este
+ *                         corriendo. Nunca las dos a la vez.
+ * Son independientes: cada uno se valida y se escribe por su cuenta, y que uno
+ * falle no impide que el otro se aplique.
  *
  * ORIGEN DEL DATO
  *   PLANILLA_ESTADO_URL, variable de entorno de Netlify. Apunta al Web App de
  *   Apps Script publicado desde la Planilla (apps-script/estado-ingreso.gs).
- *   Devuelve {"ingresoFonasaAbierto": true|false}.
+ *   Devuelve {"ingresoFonasaAbierto": true|false, "heroModo": "particular"}.
  *   No vive en el repo a proposito: es una URL de la cuenta de Juan.
  *
  * ESTE SCRIPT NUNCA HACE FALLAR EL BUILD. Sale con codigo 0 pase lo que pase.
  * Un deploy caido es peor que un deploy con Fonasa cerrado: lo primero tumba el
  * sitio entero, lo segundo solo deja de ofrecer una modalidad que hoy ya no se
- * ofrece. Cuando no puede leer, NO escribe, y el build usa el false versionado.
+ * ofrece. Cuando no puede leer, NO escribe, y el build usa los valores
+ * versionados.
  *
  * DIRECCION DEL FALLO
- *   sin variable de entorno  -> no escribe -> false versionado -> Fonasa cerrado
- *   fetch falla o da timeout -> no escribe -> false versionado -> Fonasa cerrado
- *   respuesta no es JSON     -> no escribe -> false versionado -> Fonasa cerrado
- *   el campo no es booleano  -> no escribe -> false versionado -> Fonasa cerrado
- *   booleano valido          -> escribe ese valor
+ *   sin variable de entorno  -> no escribe -> versionado -> Fonasa cerrado, hero particular
+ *   fetch falla o da timeout -> no escribe -> versionado -> Fonasa cerrado, hero particular
+ *   respuesta no es JSON     -> no escribe -> versionado -> Fonasa cerrado, hero particular
+ *   el campo no es booleano  -> no escribe ESE campo -> Fonasa cerrado
+ *   heroModo no es una de las dos cadenas -> no escribe ESE campo -> hero particular
+ *   valores validos          -> escribe esos valores
  * La lectura externa solo puede ABRIR. Nunca cierra por su cuenta, porque el
  * cierre ya es el punto de partida.
  *
@@ -29,8 +39,9 @@
  *   Si el ingreso esta ABIERTO y la lectura falla durante un build cualquiera
  *   (por ejemplo un git push que no tiene nada que ver), el sitio se despliega
  *   con Fonasa cerrado y se queda asi, en silencio, hasta el siguiente build.
- *   Por eso el aviso de abajo se imprime con marco: tiene que saltar a la vista
- *   en el registro de build de Netlify.
+ *   Lo mismo vale para el modo del hero: una campana Fonasa en curso vuelve a
+ *   la cara particular sin que nadie lo note. Por eso el aviso de abajo se
+ *   imprime con marco: tiene que saltar a la vista en el registro de Netlify.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -41,31 +52,99 @@ const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DESTINO = resolve(RAIZ, 'src', 'lib', 'estadoIngreso.js');
 const TIEMPO_LIMITE_MS = 10000;
 
+// Unicos modos admitidos. Cualquier otra cadena se descarta y queda el valor
+// versionado: un modo desconocido dejaria el hero sin variante que resolver.
+const MODOS = ['particular', 'fonasa'];
+
 function aviso(texto) {
   const linea = '='.repeat(70);
   console.warn('\n' + linea);
   console.warn('[estado-ingreso] ' + texto);
-  console.warn('[estado-ingreso] El sitio se despliega con el valor versionado: Fonasa CERRADO.');
+  console.warn('[estado-ingreso] El sitio se despliega con los valores versionados: Fonasa CERRADO, hero en modo PARTICULAR.');
   console.warn(linea + '\n');
 }
 
-function valorVersionado() {
+function valorVersionadoFonasa() {
   const texto = readFileSync(DESTINO, 'utf8');
   return /INGRESO_FONASA_ABIERTO_PLANILLA\s*=\s*true/.test(texto);
 }
 
-function escribir(abierto) {
+function valorVersionadoModo() {
   const texto = readFileSync(DESTINO, 'utf8');
-  const nuevo = texto.replace(
-    /export const INGRESO_FONASA_ABIERTO_PLANILLA = (?:true|false);/,
-    `export const INGRESO_FONASA_ABIERTO_PLANILLA = ${abierto};`
-  );
-  if (nuevo === texto) {
-    aviso('No se pudo sustituir el valor en estadoIngreso.js. El archivo cambio de forma.');
+  const m = texto.match(/HERO_MODO_PLANILLA\s*=\s*'([a-z]+)'/);
+  return m ? m[1] : 'particular';
+}
+
+/*
+ * La comprobacion es "la linea existe", no "el texto cambio". C53b comparaba el
+ * antes y el despues, asi que cuando la Planilla confirmaba el valor que ya
+ * estaba versionado la sustitucion no cambiaba ningun byte y el script lo
+ * denunciaba como si el archivo se hubiera deformado: un aviso enmarcado y
+ * falso en el registro de Netlify cada vez que el estado NO cambiaba, que es el
+ * caso normal. Probar la expresion regular separa los dos casos.
+ */
+function sustituir(patron, reemplazo, nombre) {
+  const texto = readFileSync(DESTINO, 'utf8');
+  if (!patron.test(texto)) {
+    aviso(`No se pudo sustituir ${nombre} en estadoIngreso.js. El archivo cambio de forma.`);
     return false;
   }
-  writeFileSync(DESTINO, nuevo, 'utf8');
+  writeFileSync(DESTINO, texto.replace(patron, reemplazo), 'utf8');
   return true;
+}
+
+function escribirFonasa(abierto) {
+  return sustituir(
+    /export const INGRESO_FONASA_ABIERTO_PLANILLA = (?:true|false);/,
+    `export const INGRESO_FONASA_ABIERTO_PLANILLA = ${abierto};`,
+    'INGRESO_FONASA_ABIERTO_PLANILLA'
+  );
+}
+
+function escribirModo(modo) {
+  return sustituir(
+    /export const HERO_MODO_PLANILLA = '[a-z]*';/,
+    `export const HERO_MODO_PLANILLA = '${modo}';`,
+    'HERO_MODO_PLANILLA'
+  );
+}
+
+function aplicarFonasa(datos) {
+  const abierto = datos?.ingresoFonasaAbierto;
+  if (typeof abierto !== 'boolean') {
+    aviso(
+      'La respuesta no trae ingresoFonasaAbierto como booleano. Recibido: ' +
+        JSON.stringify(abierto)
+    );
+    return;
+  }
+
+  const antes = valorVersionadoFonasa();
+  if (!escribirFonasa(abierto)) return;
+
+  console.log(
+    `[estado-ingreso] Ingreso Fonasa: ${abierto ? 'ABIERTO' : 'cerrado'}` +
+      (antes === abierto ? ' (sin cambio respecto del valor versionado).' : ' (cambia respecto del valor versionado).')
+  );
+}
+
+function aplicarModo(datos) {
+  const modo = datos?.heroModo;
+  if (typeof modo !== 'string' || !MODOS.includes(modo)) {
+    aviso(
+      'La respuesta no trae heroModo como "particular" o "fonasa". Recibido: ' +
+        JSON.stringify(modo)
+    );
+    return;
+  }
+
+  const antes = valorVersionadoModo();
+  if (!escribirModo(modo)) return;
+
+  console.log(
+    `[estado-ingreso] Modo del hero: ${modo}` +
+      (antes === modo ? ' (sin cambio respecto del valor versionado).' : ' (cambia respecto del valor versionado).')
+  );
 }
 
 async function main() {
@@ -92,22 +171,9 @@ async function main() {
     return;
   }
 
-  const abierto = datos?.ingresoFonasaAbierto;
-  if (typeof abierto !== 'boolean') {
-    aviso(
-      'La respuesta no trae ingresoFonasaAbierto como booleano. Recibido: ' +
-        JSON.stringify(abierto)
-    );
-    return;
-  }
-
-  const antes = valorVersionado();
-  if (!escribir(abierto)) return;
-
-  console.log(
-    `[estado-ingreso] Planilla leida. Ingreso Fonasa: ${abierto ? 'ABIERTO' : 'cerrado'}` +
-      (antes === abierto ? ' (sin cambio respecto del valor versionado).' : ' (cambia respecto del valor versionado).')
-  );
+  console.log('[estado-ingreso] Planilla leida.');
+  aplicarFonasa(datos);
+  aplicarModo(datos);
 }
 
 // Sin catch aqui el build de Netlify se caeria ante cualquier error inesperado.

@@ -34,7 +34,7 @@ export const PRESTADOR = {
  *
  * Nota: los strings LITERALES del arancel Fonasa (p. ej. "Telerehabilitación:
  * Psicólogo clínico") viven solo donde el usuario debe reconocer el portal:
- * la guía (ModalGuiaFonasa) y el correo post-reserva (cal-webhook). Aquí se usa
+ * la guía del bono (GuiaBonoApp) y el correo post-reserva (cal-webhook). Aquí se usa
  * la etiqueta funcional para no recargar al usuario que solo está orientándose.
  */
 export const FONASA_CODIGOS = [

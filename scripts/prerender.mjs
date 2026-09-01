@@ -22,6 +22,22 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(RAIZ, 'dist')
 
+const { render, HERO_MODO } = await import(
+  pathToFileURL(path.join(RAIZ, 'dist-ssr', 'entry-server.js')).href
+)
+
+/*
+ * C54: los textos canonicos del inicio dependen del modo del hero, porque el
+ * modo cambia que se ofrece. El copago solo puede exigirse en modo Fonasa; en
+ * modo particular lo que tiene que estar es el precio particular y la linea de
+ * pago. El modo se lee del mismo bundle que se acaba de renderizar, no de una
+ * segunda lectura de estadoIngreso.js que podria discrepar.
+ */
+const TEXTOS_INICIO =
+  HERO_MODO === 'fonasa'
+    ? ['5.570', '09 08 101']
+    : ['$25.000', 'transferencia o WebPay', 'sin cupos']
+
 const PAGINAS = [
   {
     archivo: 'index.html',
@@ -29,9 +45,9 @@ const PAGINAS = [
     clave: 'main',
     textosRequeridos: [
       'La vida moderna nos mantiene siempre en movimiento',
-      '5.570',
       'certificada por Fonasa',
       'Preguntas frecuentes',
+      ...TEXTOS_INICIO,
     ],
   },
   {
@@ -64,6 +80,16 @@ const PAGINAS = [
     clave: 'respira',
     textosRequeridos: [],
   },
+  {
+    // C54: la guia del bono salio del modal y tiene pagina propia. Es la unica
+    // superficie donde los codigos de prestacion viven en los dos modos, asi
+    // que se exigen aqui: si desaparecieran, el paciente Fonasa se queda sin el
+    // dato que necesita para comprar el bono.
+    archivo: 'guia-bono-fonasa.html',
+    raizDom: 'root-guia-bono',
+    clave: 'guiaBono',
+    textosRequeridos: ['09 08 101', 'Mi Fonasa', 'folio'],
+  },
 ]
 
 // Minimo de caracteres que debe aportar el render de cada pagina. Un valor por
@@ -72,10 +98,6 @@ const MINIMO_CARACTERES = 500
 
 const RESPALDO_NOSCRIPT =
   '<noscript><style>[style*="opacity"]{opacity:1!important}[style*="transform"]{transform:none!important}</style></noscript>'
-
-const { render } = await import(
-  pathToFileURL(path.join(RAIZ, 'dist-ssr', 'entry-server.js')).href
-)
 
 let errores = 0
 
@@ -184,4 +206,4 @@ if (errores > 0) {
   process.exit(1)
 }
 
-console.log('[prerender] las 6 paginas quedaron con contenido en HTML crudo')
+console.log(`[prerender] las ${PAGINAS.length} paginas quedaron con contenido en HTML crudo (modo del hero: ${HERO_MODO})`)
