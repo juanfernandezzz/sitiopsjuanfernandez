@@ -26,6 +26,15 @@
  * traerReservas_, que ya viven ahi. Pegado en cualquier otro proyecto no corre,
  * y lo dice en el registro en vez de adivinar.
  *
+ * LA FIRMA DE LA QUE ESTE ARCHIVO DEPENDE (C57)
+ * traerReservas_(estado, extras). Aca se la llama con ('upcoming', {}), igual
+ * que las otras dos llamadas que existen en el proyecto de la Planilla. Es la
+ * unica dependencia externa que este repo no puede verificar por si solo: ese
+ * codigo vive alla y no esta versionado aca. C55 asumio (desde, hasta) y la
+ * consulta salia malformada. Si algun dia la firma cambia en la Planilla, hay
+ * que actualizar la llamada de este archivo. El banco de pruebas la fija: su
+ * doble de traerReservas_ revienta si se la llama de otra forma.
+ *
  * POR QUE EMPAREJA POR HORA MAS CORREO, Y NO POR ID
  * El id del evento de Google termina en "@Cal.com", y es tentador cortarlo por
  * la arroba y buscar ese trozo entre los uid de Cal.com. No se hace. El formato
@@ -312,9 +321,23 @@ function _calcularHuerfanosBH_() {
   }
 
   // CONDICION DE ABORTO 1: la llamada a Cal.com fallo, dio error o vino vacia.
+  //
+  // C57: la firma real es traerReservas_(estado, extras), no (desde, hasta).
+  // Verificada en el editor de Apps Script del proyecto de la Planilla, donde
+  // las dos unicas llamadas que existen son traerReservas_('upcoming', {}) y
+  // traerReservas_('past', { afterStart: hace180 }). C55 asumio (desde, hasta)
+  // y con eso la consulta salia malformada.
+  //
+  // Se pide 'upcoming' entero, que es un superconjunto de la ventana de
+  // DIAS_BH dias, y se filtra despues aca mismo. A proposito: una reserva que
+  // cae justo fuera de la ventana igual tiene que poder emparejar con su
+  // evento, o su evento pareceria huerfano.
+  //
+  // traerReservas_ pagina sola por dentro (hasMore, nextCursor) y devuelve el
+  // acumulado, asi que desde aca no hay que paginar nada.
   var crudo;
   try {
-    crudo = traerReservas_(ventana.desde, ventana.hasta);
+    crudo = traerReservas_('upcoming', {});
   } catch (e) {
     r.motivo = 'ABORTA: la llamada a Cal.com fallo: ' + e;
     return r;

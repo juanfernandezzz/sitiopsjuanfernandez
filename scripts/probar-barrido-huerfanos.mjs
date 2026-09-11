@@ -25,14 +25,27 @@
  * escribieron a mano con una hora de desfase y los 11 casos dieron rojo por un
  * error del banco, no del codigo.
  *
+ * LO QUE UN DOBLE FLOJO TAPO (C57)
+ * El doble de traerReservas_ ignoraba sus argumentos y devolvia las reservas
+ * fuera cual fuera la llamada. Con eso, el barrido llamaba a traerReservas_ con
+ * dos fechas cuando la firma real es traerReservas_(estado, extras), la consulta
+ * a Cal.com salia malformada, y las 14 pruebas pasaban en verde igual. Ahora el
+ * doble verifica la firma y revienta la corrida si no cuadra. Un doble que
+ * acepta cualquier cosa no prueba nada.
+ *
  * USO
  *   node scripts/probar-barrido-huerfanos.mjs
  *   node scripts/probar-barrido-huerfanos.mjs --caso-regresion
+ *   node scripts/probar-barrido-huerfanos.mjs --caso-firma
  *   node scripts/probar-barrido-huerfanos.mjs --fuente <ruta al .gs>
  *
  * --caso-regresion corre solo el caso que motiva C56 (un huerfano, cada reserva
  * viva con su evento) y escupe el registro entero. Con --fuente apuntando a la
  * version anterior del archivo se ve el defecto en vivo.
+ *
+ * --caso-firma corre sola la prueba que fija la firma de traerReservas_ (C57).
+ * Va aparte por el mismo motivo: contra la version anterior del .gs el doble
+ * revienta en la primera prueba y el banco entero se cae antes de llegar a ella.
  */
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -46,6 +59,7 @@ const iFuente = argv.indexOf('--fuente');
 const FUENTE_RUTA =
   iFuente !== -1 ? argv[iFuente + 1] : resolve(RAIZ, 'apps-script', 'barrido-huerfanos.gs');
 const SOLO_REGRESION = argv.indexOf('--caso-regresion') !== -1;
+const SOLO_FIRMA = argv.indexOf('--caso-firma') !== -1;
 
 const FUENTE = readFileSync(FUENTE_RUTA, 'utf8');
 
@@ -100,6 +114,28 @@ function huerfano(inicio, correo, titulo) {
 const PRIMERA = Date.parse('2026-09-12T09:00:00-04:00');
 const horaN = (i) => new Date(PRIMERA + i * 3600 * 1000).toISOString();
 
+/*
+ * LA FIRMA QUE EL DOBLE FIJA (C57)
+ * En el proyecto de la Planilla la firma real es traerReservas_(estado, extras)
+ * y las dos unicas llamadas que existen son traerReservas_('upcoming', {}) y
+ * traerReservas_('past', { afterStart: hace180 }). El barrido tiene que llamarla
+ * con ('upcoming', {}).
+ *
+ * Se exige objeto LLANO en el segundo argumento a proposito. Un Date cumple
+ * typeof x === 'object', y un Date en ese lugar es exactamente el error que hay
+ * que atrapar: un doble que lo dejara pasar volveria a tapar el mismo defecto.
+ */
+function esObjetoLlano(x) {
+  return Object.prototype.toString.call(x) === '[object Object]';
+}
+
+function describirArg(x) {
+  if (typeof x === 'string') return "'" + x + "'";
+  if (Object.prototype.toString.call(x) === '[object Date]') return 'Date(' + x.toISOString() + ')';
+  if (esObjetoLlano(x)) return JSON.stringify(x);
+  return String(x);
+}
+
 function correr({
   eventos,
   reservas,
@@ -109,6 +145,8 @@ function correr({
   funcion = 'borrarHuerfanos',
 }) {
   const registro = [];
+  const llamadas = [];
+  let firmaMala = '';
   const ctx = {
     Date: class extends Date {
       constructor(...a) {
@@ -140,7 +178,18 @@ function correr({
     },
   };
   if (!sinCliente) {
-    ctx.traerReservas_ = () => {
+    ctx.traerReservas_ = (estado, extras) => {
+      llamadas.push([estado, extras]);
+      if (estado !== 'upcoming' || !esObjetoLlano(extras)) {
+        firmaMala =
+          'se la llamo con traerReservas_(' +
+          [estado, extras].map(describirArg).join(', ') +
+          "), y su firma es traerReservas_(estado, extras): aca va ('upcoming', {}).";
+        // Se lanza para que el barrido no siga con una consulta malformada, y
+        // ademas queda anotado afuera: el try del barrido se tragaria esta
+        // excepcion y la contaria como aborto 1, que seria un verde falso.
+        throw new Error('FIRMA EQUIVOCADA de traerReservas_');
+      }
       if (explota) throw new Error('403 de Cal.com');
       return { bookings: reservas };
     };
@@ -148,7 +197,26 @@ function correr({
   vm.createContext(ctx);
   vm.runInContext(FUENTE + '\nCONFIRMO_BORRADO = ' + confirmo + ';', ctx);
   vm.runInContext(funcion + '();', ctx);
-  return { registro, texto: registro.join('\n') };
+  if (firmaMala) {
+    const err = new Error('FIRMA EQUIVOCADA: ' + firmaMala);
+    err.llamadas = llamadas;
+    throw err;
+  }
+  return { registro, texto: registro.join('\n'), llamadas };
+}
+
+/*
+ * Corre el barrido y devuelve como se llamo a traerReservas_, aunque el doble
+ * haya matado la corrida por firma equivocada. Es lo que deja correr la prueba
+ * de firma contra la version vieja del .gs, donde el doble revienta a proposito.
+ */
+function llamadasATraerReservas(opciones) {
+  try {
+    return correr(opciones).llamadas;
+  } catch (e) {
+    if (e && e.llamadas) return e.llamadas;
+    throw e;
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -254,6 +322,48 @@ function afirmar(nombre, condicion, extra) {
     console.log('  FALLA ' + nombre);
     if (extra) console.log(extra);
   }
+}
+
+/*
+ * LA PRUEBA QUE FIJA LA FIRMA (C57). Vive en una funcion, y no suelta como las
+ * demas, porque tiene que poder correrse sola contra las dos versiones del .gs:
+ * contra 744ce72 el doble revienta ya en la prueba 1 y el banco entero se cae
+ * antes de llegar hasta aca. Con --caso-firma corre solo esto.
+ */
+function pruebaFirmaC57() {
+  console.log("\n== 15. NUEVA C57. El barrido llama a traerReservas_ con ('upcoming', {}) ==");
+  const { eventos, reservas } = escenario(6, 1);
+  const llamadas = llamadasATraerReservas({ eventos, reservas, confirmo: false });
+  const primera = llamadas[0] || [];
+  const comoSeLlamo = 'traerReservas_(' + primera.map(describirArg).join(', ') + ')';
+  console.log('  llamada real: ' + comoSeLlamo);
+  afirmar(
+    'llama a traerReservas_ una sola vez: no pagina desde aca',
+    llamadas.length === 1,
+    '  llamadas: ' + llamadas.length
+  );
+  afirmar(
+    "el primer argumento es el estado 'upcoming', no una fecha",
+    primera[0] === 'upcoming',
+    '  fue: ' + comoSeLlamo
+  );
+  afirmar(
+    'el segundo argumento es un objeto de opciones, no una fecha',
+    esObjetoLlano(primera[1]),
+    '  fue: ' + comoSeLlamo
+  );
+  afirmar(
+    'el objeto de opciones va vacio',
+    esObjetoLlano(primera[1]) && Object.keys(primera[1]).length === 0,
+    '  fue: ' + comoSeLlamo
+  );
+}
+
+if (SOLO_FIRMA) {
+  console.log('Fuente: ' + FUENTE_RUTA);
+  pruebaFirmaC57();
+  console.log(fallos === 0 ? '\nLA FIRMA ES LA CORRECTA\n' : `\n${fallos} AFIRMACIONES DE FIRMA FALLAN\n`);
+  process.exit(fallos === 0 ? 0 : 1);
 }
 
 console.log('\n== 1. Caso del 11 de septiembre: detecta los dos huerfanos, en ensayo no borra ==');
@@ -429,6 +539,8 @@ console.log('\n== 14. REGRESION C56. Un huerfano con cada reserva viva en su eve
   afirmar('no avisa de umbral (1 de 4 no lo supera)', !/UMBRAL/.test(texto), texto);
   afirmar('no borro nada (ensayo)', eventos.every((e) => !e._borrado.valor));
 }
+
+pruebaFirmaC57();
 
 console.log(fallos === 0 ? '\nTODAS LAS PRUEBAS PASAN\n' : `\n${fallos} PRUEBAS FALLAN\n`);
 process.exit(fallos === 0 ? 0 : 1);
