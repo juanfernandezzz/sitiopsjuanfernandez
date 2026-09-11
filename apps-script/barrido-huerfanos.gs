@@ -38,9 +38,36 @@
  * borrarse el evento cuyo id termina en "@Cal.com". Todo lo que Juan creo a
  * mano queda fuera del alcance del script, pase lo que pase.
  *
+ * LOS FRENOS, Y CUAL FRENA QUE
+ * Hay DOS condiciones de aborto y UN umbral, y no hacen lo mismo.
+ *
+ *   ABORTO 1. La llamada a Cal.com fallo, dio error, vino en una forma que no
+ *             se reconoce, trajo cero reservas vivas, o alguna reserva vino sin
+ *             hora o sin correo. Sin con que comparar no se afirma nada.
+ *   ABORTO 3. No se pudo leer el correo del invitado de un evento candidato.
+ *             Ese evento pareceria huerfano por falta de dato, no por serlo.
+ *
+ * Los dos abortos cortan el calculo entero: no se lista, no se borra, y el
+ * registro dice por que. Los numeros conservan sus nombres de C55 a proposito,
+ * para que el codigo y este comentario se puedan leer juntos.
+ *
+ *   EL UMBRAL.  No aborta. Solo dice que el resultado es sospechoso porque
+ *               salieron demasiados huerfanos de golpe, y con eso bloquea el
+ *               borrado. listarHuerfanos() avisa y muestra la lista igual.
+ *
+ * QUE PASO CON EL ABORTO 2 (C56)
+ * Existia y estaba roto. Comparaba las reservas vivas contra los eventos de
+ * Cal.com del calendario y abortaba cuando habia menos reservas que eventos.
+ * Pero cada huerfano ES un evento sin reserva viva, asi que esa desigualdad
+ * solo se cumplia cuando NO habia ningun huerfano: en cuanto aparecia uno, el
+ * barrido abortaba diciendo que la consulta habia venido incompleta, que era
+ * falso. El guardian impedia encontrar aquello para lo que se escribio el
+ * archivo. C56 lo saca y pone en su lugar el umbral, que mide lo mismo donde
+ * significa algo: sobre el tamano del resultado.
+ *
  * POR QUE LA DE BORRAR NACE APAGADA
  * Un falso positivo aqui borra la sesion de un paciente real, y un evento
- * borrado por script no deja rastro util. Ninguna condicion de aborto cubre el
+ * borrado por script no deja rastro util. Ni los abortos ni el umbral cubren el
  * caso de que el emparejamiento este mal pensado. Por eso el orden de uso es
  * siempre: listarHuerfanos(), leer la lista con los ojos, reconocer cada hora, y
  * recien ahi poner CONFIRMO_BORRADO en true. La revision humana no es un
@@ -73,6 +100,34 @@ var SUFIJO_CAL_BH = '@Cal.com';
 // La firma del Limitador de Agenda (limitador.gs). Sus bloqueos son suyos y los
 // gestiona el: aca quedan excluidos aunque cumplieran todo lo demas.
 var FIRMA_LIMITADOR_BH = 'BLOQUEO-AUTOMATICO-v2';
+
+/*
+ * EL UMBRAL DE SOSPECHA, y por que se mide sobre el RESULTADO.
+ *
+ * La idea de fondo es buena: si a la consulta de Cal.com le falto una pagina,
+ * de golpe pareceran huerfanos muchisimos eventos a la vez. Huerfanos de
+ * verdad hay pocos y sueltos; una consulta incompleta produce un bloque.
+ *
+ * C55 midio eso sobre los conteos crudos, comparando reservas contra eventos, y
+ * ahi el arreglo estaba mal por construccion. Cada huerfano es, por definicion,
+ * un evento sin reserva viva, asi que cada huerfano hace que los eventos
+ * superen a las reservas en uno. "Menos reservas que eventos" era exactamente
+ * lo mismo que "hay al menos un huerfano": el guardian abortaba justo cuando
+ * habia algo que encontrar, e impedia al archivo hacer aquello para lo que se
+ * escribio. C56 lo mueve al unico sitio donde la sospecha significa algo, que
+ * es el tamano del resultado.
+ *
+ * Y no frena la lectura: listarHuerfanos() solo mira, asi que avisa y muestra
+ * igual. Lo unico que el umbral bloquea es el borrado.
+ */
+
+// Tope absoluto. Mas de cinco huerfanos de una sentada no es un calendario
+// sucio, es una consulta que vino mal.
+var TOPE_HUERFANOS_BH = 5;
+
+// Proporcion maxima sobre los candidatos. Cubre el caso contrario al del tope:
+// un calendario chico donde cinco ya serian casi todo.
+var PROPORCION_MAX_HUERFANOS_BH = 0.25;
 
 // --------------------------------------------------------------------------
 // Utilidades
@@ -213,9 +268,16 @@ function _parReservaBH_(reserva) {
 // --------------------------------------------------------------------------
 
 /**
- * Devuelve { ok, motivo, reservasTotal, reservasEnVentana, candidatos, huerfanos }.
- * ok en false significa ABORTA: no se puede afirmar nada sobre este calendario y
- * no se borra ni un evento. huerfanos solo tiene sentido con ok en true.
+ * Devuelve { ok, motivo, reservasTotal, reservasEnVentana, candidatos, huerfanos,
+ * umbralSuperado, motivoUmbral }.
+ *
+ * ok y umbralSuperado son DOS SENALES DISTINTAS y no se mezclan:
+ *   ok              "pude calcular". En false significa ABORTA: no se puede
+ *                   afirmar nada sobre este calendario y no se borra ni un
+ *                   evento. huerfanos solo tiene sentido con ok en true.
+ *   umbralSuperado  "el resultado es sospechoso". El calculo es fiable igual,
+ *                   asi que la lista se muestra; lo unico que se bloquea es el
+ *                   borrado. Superar el umbral NUNCA pone ok en false.
  */
 function _calcularHuerfanosBH_() {
   var r = {
@@ -225,6 +287,8 @@ function _calcularHuerfanosBH_() {
     reservasEnVentana: 0,
     candidatos: 0,
     huerfanos: [],
+    umbralSuperado: false,
+    motivoUmbral: '',
   };
 
   var cal = CalendarApp.getCalendarById(CALENDARIO_BH);
@@ -295,16 +359,6 @@ function _calcularHuerfanosBH_() {
     return r;
   }
 
-  // CONDICION DE ABORTO 2: menos reservas que eventos de Cal.com en el
-  // calendario significa que la consulta vino incompleta, no que sobren eventos.
-  if (enVentana < candidatos.length) {
-    r.motivo =
-      'ABORTA: Cal.com devolvio ' + enVentana + ' reservas en la ventana y el' +
-      ' calendario tiene ' + candidatos.length + ' eventos de Cal.com en la misma' +
-      ' ventana. La consulta vino incompleta (paginacion, filtro o permisos).';
-    return r;
-  }
-
   var huerfanos = [];
   for (var k = 0; k < candidatos.length; k++) {
     var ev = candidatos[k];
@@ -334,6 +388,25 @@ function _calcularHuerfanosBH_() {
 
   r.huerfanos = huerfanos;
   r.ok = true;
+
+  // El umbral va aqui, sobre el resultado ya calculado, y no antes sobre los
+  // conteos crudos. Con cero candidatos no se afirma nada: no hay resultado del
+  // que sospechar.
+  if (
+    candidatos.length > 0 &&
+    (huerfanos.length > TOPE_HUERFANOS_BH ||
+      huerfanos.length > PROPORCION_MAX_HUERFANOS_BH * candidatos.length)
+  ) {
+    r.umbralSuperado = true;
+    r.motivoUmbral =
+      'UMBRAL SUPERADO: salieron ' + huerfanos.length + ' huerfanos sobre ' +
+      candidatos.length + ' eventos de Cal.com en la ventana. Tantos de golpe' +
+      ' apuntan a una consulta incompleta de Cal.com (una pagina que falto, un' +
+      ' filtro, permisos) antes que a huerfanos de verdad, que son pocos y' +
+      ' sueltos. El borrado queda bloqueado. La lista se muestra igual para que' +
+      ' puedas mirarla y decidir.';
+  }
+
   return r;
 }
 
@@ -370,6 +443,12 @@ function _informarBH_(cal, r) {
         '  |  ' + h.correos.join(', ')
     );
   }
+
+  // El aviso va DESPUES de la lista, no en vez de ella: quien mira el registro
+  // tiene que poder ver los datos sobre los que se esta desconfiando.
+  if (r.umbralSuperado) {
+    Logger.log(r.motivoUmbral);
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -404,8 +483,20 @@ function borrarHuerfanos() {
   var r = _calcularHuerfanosBH_();
   _informarBH_(cal, r);
 
+  // El orden de los frenos: no pude calcular, no hay nada que borrar, el
+  // resultado es sospechoso, y recien al final la llave de Juan.
   if (!r.ok) return;
   if (!r.huerfanos.length) return;
+
+  if (r.umbralSuperado) {
+    Logger.log(
+      'No se borra nada, ni con CONFIRMO_BORRADO en true: con el umbral superado' +
+        ' lo probable es que falten reservas en la respuesta de Cal.com, no que' +
+        ' sobren eventos en el calendario. Corre listarHuerfanos() y compara la' +
+        ' lista con el calendario antes de insistir.'
+    );
+    return;
+  }
 
   if (!CONFIRMO_BORRADO) {
     Logger.log(
