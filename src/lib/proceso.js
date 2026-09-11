@@ -20,7 +20,7 @@ export const PROCESO_ONLINE = {
       num: '01',
       titulo: 'Tu reserva queda confirmada',
       texto: 'Recibes en tu email la confirmación con fecha, hora y enlace de la sesión. Todo desde Cal.com.',
-      nota: 'Si vas con bono Fonasa, lo compras y me envías el folio antes de la sesión, sin excepción. La sesión particular se paga después de la sesión, por transferencia. Te llega todo detallado en el mismo correo.',
+      nota: 'Si vas con bono Fonasa, lo compras y me envías el folio antes de la sesión, sin excepción. La sesión particular se paga después de la sesión, por transferencia o WebPay. Te llega todo detallado en el mismo correo.',
     },
     {
       num: '02',
@@ -44,7 +44,7 @@ export const PROCESO_ONLINE = {
     { clave: 'cifrado', titulo: 'Llamada cifrada', texto: 'Conexión protegida' },
   ],
   // C52c: dejaba de liderar con el copago Fonasa, que ya no se puede agendar.
-  notaPago: `El pago es simple: la sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia después de la sesión.`,
+  notaPago: `El pago es simple: la sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia o WebPay, después de la sesión.`,
   cierre: 'Si en cualquier momento la conexión falla, te llamo o coordinamos por WhatsApp para retomar.',
 };
 
@@ -58,7 +58,7 @@ export const PROCESO_TRABAJO = {
     {
       num: '01',
       titulo: 'Agendas tu sesión',
-      cuerpo: 'Eliges el horario que te acomode y reservas en línea. Recibes el enlace de videollamada al confirmar la reserva. El pago de la sesión particular es por transferencia, después de la sesión.',
+      cuerpo: 'Eliges el horario que te acomode y reservas en línea. Recibes el enlace de videollamada al confirmar la reserva. El pago de la sesión particular es por transferencia o WebPay, después de la sesión.',
     },
     {
       num: '02',

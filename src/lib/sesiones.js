@@ -20,15 +20,18 @@
  * con quitar la bandera aqui: no hay que tocar ningun componente.
  *
  * C54: la lista se arma segun OFERTA_FONASA_VISIBLE (el modo del hero). En modo
- * particular la primera sesion Fonasa SALE del arreglo, y la de pareja se queda
- * pero sin marca ni copago Fonasa: en esa campana el copago hace pensar que se
- * puede usar el bono, y el bono no esta disponible para entrar. La terapia de
- * pareja se muestra en los DOS modos, siempre con la etiqueta de sin cupos.
- * Como este arreglo es la fuente unica, el cambio propaga solo a Precios, al
- * menu del header, al modal de tipo de sesion, a la seccion Agendar y a la app.
+ * particular la primera sesion Fonasa SALE del arreglo. C55: la de pareja sale
+ * tambien, asi que en modo particular queda una sola sesion agendable, la
+ * particular. Como este arreglo es la fuente unica, el cambio propaga solo a
+ * Precios, al menu del header, al modal de tipo de sesion, a la seccion
+ * Agendar y a la app.
  *
  * `precio` puede venir en null: significa que esa sesion no tiene monto que
  * mostrar en esta campana. Cada superficie lo omite en vez de imprimir vacio.
+ * C55: hoy ninguna entrada llega con null, porque la unica que lo producia
+ * era la de pareja en modo particular y esa ya no se arma. La tolerancia se
+ * queda en las superficies: es el contrato del campo, no un parche de una
+ * campana.
  */
 import { PRECIOS } from './precios';
 import { INGRESO_FONASA_ABIERTO, OFERTA_FONASA_VISIBLE } from './modalidades';
@@ -59,14 +62,20 @@ export const SESIONES = [
         },
       ]
     : []),
-  {
-    key: 'parejaFonasa',
-    titulo: OFERTA_FONASA_VISIBLE
-      ? 'Sesión de pareja con bono Fonasa'
-      : 'Terapia de pareja',
-    precio: OFERTA_FONASA_VISIBLE ? PRECIOS.fonasaCopago.display : null,
-    detalle: 'Con ambos miembros presentes. Hoy está sin cupos.',
-    cta: 'Agendar sesión de pareja',
-    sinCupos: true,
-  },
+  // C55: la terapia de pareja sale del modo particular por completo. Antes se
+  // mostraba en los dos modos con la etiqueta de sin cupos. Decision de Juan:
+  // en modo particular no aporta, porque no hay cupo de pareja de ningun tipo
+  // y no piensa ofrecerla hasta especializarse. En modo fonasa se mantiene.
+  ...(OFERTA_FONASA_VISIBLE
+    ? [
+        {
+          key: 'parejaFonasa',
+          titulo: 'Sesión de pareja con bono Fonasa',
+          precio: PRECIOS.fonasaCopago.display,
+          detalle: 'Con ambos miembros presentes. Hoy está sin cupos.',
+          cta: 'Agendar sesión de pareja',
+          sinCupos: true,
+        },
+      ]
+    : []),
 ];

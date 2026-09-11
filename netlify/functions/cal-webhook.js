@@ -613,7 +613,7 @@ export function construirCorreo({
       `Cómo se paga tu sesión particular (${PRECIOS.particular})`,
       [
         parrafo(
-          '<strong>La sesión particular se paga después de la sesión</strong>, por transferencia electrónica a esta cuenta:'
+          '<strong>La sesión particular se paga después de la sesión</strong>, por transferencia electrónica o WebPay:'
         ),
         tablaDatos(filas),
         parrafo(
@@ -630,7 +630,7 @@ export function construirCorreo({
     pagoTexto.push(
       '',
       `CÓMO SE PAGA TU SESIÓN PARTICULAR (${PRECIOS.particular})`,
-      'La sesión particular se paga DESPUÉS de la sesión, por transferencia electrónica a esta cuenta:',
+      'La sesión particular se paga DESPUÉS de la sesión, por transferencia electrónica o WebPay:',
       '',
       ...filas.map(([etiqueta, valor]) => `  ${etiqueta}: ${valor}`),
       '',

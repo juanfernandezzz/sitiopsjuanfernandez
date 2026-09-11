@@ -20,7 +20,9 @@ const FONASA_PRIMERA_SIN_CUPOS = sinCuposDe('primeraSesionFonasa');
 // C54: en modo particular la oferta Fonasa (copago, codigos MLE, tarjeta de
 // primera sesion) no ocupa lugar en esta seccion. Lo decide el modo del hero,
 // no el estado del ingreso: son dos interruptores distintos (modalidades.js).
-// La terapia de pareja se queda en los dos modos, siempre con la etiqueta.
+// C55: la terapia de pareja tambien sale del modo particular, tarjeta y fila de
+// la tabla. Con eso la columna derecha se queda vacia en esa campana, y la
+// seccion pasa a una sola tarjeta centrada en vez de media rejilla en blanco.
 const GUIA_BONO_HREF = '/guia-bono-fonasa.html';
 
 const WEBPAY_PAGO_URL = 'https://www.webpay.cl/form-pay/388212';
@@ -109,7 +111,18 @@ export default function Precios() {
         </motion.div>
 
         {/* Grid 1 + 3 en desktop: destacada a la izquierda, tres apiladas a la derecha */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-start">
+        {/* C55: en modo particular no queda nada en la columna derecha, asi que
+            la rejilla se apaga y la tarjeta particular va sola y centrada. Con
+            grid-cols-2 vacia a la derecha la tarjeta quedaba pegada al borde
+            izquierdo con medio ancho de pagina en blanco al lado. En modo
+            fonasa la clase es exactamente la misma de antes. */}
+        <div
+          className={
+            OFERTA_FONASA_VISIBLE
+              ? 'grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 lg:items-start'
+              : 'max-w-xl mx-auto'
+          }
+        >
           {/* C52: la destacada pasa a ser la sesion particular. El ingreso
               Fonasa esta cerrado, asi que dejarlo en el lugar mas grande de la
               pagina con un boton vivo mandaba gente a reservar algo que el
@@ -123,11 +136,7 @@ export default function Precios() {
                 '0 1px 3px rgba(201, 123, 94, 0.08), 0 12px 32px rgba(201, 123, 94, 0.08)',
             }}
           >
-            <span className="absolute -top-3 left-6 bg-terracotta-deep text-cream font-body text-[12px] font-medium tracking-[0.02em] px-3 py-1.5 rounded-full select-none">
-              Agenda abierta
-            </span>
-
-            <h3 className="font-display text-xl text-ink mb-6 mt-2">
+            <h3 className="font-display text-xl text-ink mb-6">
               Sesión particular
             </h3>
 
@@ -156,7 +165,7 @@ export default function Precios() {
             </ul>
 
             <p className="font-body text-[15px] text-ink/75 leading-relaxed mb-7">
-              Si tienes Isapre, otra previsión o ninguna. El pago se coordina por WhatsApp y puede ser después de la sesión.
+              Si tienes Isapre, otra previsión o ninguna. Pagas por transferencia o WebPay, después de la sesión.
             </p>
 
             <div className="mt-auto flex flex-col gap-4">
@@ -224,9 +233,9 @@ export default function Precios() {
             </div>
           </motion.article>
 
-          {/* Columna derecha. En modo Fonasa van las dos modalidades con bono
-              apiladas; en modo particular queda solo la terapia de pareja, que
-              se muestra en los dos modos con su etiqueta de sin cupos. */}
+          {/* Columna derecha. Solo existe en modo Fonasa: ahi van las dos
+              modalidades con bono apiladas. En modo particular las dos se van,
+              y esta columna no pinta nada. */}
           <div className="flex flex-col gap-6 lg:gap-8">
             {/* Primera sesión con bono Fonasa */}
             {OFERTA_FONASA_VISIBLE && (
@@ -307,6 +316,7 @@ export default function Precios() {
             )}
 
             {/* Terapia de pareja */}
+            {OFERTA_FONASA_VISIBLE && (
             <motion.article
               variants={item}
               className="relative bg-offwhite rounded-2xl p-6 md:p-7 flex flex-col"
@@ -315,27 +325,21 @@ export default function Precios() {
               {PAREJA_SIN_CUPOS && <VeloSinCupos />}
 
               <h3 className="font-display text-lg text-ink mb-2">
-                {OFERTA_FONASA_VISIBLE
-                  ? 'Terapia de pareja con bono Fonasa'
-                  : 'Terapia de pareja'}
+                Terapia de pareja con bono Fonasa
               </h3>
-              {OFERTA_FONASA_VISIBLE && (
-                <p className="mb-2">
-                  <span
-                    className="font-display text-2xl md:text-3xl text-ink"
-                    style={{ fontVariationSettings: '"opsz" 144' }}
-                  >
-                    {PRECIOS.fonasaCopago.display}
-                  </span>
-                  <span className="font-body text-[16px] text-sage ml-3">
-                    Copago Modalidad Libre Elección
-                  </span>
-                </p>
-              )}
+              <p className="mb-2">
+                <span
+                  className="font-display text-2xl md:text-3xl text-ink"
+                  style={{ fontVariationSettings: '"opsz" 144' }}
+                >
+                  {PRECIOS.fonasaCopago.display}
+                </span>
+                <span className="font-body text-[16px] text-sage ml-3">
+                  Copago Modalidad Libre Elección
+                </span>
+              </p>
               <p className="font-body text-[16px] text-ink/70 leading-relaxed mb-5">
-                {OFERTA_FONASA_VISIBLE
-                  ? 'Código 09 08 103. Sesión de 45 minutos con ambos miembros presentes.'
-                  : 'Sesión de 45 minutos con ambos miembros presentes.'}
+                Código 09 08 103. Sesión de 45 minutos con ambos miembros presentes.
                 {PAREJA_SIN_CUPOS && (
                   <>
                     {' '}
@@ -357,6 +361,7 @@ export default function Precios() {
                 )}
               </div>
             </motion.article>
+            )}
           </div>
 
         </div>
@@ -401,24 +406,20 @@ export default function Precios() {
                   <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
                 </tr>
               )}
-              <tr className="border-b border-sage/15">
-                <th scope="row" className="py-3 pr-4 font-normal text-left">
-                  {OFERTA_FONASA_VISIBLE
-                    ? 'Sesión de pareja con bono Fonasa'
-                    : 'Terapia de pareja'}
-                  {PAREJA_SIN_CUPOS && (
-                    <span className="block text-[13px] text-sage/85 mt-0.5">
-                      Sin cupos por ahora
-                    </span>
-                  )}
-                </th>
-                {OFERTA_FONASA_VISIBLE && <td className="py-3 pr-4">09 08 103</td>}
-                <td className="py-3">
-                  {OFERTA_FONASA_VISIBLE
-                    ? `${PRECIOS.fonasaCopago.display} copago`
-                    : 'sin cupos'}
-                </td>
-              </tr>
+              {OFERTA_FONASA_VISIBLE && (
+                <tr className="border-b border-sage/15">
+                  <th scope="row" className="py-3 pr-4 font-normal text-left">
+                    Sesión de pareja con bono Fonasa
+                    {PAREJA_SIN_CUPOS && (
+                      <span className="block text-[13px] text-sage/85 mt-0.5">
+                        Sin cupos por ahora
+                      </span>
+                    )}
+                  </th>
+                  <td className="py-3 pr-4">09 08 103</td>
+                  <td className="py-3">{`${PRECIOS.fonasaCopago.display} copago`}</td>
+                </tr>
+              )}
             </tbody>
           </table>
           <p className="font-body text-[13.5px] text-ink/60 mt-3 leading-relaxed">

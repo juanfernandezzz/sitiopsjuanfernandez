@@ -32,6 +32,13 @@
  *   el campo no es booleano  -> no escribe ESE campo -> Fonasa cerrado
  *   heroModo no es una de las dos cadenas -> no escribe ESE campo -> hero particular
  *   valores validos          -> escribe esos valores
+ * Las dos filas del medio son POR CAMPO: un campo invalido NO arrastra al otro.
+ * Con ingresoFonasaAbierto true y heroModo "FONASA" el sitio queda con Fonasa
+ * ABIERTO y el hero en particular, no con los dos en su valor versionado. C55
+ * corrige el aviso, que hasta entonces afirmaba lo segundo en los dos casos.
+ * Por eso toda ejecucion termina imprimiendo una linea ESTADO QUE SE COMPILA,
+ * leida del archivo en disco: es la unica que dice el estado real de los dos
+ * interruptores, sin deducirlo de que fallo y que no.
  * La lectura externa solo puede ABRIR. Nunca cierra por su cuenta, porque el
  * cierre ya es el punto de partida.
  *
@@ -56,12 +63,26 @@ const TIEMPO_LIMITE_MS = 10000;
 // versionado: un modo desconocido dejaria el hero sin variante que resolver.
 const MODOS = ['particular', 'fonasa'];
 
+// C55: este aviso ya no afirma en que estado queda el sitio. Antes decia
+// siempre "se despliega con los valores versionados", y eso es falso cuando un
+// campo se aplico y el otro no: la aplicacion es independiente por campo. Con
+// ingresoFonasaAbierto valido y heroModo invalido, el archivo quedaba en true y
+// el registro decia CERRADO. Un aviso que afirma sin comprobar es peor que no
+// tener aviso. El estado real lo imprime estadoFinal(), leyendo el archivo.
 function aviso(texto) {
   const linea = '='.repeat(70);
   console.warn('\n' + linea);
   console.warn('[estado-ingreso] ' + texto);
-  console.warn('[estado-ingreso] El sitio se despliega con los valores versionados: Fonasa CERRADO, hero en modo PARTICULAR.');
+  console.warn('[estado-ingreso] Ese campo conserva su valor versionado.');
   console.warn(linea + '\n');
+}
+
+// Lee el archivo en disco, no las variables en memoria: es lo unico que dice la
+// verdad sobre lo que se va a compilar.
+function estadoFinal() {
+  const fonasa = valorVersionadoFonasa() ? 'ABIERTO' : 'cerrado';
+  const modo = valorVersionadoModo();
+  console.log(`[estado-ingreso] ESTADO QUE SE COMPILA -> Ingreso Fonasa: ${fonasa} | Modo del hero: ${modo}`);
 }
 
 function valorVersionadoFonasa() {
@@ -152,6 +173,7 @@ async function main() {
 
   if (!url) {
     aviso('Falta la variable de entorno PLANILLA_ESTADO_URL.');
+    estadoFinal();
     return;
   }
 
@@ -163,20 +185,24 @@ async function main() {
     });
     if (!respuesta.ok) {
       aviso(`La Planilla respondio ${respuesta.status}.`);
+      estadoFinal();
       return;
     }
     datos = await respuesta.json();
   } catch (error) {
     aviso(`No se pudo leer la Planilla: ${error?.message || error}`);
+    estadoFinal();
     return;
   }
 
   console.log('[estado-ingreso] Planilla leida.');
   aplicarFonasa(datos);
   aplicarModo(datos);
+  estadoFinal();
 }
 
 // Sin catch aqui el build de Netlify se caeria ante cualquier error inesperado.
 main().catch((error) => {
   aviso(`Error inesperado: ${error?.message || error}`);
+  estadoFinal();
 });

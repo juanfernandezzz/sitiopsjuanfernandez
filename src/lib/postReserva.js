@@ -130,7 +130,7 @@ export function pasosParticular() {
     // encuadre que el correo automatico.
     titulo: `Cómo se paga tu sesión particular (${PRECIOS.particular.display})`,
     intro:
-      'La sesión particular se paga después de la sesión, por transferencia electrónica:',
+      'La sesión particular se paga después de la sesión, por transferencia electrónica o WebPay:',
     transferencia: TRANSFERENCIA,
     nota: `Envíame el comprobante a ${CONTACTO.email} o por WhatsApp (${CONTACTO.whatsappDisplay}).`,
     webpay: { texto: 'Pagar con WebPay', url: WEBPAY_URL },
