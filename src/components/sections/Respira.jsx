@@ -3,6 +3,7 @@ import { motion, useInView, useReducedMotion } from 'framer-motion';
 import RespiraVisor from '../respira/RespiraVisor';
 import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
+import { AGENDA_CERRADA } from '../../lib/modalidades';
 import { RESPIRA_TEXTO } from '../../lib/respiraNucleo';
 
 /**
@@ -92,22 +93,26 @@ export default function Respira() {
             </p>
           </motion.div>
 
-          {/* Vía suave hacia agendar (mismo cuadro que /respira) */}
-          <motion.div
-            variants={item}
-            className="mt-10 mx-auto bg-offwhite rounded-2xl px-6 py-8 md:px-10 md:py-10 ring-1 ring-sage/15"
-            style={{ maxWidth: 620 }}
-          >
-            <p
-              className="font-body text-ink/80 mb-5"
-              style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '50ch' }}
+          {/* Vía suave hacia agendar (mismo cuadro que /respira). C58: con la
+              agenda cerrada el cuadro entero se va, texto incluido: invitaba a
+              trabajarlo en sesión. */}
+          {!AGENDA_CERRADA && (
+            <motion.div
+              variants={item}
+              className="mt-10 mx-auto bg-offwhite rounded-2xl px-6 py-8 md:px-10 md:py-10 ring-1 ring-sage/15"
+              style={{ maxWidth: 620 }}
             >
-              {RESPIRA_TEXTO.puenteTexto}
-            </p>
-            <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
-              {RESPIRA_TEXTO.puenteCta}
-            </Button>
-          </motion.div>
+              <p
+                className="font-body text-ink/80 mb-5"
+                style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '50ch' }}
+              >
+                {RESPIRA_TEXTO.puenteTexto}
+              </p>
+              <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
+                {RESPIRA_TEXTO.puenteCta}
+              </Button>
+            </motion.div>
+          )}
 
           {/* Enlace a la herramienta en su propia página */}
           <motion.div variants={item} className="mt-6 text-center">

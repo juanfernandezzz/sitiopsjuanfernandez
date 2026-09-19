@@ -33,10 +33,26 @@ const { render, HERO_MODO } = await import(
  * pago. El modo se lee del mismo bundle que se acaba de renderizar, no de una
  * segunda lectura de estadoIngreso.js que podria discrepar.
  */
-const TEXTOS_INICIO =
-  HERO_MODO === 'fonasa'
-    ? ['5.570', '09 08 101']
-    : ['$25.000', 'transferencia o WebPay', 'sin cupos']
+/*
+ * C58: un modo por entrada, sin rama por descarte. En modo cerrada se exige el
+ * aviso de agenda cerrada y el precio (que sigue en Precios), y ademas se
+ * PROHIBEN los rastros de reserva: si un CTA con data-cal-link o un enlace a
+ * la primera sesion sobrevive en el HTML, el build falla y Netlify no publica
+ * un sitio que dice "cerrada" mientras ofrece reservar.
+ */
+const INICIO_POR_MODO = {
+  particular: { requeridos: ['$25.000', 'transferencia o WebPay', 'sin cupos'], prohibidos: [] },
+  fonasa: { requeridos: ['5.570', '09 08 101'], prohibidos: [] },
+  cerrada: {
+    requeridos: ['$25.000', 'agenda está cerrada'],
+    prohibidos: ['data-cal-link', 'primera-sesion', '5.570'],
+  },
+}
+if (!INICIO_POR_MODO[HERO_MODO]) {
+  console.error(`[prerender] el modo del hero '${HERO_MODO}' no tiene textos canonicos`)
+  process.exit(1)
+}
+const TEXTOS_INICIO = INICIO_POR_MODO[HERO_MODO].requeridos
 
 const PAGINAS = [
   {
@@ -49,6 +65,7 @@ const PAGINAS = [
       'Preguntas frecuentes',
       ...TEXTOS_INICIO,
     ],
+    textosProhibidos: INICIO_POR_MODO[HERO_MODO].prohibidos,
   },
   {
     archivo: 'cita-agendada.html',
@@ -82,7 +99,7 @@ const PAGINAS = [
   },
   {
     // C54: la guia del bono salio del modal y tiene pagina propia. Es la unica
-    // superficie donde los codigos de prestacion viven en los dos modos, asi
+    // superficie donde los codigos de prestacion viven en todos los modos, asi
     // que se exigen aqui: si desaparecieran, el paciente Fonasa se queda sin el
     // dato que necesita para comprar el bono.
     archivo: 'guia-bono-fonasa.html',
@@ -191,6 +208,13 @@ for (const pagina of PAGINAS) {
   for (const texto of pagina.textosRequeridos) {
     if (!html.includes(texto)) {
       console.error(`[prerender] ${pagina.archivo}: falta el texto canonico "${texto}"`)
+      errores += 1
+    }
+  }
+
+  for (const texto of pagina.textosProhibidos || []) {
+    if (html.includes(texto)) {
+      console.error(`[prerender] ${pagina.archivo}: sobrevive "${texto}" en modo ${HERO_MODO}`)
       errores += 1
     }
   }

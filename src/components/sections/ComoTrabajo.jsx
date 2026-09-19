@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
+import { AGENDA_CERRADA } from '../../lib/modalidades';
 import { PROCESO_TRABAJO, PROCESO_ONLINE } from '../../lib/proceso';
 
 /**
@@ -292,20 +293,22 @@ export default function ComoTrabajo() {
           </motion.p>
         </motion.div>
 
-        {/* CTA final */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-40px' }}
-          className="mt-12 flex justify-center"
-        >
-          <motion.div variants={item}>
-            <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
-              Agendar tu sesión
-            </Button>
+        {/* CTA final. C58: no existe con la agenda cerrada. */}
+        {!AGENDA_CERRADA && (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+            className="mt-12 flex justify-center"
+          >
+            <motion.div variants={item}>
+              <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
+                Agendar tu sesión
+              </Button>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        )}
       </div>
     </section>
   );

@@ -4,6 +4,7 @@ import Footer from './components/layout/Footer';
 import Button from './components/ui/Button';
 import RespiraVisor from './components/respira/RespiraVisor';
 import { RESPIRA_TEXTO } from './lib/respiraNucleo';
+import { AGENDA_CERRADA } from './lib/modalidades';
 
 /**
  * Respira conmigo (C24; visor extraído a componente compartido en el fixpack).
@@ -57,18 +58,20 @@ export default function RespiraApp() {
             {RESPIRA_TEXTO.seguridad}
           </p>
 
-          {/* Vía suave hacia agendar */}
-          <div className="mt-12 bg-offwhite rounded-2xl px-6 py-8 md:px-10 md:py-10 ring-1 ring-sage/15">
-            <p
-              className="font-body text-ink/80 mb-5"
-              style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '50ch' }}
-            >
-              {RESPIRA_TEXTO.puenteTexto}
-            </p>
-            <Button as="a" href="/#agendar" size="lg" variant="primary">
-              {RESPIRA_TEXTO.puenteCta}
-            </Button>
-          </div>
+          {/* Vía suave hacia agendar. C58: no existe con la agenda cerrada. */}
+          {!AGENDA_CERRADA && (
+            <div className="mt-12 bg-offwhite rounded-2xl px-6 py-8 md:px-10 md:py-10 ring-1 ring-sage/15">
+              <p
+                className="font-body text-ink/80 mb-5"
+                style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '50ch' }}
+              >
+                {RESPIRA_TEXTO.puenteTexto}
+              </p>
+              <Button as="a" href="/#agendar" size="lg" variant="primary">
+                {RESPIRA_TEXTO.puenteCta}
+              </Button>
+            </div>
+          )}
         </div>
       </main>
 

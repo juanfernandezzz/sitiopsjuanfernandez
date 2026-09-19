@@ -1,4 +1,4 @@
-import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
+import { EVENTO_PRINCIPAL, AGENDA_CERRADA } from '../../lib/modalidades';
 import React, { useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import { HERO } from '../../lib/hero';
@@ -179,42 +179,51 @@ export default function Hero() {
               {HERO.microcopia}
             </p>
 
-            <div
-              className="anim-rise mt-4 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
-              style={delay(370)}
-            >
-              <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
-                {HERO.ctaPrimario}
-              </Button>
-              <Button
-                size="lg"
-                variant="secondary"
-                as="a"
-                href={WA_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
+            {/* C58: en modo cerrada no hay CTAs (ctaPrimario null en
+                hero.js) y la fila entera desaparece, sin dejar hueco. */}
+            {HERO.ctaPrimario && (
+              <div
+                className="anim-rise mt-4 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+                style={delay(370)}
               >
-                {HERO.ctaSecundario}
-              </Button>
-            </div>
+                <Button size="lg" variant="primary" onClick={openTipoSesionModal}>
+                  {HERO.ctaPrimario}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  as="a"
+                  href={WA_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {HERO.ctaSecundario}
+                </Button>
+              </div>
+            )}
 
             {/* C54: la forma de pago va bajo el CTA primario, no junto al
                 precio. Arriba queda el monto (el dato que se busca antes de
                 decidir) y aca la fricción de pagar, que recién importa cuando
                 ya se está mirando el botón. */}
-            <p
-              className="anim-rise mt-3 font-body text-[15px] lg:text-[16px] text-ink/75"
-              style={delay(400)}
-            >
-              {HERO.lineaPago}
-            </p>
+            {HERO.lineaPago && (
+              <p
+                className="anim-rise mt-3 font-body text-[15px] lg:text-[16px] text-ink/75"
+                style={delay(400)}
+              >
+                {HERO.lineaPago}
+              </p>
+            )}
 
             {/* Píldora de disponibilidad en vivo. Va DESPUES del CTA, nunca
                 antes: así nunca empuja el botón primario bajo el pliegue en
-                móvil, se limite a lo que quede debajo. */}
-            <div className="anim-rise mt-3" style={delay(430)}>
-              <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="hero" />
-            </div>
+                móvil, se limite a lo que quede debajo. C58: con la agenda
+                cerrada no se monta, ni siquiera su marcador de posición. */}
+            {!AGENDA_CERRADA && (
+              <div className="anim-rise mt-3" style={delay(430)}>
+                <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="hero" />
+              </div>
+            )}
 
             {/* Ruta alternativa. Se queda DESPUES del CTA principal a
                 proposito: un enlace secundario sobre el boton competiria con

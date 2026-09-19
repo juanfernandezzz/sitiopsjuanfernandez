@@ -4,16 +4,19 @@
  * microcopia de precios y los chips de confianza viven SOLO aqui: editar este
  * archivo mueve el sitio en el mismo deploy y la app en el siguiente OTA.
  *
- * C54: el hero es conmutable. Hay dos variantes completas y HERO_MODO decide
- * cual se exporta como HERO. Los componentes consumen HERO y nunca preguntan
- * por el modo: la variante se resuelve aca, en tiempo de build, asi que el HTML
- * prerenderizado ya sale con una sola cara y no hay nada que decidir en el
- * navegador.
+ * C54: el hero es conmutable. Hay una variante completa por modo y HERO_MODO
+ * decide cual se exporta como HERO. Los componentes consumen HERO y nunca
+ * preguntan por el modo: la variante se resuelve aca, en tiempo de build, asi
+ * que el HTML prerenderizado ya sale con una sola cara y no hay nada que
+ * decidir en el navegador.
  *
  *   particular  la campana de sesion particular. Es la cara por defecto y la
  *               que queda si la Planilla no responde.
  *   fonasa      la campana de bono Fonasa. Recupera el orden anterior a C52:
  *               Fonasa primero, particular como ruta alternativa.
+ *   cerrada     C58. La agenda sin cupos de ingreso. No ofrece nada: sin CTAs,
+ *               sin precio y sin linea de pago. Los campos que no aplican van
+ *               en null y Hero.jsx no los renderiza.
  *
  * El modo NO dice si hay cupos. Eso lo decide INGRESO_FONASA_ABIERTO, que es
  * otro interruptor: el hero puede hablar de Fonasa mientras la tarjeta de
@@ -90,4 +93,40 @@ export const HERO_FONASA = {
   chips: [CHIP_PRIMERO, 'Inscrito en Fonasa', CHIP_ULTIMO],
 };
 
-export const HERO = HERO_MODO === 'fonasa' ? HERO_FONASA : HERO_PARTICULAR;
+/**
+ * Modo cerrada (C58). Dice una sola cosa: que la agenda esta cerrada. No
+ * promete fecha de reapertura porque no la hay. Sin CTA primario, sin boton de
+ * WhatsApp, sin precio y sin linea de pago: no se ofrece nada que reservar ni
+ * que pagar, y el precio sigue mas abajo, en Precios. El boton flotante de
+ * WhatsApp queda como el canal que ya existia, sin pasar a primer plano. Los
+ * chips son los del modo particular.
+ */
+export const HERO_CERRADA = {
+  ...COMUN,
+  sub: 'Mi agenda está cerrada y hoy no tengo horas para pacientes nuevos.',
+  microcopia: 'Si ya estás en tratamiento conmigo, tus sesiones siguen como siempre.',
+  ctaPrimario: null,
+  ctaSecundario: null,
+  lineaPago: null,
+  enlaceSecundario: null,
+  chips: HERO_PARTICULAR.chips,
+};
+
+/*
+ * Resolucion explicita, un modo por entrada. Nada cae en otra variante por
+ * descarte: un modo que no esta en esta tabla rompe el build en vez de
+ * mostrar la cara equivocada. No puede llegar uno desconocido desde la
+ * Planilla (scripts/estado-ingreso.mjs los descarta antes); esto cuida el dia
+ * en que alguien agregue un cuarto modo al script y olvide darle cara.
+ */
+const HERO_POR_MODO = {
+  particular: HERO_PARTICULAR,
+  fonasa: HERO_FONASA,
+  cerrada: HERO_CERRADA,
+};
+
+if (!HERO_POR_MODO[HERO_MODO]) {
+  throw new Error(`hero.js: el modo del hero '${HERO_MODO}' no tiene variante.`);
+}
+
+export const HERO = HERO_POR_MODO[HERO_MODO];

@@ -1,4 +1,4 @@
-import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
+import { EVENTO_PRINCIPAL, AGENDA_CERRADA } from '../../lib/modalidades';
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS, CAL_NAMESPACE, CAL_EMBED_CONFIG } from '../../lib/cal';
@@ -65,7 +65,75 @@ const EmbedSkeleton = () => (
   />
 );
 
+/*
+ * C58: con la agenda cerrada la seccion no ofrece nada: sin pestanas, sin
+ * calendario, sin modulo de disponibilidad. Se queda como un aviso corto y no
+ * desaparece del todo porque #agendar sigue vivo en anuncios viejos, marcadores
+ * y correos: quien llega por ahi lee que la agenda esta cerrada en vez de caer
+ * en la parte de arriba de la pagina sin explicacion. El enlace al
+ * consentimiento se queda para quien ya esta en tratamiento.
+ */
+function AgendaCerrada() {
+  return (
+    <section
+      className="relative bg-cream py-16 md:py-20 px-5 md:px-8"
+      aria-labelledby="agendar-heading"
+    >
+      <div className="mx-auto" style={{ maxWidth: 1080 }}>
+        <p
+          className="font-body uppercase text-sage"
+          style={{
+            fontSize: 13,
+            letterSpacing: '0.18em',
+            fontWeight: 600,
+            marginBottom: 14,
+          }}
+        >
+          Agenda
+        </p>
+        <h2
+          id="agendar-heading"
+          className="font-display text-ink"
+          style={{
+            fontSize: 'clamp(36px, 5vw, 56px)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.015em',
+            fontVariationSettings: '"opsz" 144, "SOFT" 50',
+            marginBottom: 18,
+            textWrap: 'balance',
+          }}
+        >
+          La agenda está cerrada
+        </h2>
+        <p
+          className="font-body text-ink/75"
+          style={{ fontSize: 18, lineHeight: 1.55, maxWidth: 620 }}
+        >
+          Hoy no tengo horas para pacientes nuevos.
+        </p>
+        <p
+          className="font-body text-ink/75"
+          style={{ fontSize: 14, marginTop: 24, lineHeight: 1.5 }}
+        >
+          Si ya estás en tratamiento conmigo, el consentimiento informado sigue{' '}
+          <a
+            href="/consentimiento.html"
+            className="text-sage underline decoration-sage/30 hover:decoration-sage underline-offset-2 transition-colors"
+          >
+            disponible aquí
+          </a>
+          .
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function Agendar() {
+  return AGENDA_CERRADA ? <AgendaCerrada /> : <AgendarAbierta />;
+}
+
+function AgendarAbierta() {
   const [selectedKey, setSelectedKey] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [showChooseWarning, setShowChooseWarning] = useState(false);

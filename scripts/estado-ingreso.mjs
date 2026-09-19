@@ -7,9 +7,10 @@
  *
  * LOS DOS INTERRUPTORES
  *   ingresoFonasaAbierto  booleano. Si el ingreso Fonasa acepta reservas.
- *   heroModo              'particular' o 'fonasa'. Que cara muestra el sitio,
- *                         segun cual de las dos campanas de Google Ads este
- *                         corriendo. Nunca las dos a la vez.
+ *   heroModo              'particular', 'fonasa' o 'cerrada'. Que cara muestra
+ *                         el sitio: una de las dos campanas de Google Ads (nunca
+ *                         las dos a la vez) o, desde C58, la agenda cerrada, en
+ *                         la que el sitio no ofrece ninguna reserva.
  * Son independientes: cada uno se valida y se escribe por su cuenta, y que uno
  * falle no impide que el otro se aplique.
  *
@@ -30,7 +31,7 @@
  *   fetch falla o da timeout -> no escribe -> versionado -> Fonasa cerrado, hero particular
  *   respuesta no es JSON     -> no escribe -> versionado -> Fonasa cerrado, hero particular
  *   el campo no es booleano  -> no escribe ESE campo -> Fonasa cerrado
- *   heroModo no es una de las dos cadenas -> no escribe ESE campo -> hero particular
+ *   heroModo no es una de las tres cadenas -> no escribe ESE campo -> hero particular
  *   valores validos          -> escribe esos valores
  * Las dos filas del medio son POR CAMPO: un campo invalido NO arrastra al otro.
  * Con ingresoFonasaAbierto true y heroModo "FONASA" el sitio queda con Fonasa
@@ -61,7 +62,7 @@ const TIEMPO_LIMITE_MS = 10000;
 
 // Unicos modos admitidos. Cualquier otra cadena se descarta y queda el valor
 // versionado: un modo desconocido dejaria el hero sin variante que resolver.
-const MODOS = ['particular', 'fonasa'];
+const MODOS = ['particular', 'fonasa', 'cerrada'];
 
 // C55: este aviso ya no afirma en que estado queda el sitio. Antes decia
 // siempre "se despliega con los valores versionados", y eso es falso cuando un
@@ -153,7 +154,7 @@ function aplicarModo(datos) {
   const modo = datos?.heroModo;
   if (typeof modo !== 'string' || !MODOS.includes(modo)) {
     aviso(
-      'La respuesta no trae heroModo como "particular" o "fonasa". Recibido: ' +
+      'La respuesta no trae heroModo como "particular", "fonasa" o "cerrada". Recibido: ' +
         JSON.stringify(modo)
     );
     return;

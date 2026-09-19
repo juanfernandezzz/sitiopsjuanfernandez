@@ -17,10 +17,11 @@
 import { PRECIOS } from './precios';
 import { OFERTA_FONASA_VISIBLE } from './modalidades';
 
-// C54: la respuesta de precios tiene dos caras, igual que el hero. En modo
+// C54: la respuesta de precios tiene dos caras. C58: el modo cerrada usa la
+// particular, porque OFERTA_FONASA_VISIBLE es false. En modo
 // particular no nombra el copago ni los codigos MLE: quien llega por un anuncio
 // de sesion particular no puede usar el bono, y ver el copago es justo lo que
-// hace pensar que si. La pregunta de como comprar el bono se queda en los dos
+// hace pensar que si. La pregunta de como comprar el bono se queda en todos los
 // modos, porque los pacientes Fonasa en tratamiento la siguen necesitando.
 const RESPUESTA_PRECIO = OFERTA_FONASA_VISIBLE
   ? `La primera sesión con bono Fonasa Modalidad Libre Elección tiene un copago de ${PRECIOS.fonasaCopago.display} para afiliados de tramos B, C y D, bajo los códigos 09 08 101, 09 08 102 y 09 08 103. La sesión particular cuesta ${PRECIOS.particular.display} y la pagas por transferencia o WebPay, después de la sesión. Misma duración y dedicación en ambos casos.`

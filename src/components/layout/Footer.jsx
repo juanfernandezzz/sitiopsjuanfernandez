@@ -6,7 +6,7 @@ import {
   FONASA_CODIGOS,
   URLS_EXTERNAS,
 } from '../../lib/contacto';
-import { OFERTA_FONASA_VISIBLE } from '../../lib/modalidades';
+import { OFERTA_FONASA_VISIBLE, AGENDA_CERRADA } from '../../lib/modalidades';
 
 /**
  * Footer compartido en sitio principal, consentimiento y politica-privacidad.
@@ -195,7 +195,7 @@ function ColumnaCredenciales() {
         )}
         {/* C54: los codigos de prestacion MLE solo se listan cuando la oferta
             Fonasa esta en pantalla. La inscripcion del prestador en MLE, que es
-            la credencial, se queda arriba en los dos modos: lo que sale es el
+            la credencial, se queda arriba en todos los modos: lo que sale es el
             dato operativo de compra del bono, que en modo particular no le
             sirve a nadie y sugiere una via que no esta abierta. Quien lo
             necesita lo tiene completo en la guia del bono. */}
@@ -252,8 +252,10 @@ function ColumnaContacto() {
           maxWidth: '30ch',
         }}
       >
-        Contenido breve sobre bienestar y psicología. Para agendar, escríbeme por
-        WhatsApp.
+        {/* C58: con la agenda cerrada no se invita a agendar por WhatsApp. */}
+        {AGENDA_CERRADA
+          ? 'Contenido breve sobre bienestar y psicología.'
+          : 'Contenido breve sobre bienestar y psicología. Para agendar, escríbeme por WhatsApp.'}
       </p>
       <div
         className="font-body"
@@ -286,11 +288,12 @@ function ColumnaContacto() {
           { label: 'Cómo trabajo', href: '/#como-trabajo' },
           { label: 'Sobre mí', href: '/#bio' },
           { label: 'Precios', href: '/#precios' },
-          { label: 'Agendar', href: '/#agendar' },
+          // C58: sin enlace Agendar con la agenda cerrada.
+          ...(AGENDA_CERRADA ? [] : [{ label: 'Agendar', href: '/#agendar' }]),
           { label: 'Preguntas frecuentes', href: '/#faq' },
           { label: 'Respira conmigo', href: '/respira' },
           // C54: la guia del bono salio del recorrido principal y vive aca, en
-          // los DOS modos. Los pacientes Fonasa en tratamiento la siguen
+          // TODOS los modos. Los pacientes Fonasa en tratamiento la siguen
           // usando aunque el ingreso este cerrado y el hero hable de particular.
           { label: 'Guía del bono Fonasa', href: '/guia-bono-fonasa.html' },
         ]}

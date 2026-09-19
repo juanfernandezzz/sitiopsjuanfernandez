@@ -3,7 +3,7 @@ import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { CAL_USERNAME, CAL_EVENTS } from '../../lib/cal';
 import { PRECIOS } from '../../lib/precios';
 import { SESIONES } from '../../lib/sesiones';
-import { OFERTA_FONASA_VISIBLE } from '../../lib/modalidades';
+import { OFERTA_FONASA_VISIBLE, AGENDA_CERRADA } from '../../lib/modalidades';
 import Button from '../ui/Button';
 import VeloSinCupos from '../ui/EtiquetaSinCupos';
 
@@ -169,14 +169,19 @@ export default function Precios() {
             </p>
 
             <div className="mt-auto flex flex-col gap-4">
-              <Button
-                calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular}`}
-                variant="primary"
-                size="lg"
-                className="w-full"
-              >
-                Agendar sesión particular
-              </Button>
+              {/* C58: con la agenda cerrada la tarjeta informa el precio y no
+                  ofrece reservar. El pago WebPay de abajo se queda: lo usan
+                  quienes ya estan en tratamiento. */}
+              {!AGENDA_CERRADA && (
+                <Button
+                  calLink={`${CAL_USERNAME}/${CAL_EVENTS.particular}`}
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                >
+                  Agendar sesión particular
+                </Button>
+              )}
 
               {/* Pago WebPay: form POST oficial. Sale directo a WebPay (sin
                   preventDefault) y abre en pestaña nueva para no perder el sitio.
@@ -290,7 +295,7 @@ export default function Precios() {
               </p>
 
               {/* C54: la guia del bono dejo de ser un modal y vive en su propia
-                  pagina, alcanzable desde el pie del sitio en los dos modos. */}
+                  pagina, alcanzable desde el pie del sitio en todos los modos. */}
               <a
                 href={GUIA_BONO_HREF}
                 className="font-body text-[15px] text-sage hover:text-[#2F4538] underline decoration-sage/30 hover:decoration-sage underline-offset-4 mb-5 self-start transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-cream rounded-sm"

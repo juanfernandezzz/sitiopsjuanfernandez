@@ -29,7 +29,7 @@
  *   dato no llegó o no es confiable, cae al mensaje sin fecha: nunca se inventa
  *   una hora.
  */
-import { EVENTO_PRINCIPAL } from '../../lib/modalidades';
+import { EVENTO_PRINCIPAL, AGENDA_CERRADA } from '../../lib/modalidades';
 import { useEffect, useRef } from 'react';
 import { CONTACTO } from '../../lib/contacto';
 import { ESTADOS, normalizar, mensajeWhatsApp, urlWhatsApp } from '../../lib/disponibilidad';
@@ -44,6 +44,11 @@ export default function AbrirWhatsAppDirecto({ children, evento = EVENTO_PRINCIP
   const destino = useRef(urlWhatsApp(CONTACTO.whatsappE164, mensajeWhatsApp(null)));
 
   useEffect(() => {
+    // C58: con la agenda cerrada el mensaje no nombra una hora disponible. Si
+    // Cal.com todavia mostrara el domingo (paso 2 sin hacer), el mensaje
+    // afirmaria una hora que el sitio declara cerrada. Queda el mensaje sin
+    // fecha y no se pide la disponibilidad.
+    if (AGENDA_CERRADA) return undefined;
     let vivo = true;
     cargarDisponibilidad().then((payload) => {
       if (!vivo) return;

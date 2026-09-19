@@ -25,8 +25,24 @@ import { HERO_MODO_PLANILLA } from './src/lib/estadoIngreso.js'
  * quitaron. Por eso el objeto de la oferta Fonasa incluye su coma final DENTRO
  * de la marca: al borrarse no puede dejar una coma colgando.
  */
+/*
+ * C58: que bloque de cabecera usa cada modo, uno por entrada y sin rama por
+ * descarte. 'cerrada' usa a proposito la cabecera particular: no tiene ningun
+ * CTA de reserva, solo el precio particular y la descripcion de la consulta,
+ * que siguen siendo ciertos con la agenda cerrada, y nada de Fonasa. Un modo
+ * que no este en la tabla rompe el build en vez de heredar una cabecera ajena.
+ */
+const CABECERA_POR_MODO = {
+  particular: 'particular',
+  fonasa: 'fonasa',
+  cerrada: 'particular',
+}
+
 function modoHero() {
-  const activo = HERO_MODO_PLANILLA === 'fonasa' ? 'fonasa' : 'particular'
+  const activo = CABECERA_POR_MODO[HERO_MODO_PLANILLA]
+  if (!activo) {
+    throw new Error(`vite.config.js: el modo del hero '${HERO_MODO_PLANILLA}' no tiene cabecera.`)
+  }
   const inactivo = activo === 'fonasa' ? 'particular' : 'fonasa'
   return {
     name: 'modo-hero-html',

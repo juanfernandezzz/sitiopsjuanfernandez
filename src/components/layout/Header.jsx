@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import HeaderAgendarMenu, { OpcionesAgendar } from './HeaderAgendarMenu';
+import { AGENDA_CERRADA } from '../../lib/modalidades';
 
 // C24: sin Framer Motion. El overlay y el panel del menú móvil viven siempre
 // en el DOM y animan con las clases mobile-overlay / mobile-panel (index.css):
 // transform + visibility con delay, así el cierre también anima y el panel
 // cerrado queda fuera del árbol de accesibilidad (visibility: hidden).
 
+// C58: con la agenda cerrada no hay enlace Agendar, ni botón de agendar, ni
+// opciones de sesión en el panel móvil.
 const NAV_ITEMS = [
   { label: 'Cómo trabajo', href: '#como-trabajo' },
   { label: 'Sobre mí', href: '#bio' },
   { label: 'Precios', href: '#precios' },
-  { label: 'Agendar', href: '#agendar' },
+  ...(AGENDA_CERRADA ? [] : [{ label: 'Agendar', href: '#agendar' }]),
 ];
 
 export default function Header() {
@@ -55,7 +58,7 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <HeaderAgendarMenu />
+            {!AGENDA_CERRADA && <HeaderAgendarMenu />}
             <button
               aria-label="Abrir menú"
               aria-expanded={mobileOpen}
@@ -107,15 +110,17 @@ export default function Header() {
             </a>
           ))}
         </nav>
-        <div className="mt-auto px-6 pb-8">
-          <p
-            className="font-display text-ink mb-3"
-            style={{ fontSize: 18, fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
-          >
-            Agenda tu sesión
-          </p>
-          <OpcionesAgendar onPick={() => setMobileOpen(false)} />
-        </div>
+        {!AGENDA_CERRADA && (
+          <div className="mt-auto px-6 pb-8">
+            <p
+              className="font-display text-ink mb-3"
+              style={{ fontSize: 18, fontVariationSettings: '"opsz" 144, "SOFT" 50' }}
+            >
+              Agenda tu sesión
+            </p>
+            <OpcionesAgendar onPick={() => setMobileOpen(false)} />
+          </div>
+        )}
       </aside>
     </>
   );

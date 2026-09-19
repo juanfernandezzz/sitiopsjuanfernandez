@@ -2,9 +2,14 @@
  * Interruptores comerciales del sitio. C54: son DOS, y son independientes.
  *
  *   INGRESO_FONASA_ABIERTO  si el ingreso Fonasa acepta reservas nuevas.
- *   HERO_MODO               que cara muestra el sitio, 'particular' o 'fonasa',
- *                           segun cual de las dos campanas de Google Ads este
- *                           corriendo. Nunca corren las dos a la vez.
+ *   HERO_MODO               que cara muestra el sitio: 'particular', 'fonasa'
+ *                           o 'cerrada'. Los dos primeros siguen a la campana
+ *                           de Google Ads que este corriendo (nunca corren las
+ *                           dos a la vez). C58: 'cerrada' es la agenda sin
+ *                           cupos de ingreso. El sitio no ofrece ninguna
+ *                           reserva y manda por encima del ingreso Fonasa: con
+ *                           la agenda cerrada no se ofrece Fonasa aunque su
+ *                           celda diga TRUE.
  *
  * Los dos se leen de estadoIngreso.js, que scripts/estado-ingreso.mjs
  * sobrescribe en cada build con lo que dice la hoja Sitio web de la Planilla.
@@ -53,7 +58,30 @@
  *      del sitio en silencio.
  *
  * PARA CAMBIAR LA CARA DEL SITIO: la celda "Modo del hero" de la misma hoja,
- * con 'particular' o 'fonasa'. Un solo cambio de celda, sin commit.
+ * con 'particular', 'fonasa' o 'cerrada'. Un solo cambio de celda, sin commit.
+ *
+ * PARA CERRAR LA AGENDA (C58): son DOS pasos y solo el primero lo hace el
+ * codigo.
+ *   1. Poner 'cerrada' en la celda "Modo del hero". El sitio se reconstruye
+ *      solo y deja de ofrecer reservas: sin CTA de agendar, sin modulos de
+ *      disponibilidad, sin boton en la tarjeta de Precios, sin opciones de
+ *      agendar en el encabezado, y la seccion Agendar pasa a decir que la
+ *      agenda esta cerrada. El boton flotante de WhatsApp se queda.
+ *   2. Entrar a Cal.com, abrir el horario "Horas ingresos" y apagar el
+ *      domingo. Este paso es MANUAL. Ese horario lo comparten las primeras
+ *      sesiones de las dos modalidades, asi que un solo interruptor las cierra
+ *      a las dos. OCULTAR EL EVENTO NO BASTA: C53 ya comprobo que un evento
+ *      oculto sigue aceptando reservas por enlace directo y por embed. Lo que
+ *      hay que quitar es la disponibilidad, no la visibilidad.
+ * Si se hace solo el paso 1, el sitio dice que la agenda esta cerrada pero
+ * Cal.com la sigue abriendo: quien tenga el enlace directo de
+ * 'primera-sesion' (un correo antiguo, un marcador, la pagina publica de
+ * Cal.com) reserva el domingo igual.
+ * Este interruptor solo controla lo que el sitio DICE, nunca lo que Cal.com
+ * ACEPTA.
+ * Para reabrir se deshace en el orden inverso: primero se vuelve a encender el
+ * domingo en "Horas ingresos" y despues se cambia la celda, para que el sitio
+ * nunca ofrezca una hora que Cal.com todavia no muestra.
  */
 export { INGRESO_FONASA_ABIERTO_PLANILLA as INGRESO_FONASA_ABIERTO } from './estadoIngreso';
 export { HERO_MODO_PLANILLA as HERO_MODO } from './estadoIngreso';
@@ -80,6 +108,17 @@ export const EVENTO_PRINCIPAL = INGRESO_FONASA_ABIERTO_PLANILLA
  * particular, y el copago es lo primero que hace pensar que se puede usar el
  * bono. Lo que NO depende de esto: la certificacion de la plataforma por
  * Fonasa y la inscripcion del prestador en MLE, que son senales de confianza
- * validas para todos y se quedan en los dos modos.
+ * validas para todos y se quedan en todos los modos.
+ *
+ * C58: con 'cerrada' da false, que es lo buscado: la agenda cerrada no pone
+ * Fonasa en primer plano, igual que el modo particular.
  */
 export const OFERTA_FONASA_VISIBLE = HERO_MODO_PLANILLA === 'fonasa';
+
+/**
+ * C58: agenda cerrada. Cuando es true ninguna superficie ofrece reservas: cada
+ * CTA de agendar, cada modulo de disponibilidad y cada enlace a Cal.com
+ * pregunta por esto y no se renderiza. Con la agenda cerrada EVENTO_PRINCIPAL
+ * no lo consume ninguna superficie visible.
+ */
+export const AGENDA_CERRADA = HERO_MODO_PLANILLA === 'cerrada';

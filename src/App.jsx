@@ -1,4 +1,4 @@
-import { EVENTO_PRINCIPAL } from './lib/modalidades'
+import { EVENTO_PRINCIPAL, AGENDA_CERRADA } from './lib/modalidades'
 import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 // C31 fix pack: react-floating-whatsapp incrusta ~196 KB de imagenes en base64
 // dentro de su modulo. Cargarlo diferido lo saca del bundle critico; como el
@@ -218,6 +218,8 @@ function AppShell() {
   // window.open(cal.com) en pestaña nueva, así que la ruta de booking nunca
   // queda inerte.
   useEffect(() => {
+    // C58: con la agenda cerrada no hay nada que abrir en Cal.com.
+    if (AGENDA_CERRADA) return
     let loaded = false
     const loadCal = async () => {
       if (loaded) return
@@ -258,18 +260,24 @@ function AppShell() {
         <LazySection id="como-trabajo" minHeight={1100}><ComoTrabajo /></LazySection>
         <LazySection id="bio" minHeight={620}><SobreMi /></LazySection>
         <LazySection id="precios" minHeight={900}><Precios /></LazySection>
-        <LazySection id="agendar" minHeight={980}><Agendar /></LazySection>
+        {/* C58: con la agenda cerrada la seccion es un aviso corto, mucho mas
+            bajo que el calendario: la altura reservada lo acompana. */}
+        <LazySection id="agendar" minHeight={AGENDA_CERRADA ? 320 : 980}><Agendar /></LazySection>
         <LazySection id="respira" minHeight={760}><Respira /></LazySection>
         <LazySection id="faq" minHeight={560}><FAQ /></LazySection>
       </main>
 
       <Footer />
 
-      <Suspense fallback={null}>
-        <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
-      </Suspense>
+      {/* C58: con la agenda cerrada no queda ningun boton que abra el modal,
+          y tampoco se monta: ninguna via de reserva sobrevive en el navegador. */}
+      {!AGENDA_CERRADA && (
+        <Suspense fallback={null}>
+          <ModalTipoSesion open={isTipoSesionOpen} onClose={closeTipoSesionModal} />
+        </Suspense>
+      )}
 
-      {pasoElHero && !agendarEnVista && (
+      {!AGENDA_CERRADA && pasoElHero && !agendarEnVista && (
         <ModuloDisponibilidad evento={EVENTO_PRINCIPAL} variante="barra" />
       )}
 

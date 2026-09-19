@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Button from '../ui/Button';
 import { useUI } from '../../lib/uiContext';
+import { AGENDA_CERRADA } from '../../lib/modalidades';
 import { SOBRE_MI } from '../../lib/sobreMi';
 import { CREDENCIALES } from '../../lib/credenciales';
 
@@ -159,16 +160,19 @@ export default function SobreMi() {
                 </li>
               ))}
             </ul>
-            <div className="mt-7 pt-6 border-t border-ink/10">
-              <Button
-                size="md"
-                variant="secondary"
-                onClick={openTipoSesionModal}
-                className="w-full"
-              >
-                Agendar tu sesión
-              </Button>
-            </div>
+            {/* C58: no existe con la agenda cerrada. */}
+            {!AGENDA_CERRADA && (
+              <div className="mt-7 pt-6 border-t border-ink/10">
+                <Button
+                  size="md"
+                  variant="secondary"
+                  onClick={openTipoSesionModal}
+                  className="w-full"
+                >
+                  Agendar tu sesión
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>

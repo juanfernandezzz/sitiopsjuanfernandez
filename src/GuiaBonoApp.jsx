@@ -2,7 +2,7 @@ import HeaderUtilitario from './components/layout/HeaderUtilitario';
 import Footer from './components/layout/Footer';
 import { PRESTADOR, CONTACTO, FONASA_CODIGOS } from './lib/contacto';
 import { PRECIOS } from './lib/precios';
-import { INGRESO_FONASA_ABIERTO } from './lib/modalidades';
+import { INGRESO_FONASA_ABIERTO, AGENDA_CERRADA } from './lib/modalidades';
 
 /**
  * Guía del Bono Web de Fonasa, en página propia (C54).
@@ -12,7 +12,7 @@ import { INGRESO_FONASA_ABIERTO } from './lib/modalidades';
  *   FAQ. Eso la ponía en medio del recorrido de venta de quien llega por un
  *   anuncio de sesión particular, que no puede usar el bono. Aquí es una página
  *   de apoyo: la usan los pacientes Fonasa que ya están en tratamiento, se
- *   enlaza desde el pie del sitio en los dos modos del hero, y es alcanzable
+ *   enlaza desde el pie del sitio en todos los modos del hero, y es alcanzable
  *   siempre, sin importar si el ingreso Fonasa está abierto.
  *
  * POR QUE NO DEPENDE DEL MODO
@@ -22,8 +22,12 @@ import { INGRESO_FONASA_ABIERTO } from './lib/modalidades';
  *   aunque el resto del sitio los oculte.
  *
  * LO UNICO QUE SI MIRA UN INTERRUPTOR es el cierre: con el ingreso cerrado no
- * ofrece agendar una primera sesión Fonasa que no existe.
+ * ofrece agendar una primera sesión Fonasa que no existe. C58: con la agenda
+ * cerrada tampoco, aunque la celda del ingreso Fonasa diga TRUE. El resto de la
+ * página se queda igual.
  */
+
+const RESERVA_FONASA = INGRESO_FONASA_ABIERTO && !AGENDA_CERRADA;
 
 const WA_MENSAJE = encodeURIComponent(
   'Hola Juan, tengo una duda sobre la compra del bono Fonasa.'
@@ -229,20 +233,20 @@ export default function GuiaBonoApp() {
               className="font-body text-ink/80 mb-5"
               style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '52ch' }}
             >
-              {INGRESO_FONASA_ABIERTO
+              {RESERVA_FONASA
                 ? 'Con el bono comprado y el folio a mano, ya puedes reservar tu hora.'
                 : 'El ingreso con bono Fonasa está sin cupos por ahora: sigo atendiendo con bono a quienes ya están en tratamiento. Si es tu caso y algo del trámite no te calza, escríbeme y lo vemos.'}
             </p>
             <div className="flex flex-wrap gap-4 items-center">
               <a
-                href={INGRESO_FONASA_ABIERTO ? '/#agendar' : WA_HREF}
-                {...(INGRESO_FONASA_ABIERTO
+                href={RESERVA_FONASA ? '/#agendar' : WA_HREF}
+                {...(RESERVA_FONASA
                   ? {}
                   : { target: '_blank', rel: 'noopener noreferrer' })}
                 className="inline-flex items-center justify-center bg-terracotta-deep text-offwhite font-body font-medium rounded-full px-6 py-3 transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-light focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite"
                 style={{ fontSize: 15 }}
               >
-                {INGRESO_FONASA_ABIERTO
+                {RESERVA_FONASA
                   ? 'Agendar mi sesión ahora'
                   : 'Escribirme por WhatsApp'}
               </a>

@@ -7,9 +7,12 @@
  * Vite, y sobrescribe este archivo con los valores de la Planilla.
  *
  *   INGRESO_FONASA_ABIERTO_PLANILLA  si el ingreso Fonasa acepta reservas.
- *   HERO_MODO_PLANILLA               que cara muestra el sitio: 'particular' o
- *                                    'fonasa'. Es la campana de Google Ads que
- *                                    esta corriendo, nunca las dos a la vez.
+ *   HERO_MODO_PLANILLA               que cara muestra el sitio: 'particular',
+ *                                    'fonasa' o 'cerrada'. Los dos primeros son
+ *                                    la campana de Google Ads que esta
+ *                                    corriendo, nunca las dos a la vez. C58:
+ *                                    'cerrada' es la agenda sin cupos de
+ *                                    ingreso, y el sitio no ofrece reservas.
  *
  * SON INDEPENDIENTES A PROPOSITO
  * heroModo 'fonasa' con ingresoFonasaAbierto false es un estado valido, y es
