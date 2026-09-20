@@ -210,6 +210,8 @@ Dos números tienen que moverse **juntos**, o el módulo de disponibilidad y el 
 
 ### Apps Script (único paso manual)
 
+**C60: el proyecto de Apps Script de la Planilla es una fuente de verdad que este repo no controla y hoy tiene más código que el que ves acá. Ver [`apps-script/README.md`](apps-script/README.md) antes de asumir que cualquier `.gs` de esta carpeta refleja lo que corre en producción.**
+
 Los dos scripts (`apps-script/limitador.gs`, `apps-script/crearHorasFijas.gs`) no tienen ruta de despliegue automatizable: requeriría `clasp` y OAuth de Google. Se instalan a mano:
 
 1. Entrar a [script.google.com](https://script.google.com) y abrir el proyecto **existente** del limitador (no crear uno nuevo: el disparador temporal ya está asociado a ese proyecto).

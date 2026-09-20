@@ -12,7 +12,13 @@
  *                           celda diga TRUE.
  *
  * Los dos se leen de estadoIngreso.js, que scripts/estado-ingreso.mjs
- * sobrescribe en cada build con lo que dice la hoja Sitio web de la Planilla.
+ * sobrescribe en cada build con lo que dice la hoja Sitio web de la Planilla,
+ * a traves del Web App de Apps Script publicado en esa hoja (hoy Version 3).
+ * Apps Script sirve la version PUBLICADA, no el codigo guardado: si alguien
+ * edita ese script y solo lo guarda, sin hacer Implementar > Nueva
+ * implementacion, el build sigue leyendo la version anterior sin avisar. Mas
+ * detalle del proyecto de Apps Script, que este repo no controla, en
+ * apps-script/README.md.
  * Que sean independientes es a proposito: HERO_MODO 'fonasa' con
  * INGRESO_FONASA_ABIERTO false es un estado valido y es exactamente como estaba
  * el sitio antes de C52 (el hero habla de Fonasa y la tarjeta dice sin cupos).
