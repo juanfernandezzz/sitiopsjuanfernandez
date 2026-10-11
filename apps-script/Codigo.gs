@@ -84,7 +84,8 @@ const COLOR = {
   alerta: '#FBE9E7', alertaTexto: '#B03A2E',
   media: '#FDF3E3', mediaTexto: '#8A5A16',
   ok: '#E8EFE9', okTexto: '#2F4638',
-  tenue: '#777777'
+  tenue: '#777777',
+  pasadaFondo: '#f3f3f3', pasadaTexto: '#999999'
 };
 
 const COLUMNAS = ['Nombre', 'Periodicidad', 'Modalidad', 'Día', 'Hora',
@@ -185,6 +186,23 @@ function traerReservas_(estado, extras) {
   }
   throw new Error('Cal.com devolvió más de 25 páginas de reservas ' + estado +
     '. Las hojas no se tocaron.');
+}
+
+/**
+ * C61: reservas canceladas con inicio en el pasado, para el aviso "¿Sigues atendiendo?".
+ * Devuelve null si Cal.com no acepta 'cancelled' como estado: el aviso cae entonces
+ * a la rama B (hueco temporal) en vez de tumbar la actualizacion.
+ */
+function traerCanceladas_(desde) {
+  try {
+    const ahora = Date.now();
+    return traerReservas_('cancelled', { afterStart: desde }).filter(function (r) {
+      return new Date(r.start || r.startTime).getTime() < ahora;
+    });
+  } catch (e) {
+    Logger.log('Canceladas no disponibles, se usa el hueco temporal: ' + String(e).slice(0, 200));
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------- utilidades */
@@ -404,7 +422,8 @@ function actualizar() {
   const hf = calcularHorasFijas_(cfg, roster, alias, proximas, pasadas);
   const agenda = calcularAgenda_(cfg, alias, rosterPorClave, proximas.concat(pasadas), hf.vigente);
   const indice = indicePersonas_(alias, proximas, pasadas);
-  const avisos = calcularAvisos_(cfg, roster, hf, agenda, indice);
+  const canceladas = traerCanceladas_(hace180);
+  const avisos = calcularAvisos_(cfg, roster, hf, agenda, indice, alias, proximas, canceladas);
 
   // 2. Escribir.
   escribirAvisos_(avisos);
@@ -535,13 +554,32 @@ function calcularAgenda_(cfg, alias, rosterPorClave, reservas, vigente) {
   const dentro = {};
   dias.forEach(function (d) { dentro[d] = true; });
 
+  // C61: una semana hacia atras, en gris, para ver lo que acaba de pasar sin
+  // abrir el calendario. Si alguna vez se quieren dos, esto se sube a la hoja
+  // Configuración junto al resto de los umbrales.
+  const SEMANAS_ATRAS = 1;
+  // Solo se DIBUJA: sus dias no entran en dias, conteo ni fonasa, que alimentan
+  // Carga por día, Sobrecupo y el tope Fonasa. Sus celdas van en el mismo mapa
+  // porque las claves llevan la fecha completa.
+  const previas = [], dentroPrev = {}, fonasaPrev = {};
+  for (let k = SEMANAS_ATRAS; k >= 1; k--) {
+    const l = new Date(lunes.getTime() - k * 7 * 86400000);
+    const ds = [];
+    for (let i = 0; i < 7; i++) {
+      const d = fmt_(new Date(l.getTime() + i * 86400000), 'yyyy-MM-dd');
+      ds.push(d); dentroPrev[d] = true;
+    }
+    previas.push({ lunes: l, dias: ds });
+  }
+
   const celdas = {}, conteo = {}, fonasa = {}, particular = {};
   let minHora = 23, maxHora = 0, hubo = false;
 
   reservas.forEach(function (r) {
     const inicio = new Date(r.start || r.startTime);
     const dia = fmt_(inicio, 'yyyy-MM-dd');
-    if (!dentro[dia]) return;
+    const esPrev = !!dentroPrev[dia];
+    if (!dentro[dia] && !esPrev) return;
     const nombre = nombreAsistente_(r);
     if (!nombre) return;
     const hora = Number(fmt_(inicio, 'HH'));
@@ -557,9 +595,13 @@ function calcularAgenda_(cfg, alias, rosterPorClave, reservas, vigente) {
     const k = dia + '|' + hora;
     if (!celdas[k]) celdas[k] = { texto: texto, tipo: tipo };
     else celdas[k].texto += ' / ' + texto;
-    conteo[dia] = (conteo[dia] || 0) + 1;
-    if (modalidad === 'Fonasa') fonasa[dia] = (fonasa[dia] || 0) + 1;
-    else particular[dia] = (particular[dia] || 0) + 1;
+    if (esPrev) {
+      if (modalidad === 'Fonasa') fonasaPrev[dia] = (fonasaPrev[dia] || 0) + 1;
+    } else {
+      conteo[dia] = (conteo[dia] || 0) + 1;
+      if (modalidad === 'Fonasa') fonasa[dia] = (fonasa[dia] || 0) + 1;
+      else particular[dia] = (particular[dia] || 0) + 1;
+    }
     if (hora < minHora) minHora = hora;
     if (hora > maxHora) maxHora = hora;
     hubo = true;
@@ -596,13 +638,19 @@ function calcularAgenda_(cfg, alias, rosterPorClave, reservas, vigente) {
     fonasaSemana.push(n);
   }
 
+  previas.forEach(function (p) {
+    p.fonasa = 0;
+    p.dias.forEach(function (d) { p.fonasa += (fonasaPrev[d] || 0); });
+  });
+
   return { lunes: lunes, dias: dias, horas: horas, celdas: celdas, conteo: conteo,
-           fonasa: fonasa, particular: particular, fonasaSemana: fonasaSemana, libres: libres };
+           fonasa: fonasa, particular: particular, fonasaSemana: fonasaSemana, libres: libres,
+           previas: previas };
 }
 
 /* ------------------------------------------------------- calculo: avisos */
 
-function calcularAvisos_(cfg, roster, hf, agenda, indice) {
+function calcularAvisos_(cfg, roster, hf, agenda, indice, alias, proximas, canceladas) {
   const avisos = [];
   const hoy = new Date();
   const dia = 86400000;
@@ -618,6 +666,37 @@ function calcularAvisos_(cfg, roster, hf, agenda, indice) {
       'Le quedan ' + s.restantes + '. Vuelve a agendar la serie en Cal.com antes de esa fecha.']);
   });
 
+  // 1b. C61: semanales y quincenales sin hora la proxima semana cuando les toca.
+  // Deliberadamente NO se deduplica contra "Serie por vencer": la misma persona puede
+  // salir en las dos filas, y una fila de mas molesta pero una ausente cuesta una sesion.
+  const lunesSig = new Date(agenda.lunes.getTime() + 7 * dia);
+  const diasSig = {};
+  for (let i = 0; i < 6; i++) diasSig[fmt_(new Date(lunesSig.getTime() + i * dia), 'yyyy-MM-dd')] = true;
+  const conReserva = {};
+  proximas.forEach(function (r) {
+    if (!_reservaVivaBH_(r) || !diasSig[fmt_(new Date(r.start || r.startTime), 'yyyy-MM-dd')]) return;
+    const n = nombreAsistente_(r);
+    if (n) conReserva[claveDeCal_(n, alias)] = true;
+  });
+  const letraSig = paridadDe_(lunesSig, cfg.anclaFecha);
+  roster.forEach(function (p) {
+    if (conReserva[p.clave]) return;
+    const s = hf.vigente[p.clave];
+    const quincenal = (s ? s.periodicidad : p.periodicidadDrive) === 'Quincenal';
+    if (quincenal) {
+      // La letra sale de la serie vigente o, sin ella, de su ultima sesion. Sin ninguna
+      // reserva no se puede inventar: esa persona ya figura Pendiente en Horas fijas.
+      const e = indice[p.clave];
+      const letra = s ? s.paridad : (e && e.ultima ? paridadDe_(new Date(e.ultima), cfg.anclaFecha) : '');
+      if (!letra || letra !== letraSig) return;
+    }
+    avisos.push([P.alta, 'Alta', 'Sin agenda la próxima semana',
+      s ? (p.nombre + ', ' + s.dia + ' ' + s.hora + ' (' + s.etiqueta + ')') : p.nombre,
+      fmt_(lunesSig, 'dd-MM-yyyy'),
+      'No tiene hora reservada para la semana del ' + fmt_(lunesSig, 'dd-MM') +
+      '. Agenda su serie en Cal.com.']);
+  });
+
   // 2. Abandono probable.
   roster.forEach(function (p) {
     const e = indice[p.clave];
@@ -630,6 +709,48 @@ function calcularAvisos_(cfg, roster, hf, agenda, indice) {
       avisos.push([P.media, 'Media', 'Posible discontinuación', p.nombre,
         fmt_(new Date(e.ultima), 'dd-MM-yyyy'),
         'Sin sesión hace ' + dias + ' días y sin ninguna agendada. Considera mover su carpeta a Anteriores.']);
+    }
+  });
+
+  // 2b. C61: "¿Sigues atendiendo?". La carpeta ya esta en Actuales por definicion (el roster
+  // sale de ahi), asi que no hace falta mirar Anteriores.
+  // RAMA A (canceladas != null): la ausencia es un dato duro, una reserva cancelada con
+  // inicio pasado, posterior a la ultima sesion realizada y sin ninguna futura.
+  // RAMA B (canceladas == null, Cal.com no entrego el estado 'cancelled'): hueco temporal
+  // acotado, con texto ambiguo a proposito. Ya cubierta la serie por vencer sin filtro
+  // extra: esa persona tiene sesion futura y sale antes por "futuras > 0".
+  // Comprobado en vivo el 11-10-2026: traerReservas_('past') NO incluye canceladas (298
+  // accepted, ninguna cancelled), pero traerReservas_('cancelled', { afterStart }) SI
+  // funciona (156 en 180 dias, 140 con inicio pasado). Queda implementada la RAMA A. La B
+  // solo corre si ese estado deja de responder: el registro dira "Canceladas no disponibles".
+  const cancPor = {};
+  (canceladas || []).forEach(function (r) {
+    const n = nombreAsistente_(r);
+    if (!n) return;
+    const k = claveDeCal_(n, alias);
+    (cancPor[k] || (cancPor[k] = [])).push(new Date(r.start || r.startTime).getTime());
+  });
+  roster.forEach(function (p) {
+    const e = indice[p.clave];
+    if (e && e.futuras > 0) return;
+    const dias = (e && e.ultima) ? Math.floor((hoy.getTime() - e.ultima) / dia) : null;
+    // A partir de diasAbandono ya habla "Posible discontinuación": nunca las dos filas.
+    if (dias !== null && dias >= cfg.diasAbandono) return;
+    const quien = p.nombre + ', ' + ((e && e.ultima)
+      ? 'última sesión ' + fmt_(new Date(e.ultima), 'dd-MM-yyyy') : 'sin sesiones realizadas') +
+      ' (' + p.periodicidadDrive + ')';
+    if (canceladas) {
+      const n = (cancPor[p.clave] || []).filter(function (t) { return t > ((e && e.ultima) || 0); }).length;
+      if (!n) return;
+      avisos.push([P.media, 'Media', '¿Sigues atendiendo?', quien, '',
+        'Tiene ' + n + ' sesión(es) cancelada(s) y ninguna futura. ' +
+        'Su carpeta sigue en Actuales: decide si sigue o muévela a Anteriores.']);
+    } else {
+      const cadencia = p.periodicidadDrive === 'Semanal' ? 7 : 14;
+      if (dias === null || dias <= cadencia + 2) return;
+      avisos.push([P.media, 'Media', '¿Sigues atendiendo?', quien, '',
+        'Sin sesión futura y la última fue hace ' + dias + ' días, más de lo que indica su periodicidad. ' +
+        'Su carpeta sigue en Actuales: confirma si sigue o si fue solo que no le has reagendado.']);
     }
   });
 
@@ -745,12 +866,21 @@ function escribirAgenda_(a) {
                 COLOR.otraTexto, COLOR.otraTexto, COLOR.otraTexto];
   const semanas = Math.floor(a.dias.length / 7);
 
+  // C61: primero las semanas pasadas (se pintan en gris al final), despues las de siempre.
+  const bloques = a.previas.map(function (p) {
+    return { lunes: p.lunes, dias: p.dias, fonasa: p.fonasa };
+  });
   for (let w = 0; w < semanas; w++) {
-    const diasSemana = a.dias.slice(w * 7, w * 7 + 6);
+    bloques.push({ lunes: new Date(a.lunes.getTime() + w * 7 * 86400000),
+                   dias: a.dias.slice(w * 7, w * 7 + 7), fonasa: a.fonasaSemana[w] });
+  }
+
+  bloques.forEach(function (b) {
+    const diasSemana = b.dias.slice(0, 6);
     titulos.push(valores.length + 1);
-    valores.push(['Semana del ' + fmt_(new Date(a.lunes.getTime() + w * 7 * 86400000), 'dd-MM') +
-      ' al ' + fmt_(new Date(a.lunes.getTime() + (w * 7 + 5) * 86400000), 'dd-MM') +
-      '   ·   ' + a.fonasaSemana[w] + ' sesiones Fonasa', '', '', '', '', '', '']);
+    valores.push(['Semana del ' + fmt_(b.lunes, 'dd-MM') +
+      ' al ' + fmt_(new Date(b.lunes.getTime() + 5 * 86400000), 'dd-MM') +
+      '   ·   ' + b.fonasa + ' sesiones Fonasa', '', '', '', '', '', '']);
     fondos.push(blanco.slice()); textos.push(gris.slice());
     pesos.push(['bold', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal']);
 
@@ -783,7 +913,7 @@ function escribirAgenda_(a) {
     valores.push(['', '', '', '', '', '', '']);
     fondos.push(blanco.slice()); textos.push(gris.slice());
     pesos.push(['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal']);
-  }
+  });
 
   const rango = hoja.getRange(1, 1, valores.length, 7);
   rango.setNumberFormat('@');
@@ -803,6 +933,8 @@ function escribirAgenda_(a) {
     .setBackground(COLOR.otraFondo).setFontColor(COLOR.otraTexto);
   hoja.getRange(ley, 4).setValue('Crema: slot quincenal libre')
     .setBackground(COLOR.libreFondo).setFontColor(COLOR.libreTexto);
+  hoja.getRange(ley, 5).setValue('Gris claro: semana pasada')
+    .setBackground(COLOR.pasadaFondo).setFontColor(COLOR.pasadaTexto);
   hoja.getRange(ley + 1, 1, 1, 7).merge().setValue(
     'Códigos: SF semanal Fonasa, SP semanal particular, QA-F y QB-F quincenal Fonasa en semana A o B, ' +
     'QA-P y QB-P quincenal particular. "Libre QB" significa que ese día y hora está libre en las semanas B.'
@@ -815,6 +947,13 @@ function escribirAgenda_(a) {
   // 'Horarios protegidos'. Va al final, sobre la grilla ya escrita, y solo
   // pinta celdas vacias. Nunca lanza: ver horarios-protegidos.gs.
   pintarProtegidos_(hoja);
+
+  // C61: la semana pasada va en gris de una sola pasada y DESPUES de pintarProtegidos_,
+  // que si no volveria a poner morado encima. Costo aceptado: en una semana ya ocurrida
+  // la distincion fija, primera, resto no sirve para decidir nada, es historia.
+  const filasBloque = 3 + a.horas.length;
+  hoja.getRange(1, 1, a.previas.length * filasBloque - 1, 7)
+    .setBackground(COLOR.pasadaFondo).setFontColor(COLOR.pasadaTexto);
 }
 
 function escribirCarga_(cfg, a) {

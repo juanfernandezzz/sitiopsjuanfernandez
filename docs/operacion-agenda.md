@@ -101,6 +101,8 @@ Se eligió texto y no color porque la cuadrícula ya usa tres fondos (hora fija,
 |---|---|---|
 | Alta | Serie recurrente por vencer | Sin reagendar, esa persona se queda sin hora. No se recupera después |
 | Alta | Reserva de hora fija sin carpeta en Actuales | Esa persona figura como Pendiente sin serlo, y se corre riesgo de agendarla dos veces |
+| Alta | Sin agenda la próxima semana | Semanal, o quincenal en su letra, sin hora reservada. Puede repetir a quien sale en Serie por vencer, a propósito |
+| Media | ¿Sigues atendiendo? | Faltó a una sesión o lleva un hueco mayor que su periodicidad y su carpeta sigue en Actuales. Es una pregunta, no un vencimiento |
 | Media | Posible discontinuación | Sin sesión futura y con la última hace más días que el umbral. Sugiere mover la carpeta a Anteriores |
 | Media | Sobrecupo | Más sesiones que el tope de ese día. No siempre es un error: a veces es deliberado |
 | Media | Tope semanal Fonasa excedido | Deja menos espacio del previsto para particulares |
@@ -113,18 +115,18 @@ Se eligió texto y no color porque la cuadrícula ya usa tres fondos (hora fija,
 
 Once parámetros. Los seis topes diarios los leen **los dos** sistemas: la planilla para calcular la carga y el limitador para bloquear días en el calendario.
 
-| Parámetro | Valor al cierre de C51 |
+| Parámetro | Valor en vivo al 11-10-2026 |
 |---|---|
-| Tope de sesiones el lunes | 5 |
-| Tope de sesiones el martes | 4 |
-| Tope de sesiones el miércoles | 4 |
-| Tope de sesiones el jueves | 4 |
+| Tope de sesiones el lunes | 6 |
+| Tope de sesiones el martes | 5 |
+| Tope de sesiones el miércoles | 5 |
+| Tope de sesiones el jueves | 5 |
 | Tope de sesiones el viernes | 6 |
 | Tope de sesiones el sábado | 3 |
 | Tope semanal de sesiones Fonasa | 20 |
 | Semanas visibles en la agenda | 5 |
 | Días sin actividad para sugerir Anteriores | 21 |
-| Avisar cuando a una serie le queden N sesiones o menos | 2 |
+| Avisar cuando a una serie le queden N sesiones o menos | 1 |
 | Lunes ancla de la paridad quincenal | 2026-01-05 |
 
 El tope semanal Fonasa cuenta **todas** las sesiones Fonasa de la semana, no solo las de hora fija: primera sesión, control y avance, pareja y hora fija. La capacidad total semanal que suman los seis topes diarios es 26, así que 20 de Fonasa dejan 6 para particulares.
